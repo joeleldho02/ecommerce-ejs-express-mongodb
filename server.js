@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const nocache = require("nocache");
+const session = require('express-session');
+const { v4:uuidv4 } = require('uuid');
+
 const connectDB = require('./server/database/connection');
 
 const multer  = require('multer');
@@ -28,6 +31,12 @@ app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(session({
+    secret: uuidv4(), 
+    cookie: {maxAge:600000},
+    saveUninitialized: true
+}))
+
 app.set("view engine", "ejs");
 app.set('views', [
     path.join(__dirname, 'views'), 
@@ -41,6 +50,9 @@ app.use("/css", express.static(path.join(__dirname, "public/css")));
 app.use("/js", express.static(path.join(__dirname, "public/js")));
 app.use("/img", express.static(path.join(__dirname, "public/img")));
 app.use("assets/", express.static(path.join(__dirname, "public/assets")));
+app.use("/user/assets", express.static(path.join(__dirname, "public/assets")));
+app.use("/assets2", express.static(path.join(__dirname, "public/assets2")));
+app.use("/admin/assets2", express.static(path.join(__dirname, "public/assets2")));
 
 app.use('/', homeRouter);
 app.use('/user', userRouter);
