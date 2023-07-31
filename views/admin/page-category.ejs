@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Product Management</title>
+    <title>Category Management</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,9 +12,9 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets2/imgs/theme/favicon.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
     <!-- Template CSS -->
-    <link href="assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/datatable.css">
 
@@ -25,7 +25,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="/admin" class="brand-wrap">
-                <img src="assets2/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                <img src="/assets2/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -38,7 +38,7 @@
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item active">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
@@ -48,7 +48,7 @@
                         <span class="text">Orders</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item active">
                     <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-stars"></i>
                         <span class="text">Category</span> </a>
                 </li>
@@ -129,10 +129,13 @@
         <section class="content-main">
             <div class="content-header">
                 <div>
-                    <p>Manage all your products here.</p>
+                    <p>Manage product category here.</p>
                 </div>
                 <div>
-                    <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Add Product</a>
+                    <a href="/admin/add-category" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"
+                        data-modaltitle="Add new category" data-btnaction="add">
+                        <i class="material-icons md-plus"></i> Add Category
+                    </a>
                 </div>
             </div>
             <!-- Begin Page Content -->
@@ -140,7 +143,7 @@
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex">
-                        <h6 class="my-auto font-weight-bold text-primary">Product Management</h6>
+                        <h6 class="my-auto font-weight-bold text-primary">Category Management</h6>
                         <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
                             <select class="form-select">
                                 <option selected>All category</option>
@@ -155,47 +158,54 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Product Name</th>
-                                        <th>Description</th>
                                         <th>Category</th>
-                                        <th>Sale Price</th>
-                                        <th>Stock</th>
-                                        <th>Image</th>
+                                        <th>Description</th>
+                                        <th>List</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>Product Name</th>
-                                        <th>Description</th>
                                         <th>Category</th>
-                                        <th>Sale Price</th>
-                                        <th>Stock</th>
-                                        <th>Image</th>
+                                        <th>Description</th>
+                                        <th>List</th>
                                         <th>Action</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
-                                    <% for (let i = 0; i < products.length; i++) { %>
+                                <% if (locals.categories) { %>
+                                    
+                                    <% for (let i = 0; i < categories.length; i++) { %>
                                         <tr>
-                                          <td><%= products[i].productName %></td>
-                                          <td><%= products[i].description %></td>
-                                          <td><%= products[i].category %></td>
-                                          <td><%= products[i].salePrice %></td>
-                                          <td><%= products[i].quantity %></td>
-                                          <td><%= products[i].images[0] %></td>
+                                          <td><%= categories[i].categoryName %></td>
+                                          <td><%= categories[i].description %></td>
+                                          <td>                                               
+                                            <% if(categories[i].isListed){ %>
+                                                <span class="badge rounded-pill alert-success">Visible</span>
+                                            <% } else{ %>  
+                                                <span class="badge rounded-pill alert-danger">Unlisted</span>
+                                            <% } %>  
+                                          </td>
                                           <td>
                                             <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
-                                                <a class="ms-2" href="/admin/edit-product/<%= products[i]._id %>">
-                                                    <span class="material-icons md-edit iconbtn" title="Edit <%= products[i].productName %>">
-                                                        <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
-                                                    </span>
-                                                </a>
-                                                <form id="hidden-form-<%= i %>" action="/admin/delete-product" method="POST" style="display: none;">
-                                                  <input type="hidden" name="userID" value="<%= products[i]._id %>" />
+                                                <a class="ms-2 edit_button"
+                                                        data-bs-toggle="modal" data-bs-target="#myModal" 
+                                                        data-btnaction="edit"
+                                                        data-modaltitle="Edit category"
+                                                        data-id="<%= categories[i]._id %>"
+                                                        data-categoryname="<%= categories[i].categoryName %>"
+                                                        data-description="<%= categories[i].description %>"
+                                                        data-islisted="<%= categories[i].isListed %>"
+                                                        >
+                                                        <span class="material-icons md-edit iconbtn" title="Edit <%= categories[i].categoryName %>">
+                                                            <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                        </span>
+                                                    </a>
+                                                <form id="hidden-form-<%= i %>" action="/admin/delete-category" method="POST" style="display: none;">
+                                                  <input type="hidden" name="categoryID" value="<%= categories[i]._id %>" />
                                                 </form>
-                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= products[i].productName %>')">
-                                                    <span class=" material-icons md-delete_forever" title="Delete <%= products[i].productName %>">
+                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= categories[i].categoryName %>')">
+                                                    <span class=" material-icons md-delete_forever" title="Delete <%= categories[i].categoryName %>">
                                                         <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
                                                     </span>
                                                 </a>
@@ -203,6 +213,7 @@
                                           </td>
                                         </tr>    
                                        <% } %>
+                                    <% }  %>
                                 </tbody>
                             </table>
                         </div>
@@ -210,9 +221,48 @@
                 </div>
             </div>
             <!-- /.container-fluid -->   
-                    
-            
         </section> <!-- content-main end// -->
+        <!-- Modal for Edit button -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Edit category details</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <form name="modalForm" id="modalForm" method="post" action="/admin/edit-category">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input type="hidden" class="form-control edit-id" name="id" >
+                            </div>
+                            <div class="form-group w-100">
+                                <label for="firstName">Category Name</label>
+                                <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" required>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="email">Description</label>
+                                <input class="form-control edit-description" name="description" placeholder="Enter description">
+                            </div>  
+                            <div class="form-group mt-3">
+                                <label for="phone">List</label>
+                                <div class="form-control form-switch">
+                                    <input class="form-check-input ms-3" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                                </div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="phone">List</label>
+                                <input class="form-control edit-islisted" name="isListed" placeholder="Is listed" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- End of Modal for Edit button -->
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -244,12 +294,44 @@
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
             $('#dataTable').DataTable();
-        });    
+        });
+    
         function confirmDelete(formID, name) {
-            if (confirm(`Are you sure to delete the product ${name}?`)) {
+            if (confirm(`Are you sure to delete the category '${name}'?`)) {
                 document.getElementById(formID).submit();
             }
         }
+        $(document).on( "click", '.edit_button',function(e) {
+            const id = $(this).data('id');
+            const categoryName = $(this).data('categoryname');
+            const description = $(this).data('description');
+            const isListed = $(this).data('islisted');
+
+            $(".edit-id").val(id);
+            $(".edit-categoryname").val(categoryName);
+            $(".edit-description").val(description);
+            $(".edit-islisted").val(isListed);
+        });
+
+        $('#myModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget); // Button that triggered the modal
+
+            let btnAction = button.data('btnaction');
+            let title = button.data('modaltitle');
+            let recipient = button.data('categoryname') || "";             
+            let modal = $(this);
+            modal.find('.modal-title').text(title + " " + recipient);
+
+            if( btnAction === "add" ) {  
+                $('#modalForm').attr('action', '/admin/add-category');
+            }
+            else if( btnAction === "edit" ) {
+                $('#modalForm').attr('action', '/admin/edit-category');
+            }
+        })
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#categoryName').trigger('focus')
+        })
     </script>
 </body>
 

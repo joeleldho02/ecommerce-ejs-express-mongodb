@@ -105,7 +105,8 @@ exports.updateUser = (req, res) => {
             }
             else {
                 //res.send(data);   
-                const msg = "User details updated successfully!"
+                const msg = "User details updated successfully!";
+                console.log(msg);
                 res.redirect('/admin/customers');
             }
         })
@@ -158,7 +159,7 @@ exports.addProduct = async (req, res) => {
     console.log(req.body);
     if (!req.body) {
         console.log("Product data not submitted");
-        res.redirect('/user/login');
+        res.redirect('/admin/products');
     }
     else {
         const newProduct = new Productdb({
@@ -319,6 +320,132 @@ exports.deleteProduct = (req, res) => {
         .catch(err => {
             res.status(500).render('error', {
                 message: "Unable to delete product. Error deleting product from Database",
+                errStatus : 500,
+                error:{stack:err.message || ""}
+            });
+        });
+};
+
+
+
+//add new category to DB
+exports.addCategory = async (req, res) => {
+    console.log(req.body);
+    if (!req.body) {
+        console.log("Category data not submitted");
+        res.redirect('/admin/category');
+    }
+    else {
+        const newCategory = new Categorydb({
+            categoryName: req.body.categoryName,
+            description: req.body.description,
+            isListed: req.body.isListed
+        })
+        newCategory.save()
+            .then(data => {
+                console.log("Added new category: " + data)
+                //res.redirect('back');
+                res.redirect('/admin/category');
+            })
+            .catch(err => {
+                res.status(500).render('error', {
+                    message: "Unable to add category to database",
+                    errStatus : 500,
+                    error:{stack: err.message}
+                });
+            });
+    }
+}
+//find and retrieve all category(s) to display in table
+exports.getCategory = (req, res) => {
+    Categorydb.find({},{
+        categoryName: 1,
+        description: 1,
+        isListed: 1
+    })
+        .collation({locale: "en"})
+        .sort({ categoryName: 1 }).lean()
+        .then(data => {
+            console.log("Data received: " + data);
+            res.render('page-category', {
+                categories: data,
+                //alertMsg: req.query.status
+            });
+        })
+        .catch(err => {
+            res.status(400).render('error', {
+                message: "Unable to retrieve data from database",
+                errStatus : 400,
+                error:{stack: err.message || ""}
+            });
+        });
+    // }
+};
+//update category by category id in db
+exports.updateCategory = (req, res) => {
+    if (!req.body) {
+        return res.status(500).render('error', {
+            message: err.message || "Data to update cannot be empty"
+        });
+    }
+    const id = req.body.id;
+    const user = new Categorydb({
+        categoryName: req.body.categoryName,
+        description: req.body.description,
+        isListed: req.body.isListed,
+        updatedAt: Date.now(),
+        _id: id
+    })
+    Categorydb.findByIdAndUpdate(id, user)
+        .then(data => {
+            if (!data) {
+                res.status(500).render('error', {
+                    message: "Unable to update category",
+                    errStatus : 500,
+                    error:{stack: err.message || ""}
+                });
+            }
+            else {
+                //res.send(data);   
+                const msg = "Category updated successfully!"
+                res.redirect('/admin/category');
+            }
+        })
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Error updating category in Database",
+                errStatus : 500,
+                error:{stack: err.message || ""}
+            });
+        });
+};
+//delete category with specified categoryID from DB
+exports.deleteCategory = (req, res) => {
+    if (!req.body) {
+        return res.status(500).render('error', {
+            message: "Category ID to delete cannot be empty",
+            errStatus : 500,
+            error:{stack:""}
+        });
+    }
+    const id = req.body.categoryID;
+    Categorydb.findByIdAndDelete(id)
+        .then(data => {
+            if (!data) {
+                res.status(500).render('error', {
+                    message: "Unable to delete category. Category not found!",
+                    errStatus : 500,
+                    error:{stack:""}
+                });
+            }
+            else {
+                console.log("Delete succes: " + data);
+                res.redirect('/admin/category');
+            }
+        })
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Unable to delete category. Error deleting category from Database",
                 errStatus : 500,
                 error:{stack:err.message || ""}
             });

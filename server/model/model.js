@@ -64,9 +64,18 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    list:{
+    description: String,
+    isListed:{
         type: Boolean,
         required: true
+    },
+    createdAt: {
+        type: Date,
+        default: () => Date.now()
+    },
+    updatedAt:{
+        type: Date,
+        default: () => Date.now()
     }
 });
 const Categorydb = mongoose.model('category', categorySchema);

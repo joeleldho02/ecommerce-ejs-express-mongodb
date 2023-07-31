@@ -36,9 +36,15 @@ router.post('/delete-product', adminController.deleteProduct);
 //------- CUSTOMERS --------//
 router.get('/customers', adminController.getUsers);
 
-router.post('/edit-user', adminController.updateUser);
-
+router.post('/edit-user', adminController.updateUser); 
 router.post('/delete-user', adminController.deleteUser);
+
+//------- CUSTOMERS --------//
+router.get('/category', adminController.getCategory);
+
+router.post('/add-category', adminController.addCategory);
+router.post('/edit-category', adminController.updateCategory);
+router.post('/delete-category', adminController.deleteCategory);
 
 
 

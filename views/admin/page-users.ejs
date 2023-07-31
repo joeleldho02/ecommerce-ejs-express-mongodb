@@ -159,6 +159,7 @@
                                         </tr>
                                     </tfoot>
                                     <tbody>
+                                      <% if (locals.categories) { %>
                                         <% for (let i = 0; i < users.length; i++) { %>
                                             <tr>
                                               <td><%= users[i].firstName + " " + users[i].lastName %></td>
@@ -198,6 +199,7 @@
                                               </td>
                                             </tr>    
                                            <% } %>
+                                        <% } %>
                                     </tbody>
                                 </table>
                             </div>
@@ -207,7 +209,7 @@
                 <!-- /.container-fluid -->       
         </section> <!-- content-main end// -->
         <!-- Modal for Edit button -->
-<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
