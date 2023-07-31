@@ -12,10 +12,11 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets2/imgs/theme/favicon.svg">
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
     <!-- Template CSS -->
-    <link href="assets2/css/main.css" rel="stylesheet" type="text/css" />
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/datatable.css">
 </head>
 
@@ -47,14 +48,18 @@
                         <span class="text">Orders</span>
                     </a>
                 </li>
-                <li class="menu-item active">
-                    <a class="menu-link" href="/admin/customers"> <i class="icon material-icons md-monetization_on"></i>
-                        <span class="text">Customers</span>
-                    </a>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Category</span> </a>
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
                         <span class="text">Brands</span> </a>
+                </li>
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/customers"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Customers</span>
+                    </a>
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/coupons"> <i class="icon material-icons md-comment"></i>
@@ -110,7 +115,7 @@
                         <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
                     </li>
                     <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="assets2/imgs/people/avatar2.jpg" alt="User"></a>
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/assets2/imgs/people/avatar2.jpg" alt="User"></a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                             <a class="dropdown-item" href="/admin/profile"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
                             <a class="dropdown-item" href="/admin/settings"><i class="material-icons md-settings"></i>Account Settings</a>
@@ -138,55 +143,124 @@
                                     <thead>
                                         <tr>
                                             <th>Name</th>
-                                            <th>Position</th>
-                                            <th>Office</th>
-                                            <th>Age</th>
-                                            <th>Start date</th>
-                                            <th>Salary</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
                                         <tr>
                                             <th>Name</th>
-                                            <th>Position</th>
-                                            <th>Office</th>
-                                            <th>Age</th>
-                                            <th>Start date</th>
-                                            <th>Salary</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
-                                        <tr>
-                                            <td>Tiger Nixon</td>
-                                            <td>System Architect</td>
-                                            <td>Edinburgh</td>
-                                            <td>61</td>
-                                            <td>2011/04/25</td>
-                                            <td>$320,800</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Garrett Winters</td>
-                                            <td>Accountant</td>
-                                            <td>Tokyo</td>
-                                            <td>63</td>
-                                            <td>2011/07/25</td>
-                                            <td>$170,750</td>
-                                        </tr>
-                                    
+                                        <% for (let i = 0; i < users.length; i++) { %>
+                                            <tr>
+                                              <td><%= users[i].firstName + " " + users[i].lastName %></td>
+                                              <td><%= users[i].email %></td>
+                                              <td><%= users[i].phone %></td>
+                                              <td>                                               
+                                                <% if(users[i].isActive){ %>
+                                                    <span class="badge rounded-pill alert-success">Active</span>
+                                                <% } else{ %>  
+                                                    <span class="badge rounded-pill alert-danger">Inactive</span>
+                                                <% } %>  
+                                              </td>
+                                              <td>
+                                                <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
+                                                    <a class="ms-2 edit_button"
+                                                        data-bs-toggle="modal" data-bs-target="#myModal" 
+                                                        data-id="<%= users[i]._id %>"
+                                                        data-firstname="<%= users[i].firstName %>"
+                                                        data-lastname="<%= users[i].lastName %>"
+                                                        data-email="<%= users[i].email %>"
+                                                        data-phone="<%= users[i].phone %>"
+                                                        data-isactive="<%= users[i].isActive %>"
+                                                        >
+                                                        <span class="material-icons md-edit iconbtn" title="Edit <%= users[i].firstName %>">
+                                                            <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                        </span>
+                                                    </a>
+                                                    <form id="hidden-form-<%= i %>" action="/admin/delete-user" method="POST" style="display: none;">
+                                                      <input type="hidden" name="userID" value="<%= users[i]._id %>" />
+                                                    </form>
+                                                    <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= users[i].firstName %>')">
+                                                        <span class=" material-icons md-delete_forever" title="Delete <%= users[i].firstName %>">
+                                                            <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                        </span>
+                                                    </a> 
+                                                </div>
+                                              </td>
+                                            </tr>    
+                                           <% } %>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- /.container-fluid -->             
+                <!-- /.container-fluid -->       
         </section> <!-- content-main end// -->
+        <!-- Modal for Edit button -->
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Edit user details</h4>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <form method="post" action="/admin/edit-user">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="hidden" class="form-control edit-id" name="id" >
+                    </div>
+                    <div class="form-group d-flex mt-1" style="column-gap: 20px;">
+                        <div class="form-group w-100">
+                            <label for="firstName">First Name</label>
+                            <input class="form-control edit-firstname" id="modalFname" name="firstName" placeholder="Enter first name" required>
+                        </div>
+                        <div class="form-group w-100">
+                            <label for="lastName">Last Name</label>
+                            <input class="form-control edit-lastname" name="lastName" placeholder="Enter last name">
+                        </div>
+                    </div>   
+                    <div class="form-group mt-3">
+                        <label for="email">Email</label>
+                        <input class="form-control edit-email" name="email" placeholder="Enter email" required>
+                    </div>                 
+                    <div class="form-group mt-3">
+                        <label for="phone">Phone</label>
+                        <input class="form-control edit-phone" name="phone" placeholder="Enter phone" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="phone">Status</label>
+                        <div class="form-control form-switch">
+                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="phone">Status</label>
+                        <input class="form-control edit-isactive" name="isActive" placeholder="Is Active" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End of Modal for Edit button -->
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
-                    <script>
-                    document.write(new Date().getFullYear())
-                    </script> © JMJ Music House
+                    2023 © JMJ Music House
                 </div>
                 <div class="col-sm-6">
                     <div class="text-sm-end">
@@ -197,12 +271,12 @@
         </footer>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="assets2/js/vendors/bootstrap.bundle.min.js"></script>
-    <script src="assets2/js/vendors/select2.min.js"></script>
-    <script src="assets2/js/vendors/perfect-scrollbar.js"></script>
-    <script src="assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets2/js/vendors/select2.min.js"></script>
+    <script src="/assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
-    <script src="assets2/js/main.js" type="text/javascript"></script>
+    <script src="/assets2/js/main.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Page level plugins -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -210,9 +284,42 @@
     <!-- Page level custom scripts -->
     <script>
         // Call the dataTables jQuery plugin
-$(document).ready(function() {
-  $('#dataTable').DataTable();
-});
+        $(document).ready(function() {
+            $('#dataTable').DataTable();
+        });
+
+        function confirmDelete(formID, name) {
+            if (confirm(`Are you sure to delete the user ${name}?`)) {
+                document.getElementById(formID).submit();
+            }
+        }
+        $(document).on( "click", '.edit_button',function(e) {
+            const id = $(this).data('id');
+            const firstName = $(this).data('firstname');
+            const lastName = $(this).data('lastname');
+            const email = $(this).data('email');
+            const phone = $(this).data('phone');
+            const isActive = $(this).data('isactive');
+
+            $(".edit-id").val(id);
+            $(".edit-firstname").val(firstName);
+            $(".edit-lastname").val(lastName);
+            $(".edit-email").val(email);
+            $(".edit-phone").val(phone);
+            $(".edit-isactive").val(isActive);
+        });
+
+        $('#myModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget); // Button that triggered the modal
+            let recipient = button.data('firstname'); // Extract info from data-* attributes
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            let modal = $(this);
+            modal.find('.modal-title').text('Edit details of ' + recipient);
+        })
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#modalFname').trigger('focus')
+        })
     </script>
 </body>
 

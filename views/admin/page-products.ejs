@@ -33,7 +33,7 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item">
+                <li class="menu-item ">
                     <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
@@ -49,13 +49,17 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/customers"> <i class="icon material-icons md-monetization_on"></i>
-                        <span class="text">Customers</span>
-                    </a>
+                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Category</span> </a>
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
                         <span class="text">Brands</span> </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/customers"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Customers</span>
+                    </a>
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/coupons"> <i class="icon material-icons md-comment"></i>
@@ -128,7 +132,7 @@
                     <p>Manage all your products here.</p>
                 </div>
                 <div>
-                    <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Create new</a>
+                    <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Add Product</a>
                 </div>
             </div>
             <!-- Begin Page Content -->
@@ -137,57 +141,68 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex">
                         <h6 class="my-auto font-weight-bold text-primary">Product Management</h6>
-                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
+                        <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
                             <select class="form-select">
                                 <option selected>All category</option>
-                                <!-- Add Category list as for loop here to create options -->
                                 <option>Electronics</option>
                                 <option>Clothes</option>
                                 <option>Automobile</option>
                             </select>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Position</th>
-                                        <th>Office</th>
-                                        <th>Age</th>
-                                        <th>Start date</th>
-                                        <th>Salary</th>
+                                        <th>Product Name</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Sale Price</th>
+                                        <th>Stock</th>
+                                        <th>Image</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Position</th>
-                                        <th>Office</th>
-                                        <th>Age</th>
-                                        <th>Start date</th>
-                                        <th>Salary</th>
+                                        <th>Product Name</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Sale Price</th>
+                                        <th>Stock</th>
+                                        <th>Image</th>
+                                        <th>Action</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
-                                    <tr>
-                                        <td>Tiger Nixon</td>
-                                        <td>System Architect</td>
-                                        <td>Edinburgh</td>
-                                        <td>61</td>
-                                        <td>2011/04/25</td>
-                                        <td>$320,800</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Garrett Winters</td>
-                                        <td>Accountant</td>
-                                        <td>Tokyo</td>
-                                        <td>63</td>
-                                        <td>2011/07/25</td>
-                                        <td>$170,750</td>
-                                    </tr>
-                                
+                                    <% for (let i = 0; i < products.length; i++) { %>
+                                        <tr>
+                                          <td><%= products[i].productName %></td>
+                                          <td><%= products[i].description %></td>
+                                          <td><%= products[i].category %></td>
+                                          <td><%= products[i].salePrice %></td>
+                                          <td><%= products[i].quantity %></td>
+                                          <td><%= products[i].images[0] %></td>
+                                          <td>
+                                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
+                                                <a class="ms-2" href="/admin/edit-product/<%= products[i]._id %>">
+                                                    <span class="material-icons md-edit iconbtn" title="Edit <%= products[i].productName %>">
+                                                        <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                    </span>
+                                                </a>
+                                                <form id="hidden-form-<%= i %>" action="/admin/delete-product" method="POST" style="display: none;">
+                                                  <input type="hidden" name="userID" value="<%= products[i]._id %>" />
+                                                </form>
+                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= products[i].productName %>')">
+                                                    <span class=" material-icons md-delete_forever" title="Delete <%= products[i].productName %>">
+                                                        <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                          </td>
+                                        </tr>    
+                                       <% } %>
                                 </tbody>
                             </table>
                         </div>
@@ -227,9 +242,21 @@
     <!-- Page level custom scripts -->
     <script>
         // Call the dataTables jQuery plugin
-$(document).ready(function() {
-  $('#dataTable').DataTable();
-});
+        $(document).ready(function() {
+            $('#dataTable').DataTable();
+        });
+        var filteredData = table
+            .column( 4 )
+            .data()
+            .filter( function ( value, index ) {
+                return value > 20 ? true : false;
+        } );
+    
+        function confirmDelete(formID, name) {
+            if (confirm(`Are you sure to delete the product ${name}?`)) {
+                document.getElementById(formID).submit();
+            }
+        }
     </script>
 </body>
 

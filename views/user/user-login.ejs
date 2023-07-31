@@ -438,12 +438,15 @@
                 </div>
             </div>
         </div>
-        <section class="pt-150 pb-150">
+        <section class="pt-50 pb-50">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-10 m-auto">
-                        <div class="row">
-                            <div class="col-lg-5">
+                        <div class="row">                    
+                            <div class="col-lg-5 m-auto">
+                                <% if (locals.errorMsg) { %>
+                                    <p class="m-auto text-center mb-2"><%= errorMsg %> </p>
+                                <%} %>  
                                 <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
                                     <div class="padding_eight_all bg-white">
                                         <div class="heading_s1">
@@ -467,10 +470,6 @@
                                         </form>
                                     </div>
                                 </div>
-                            </div>       
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-6 rounded-5 overflow-hidden m-auto">
-                                <img class="w-75 border-radius-10" src="https://static.toiimg.com/thumb/resizemode-4,width-1200,height-900,msid-80482252/80482252.jpg">
                             </div>                     
                         </div>
                     </div>

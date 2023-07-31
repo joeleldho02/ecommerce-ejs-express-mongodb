@@ -14,9 +14,9 @@ async function setSession(req, res){
                 delete req.session.loginOTP;
                 delete req.session.loginErr;
                 req.session.userLoggedIn = true;
-                req.session.loggedUser = user;
+                req.session.user = user;
                 req.session.isAdmin = false;
-                console.log(`User Logged in Succesfully : ${req.session.loggedUser.firstName + req.session.loggedUser.firstName}`)
+                console.log(`User Logged in Succesfully : ${req.session.user.firstName + req.session.user.firstName}`)
                 res.redirect('/user');
             }
             else {
@@ -49,8 +49,6 @@ async function sendOTP(phone){
     // .catch(err=>console.log(err));
     return hashedOtp;
 }
-
-
 
 //User signup after email duplicate check and then add to db
 exports.registerUser = async (req, res) => {
@@ -87,7 +85,6 @@ exports.registerUser = async (req, res) => {
             });
     }
 };
-
 async function addUserDetails(req, res) {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = new Userdb({
@@ -134,9 +131,7 @@ exports.userLogin = async function(req, res){
        }
    }catch(err){
        console.log("Login Error: " + err);
-       req.session.loginErr = true;
-       req.session.loginErrMsg = err;
-       res.redirect('/user/login')
+       res.render('user-login',{ errorMsg: err });
    }
 };
 
@@ -151,13 +146,17 @@ exports.loginAuthenticate = (body) => {
                 .then(user => {
                     console.log(user);
                     if (user !== null) {
-                        bcrypt.compare(body.password, user.password)
+                        if(user.isActive){
+                            bcrypt.compare(body.password, user.password)
                             .then((status) => {
                                 if (status)
                                     resolve(user);
                                 else
                                     reject("Password is incorrect!");
-                            })
+                                });
+                            }
+                        else
+                            reject("User is blocked by the administrator! Kindly contact customer support for further details.");
                     }
                     else {
                         reject("No user found!");

@@ -1,0 +1,311 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <% if (locals.product) { %>
+            Edit <%= product.productName %>
+        <% } else { %>
+            Add Product
+        <% } %>
+    </title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/upload-image.css">
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="/admin" class="brand-wrap">
+                <img src="assets2/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/orders"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Category</span> </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Brands</span> </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/customers"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Customers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/coupons"> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Coupons</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/banners"> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Banners</span>
+                    </a>
+                </li>                
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/sales"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Sales Report</span>
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <ul class="menu-aside">
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/settings"> <i class="icon material-icons md-settings"></i>
+                        <span class="text">Settings</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/logout"> <i class="icon material-icons md-exit_to_app"></i>
+                        <span class="text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+            <br>
+            <br>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <h2 class="h2 my-0 py-0">Products Management </h2>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon" href="#">
+                            <i class="material-icons md-notifications animation-shake"></i>
+                            <span class="badge rounded-pill">3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#" > <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/assets2/imgs/people/avatar2.jpg" alt="User"></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            <a class="dropdown-item" href="/admin/profile"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                            <a class="dropdown-item" href="/admin/settings"><i class="material-icons md-settings"></i>Account Settings</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <section class="content-main">
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex">
+                        <h6 class="my-auto font-weight-bold text-primary">
+                            <% if (locals.product) { %>
+                                Edit Product Details
+                            <% } else { %>
+                                Enter Product Details
+                            <% } %>
+                        </h6>                        
+                    </div>
+                    <div class="card-body">
+                    <form name="signupForm" id="signupForm" class="login-form px-md-5" 
+                        <% if (locals.product) { %>
+                            method='POST' action="/admin/edit-product">
+                        <% } else { %>
+                            method='POST' action="/admin/add-product">
+                        <% } %>
+                        <% if (locals.product) { %>
+                            <div class="form-group">
+                                <input type="hidden" id="productID" name="productID" class="form-control" value="<%= product._id %>" >
+                            </div>
+                        <% } %>
+                        <div class="form-group finput d-flex">
+                            <div class="icon d-flex align-items-center justify-content-center">
+                                <span class="fa fa-user"></span>
+                            </div>
+                            <input type="text" class="form-control my-2 mx-2" id="productName" name="productName"
+                                placeholder="Name" 
+                                <% if (locals.product) { %>
+                                    value="<%= product.productName %>"
+                                <% } %>
+                            />
+                            <div class="error"></div>
+                        </div>
+                        <div class="form-group finput d-flex mt-3">
+                            <div class="icon d-flex align-items-center justify-content-center">
+                                <span class="fa fa-phone"></span>
+                            </div>
+                            <textarea class="form-control  my-2 mx-2" id="description" name="description"
+                                placeholder="Description"><% if (locals.product) { %><%= product.description %><%} %></textarea>
+                            <div class="error" ></div>
+                        </div>                        
+                        <div class=" d-flex align-items-center justify-content-between" style="column-gap: 20px;"> 
+                            <div class="form-group d-flex w-25 mt-4">
+                                <div class="icon me-2 d-flex align-items-center justify-content-center">
+                                    <span class="fa fa-envelope"></span>
+                                </div>
+                                <select class="form-select form-control" id="category" name="category">
+                                    <% if (locals.product) { %>
+                                        <option selected><%= product.category %></option>
+                                    <% } else { %>
+                                        <option selected>All category</option>
+                                    <% } %> 
+                                    <!-- Add Category list as for loop here to create options -->
+                                    <option>Arranger</option>
+                                    <option>Workstation</option>
+                                    <option>Stage</option>
+                                </select>
+                            </div>
+                            <div class="form-group finput d-flex mt-3 ">
+                                <div class="icon d-flex align-items-center justify-content-center">
+                                    <span class="fa fa-envelope"></span>
+                                </div>
+                                <input type="text" class="form-control my-2 mx-2" id="brand" name="brand"
+                                    placeholder="Brand" 
+                                    <% if (locals.product) { %>
+                                        value="<%= product.brand %>"
+                                    <% } %>
+                                />
+                                <div class="error"></div>
+                            </div>
+                            <div class="form-group finput d-flex mt-3 ">
+                                <div class="icon d-flex align-items-center justify-content-center">
+                                    <span class="fa fa-envelope"></span>
+                                </div>
+                                <input type="text" class="form-control my-2 mx-2" id="regularPrice" name="regularPrice"
+                                    placeholder="Regular price" 
+                                    <% if (locals.product) { %>
+                                        value="<%= product.regularPrice %>"
+                                    <% } %>
+                                />
+                                <div class="error"></div>
+                            </div>
+                            <div class="form-group finput d-flex mt-3" >
+                                <div class="icon d-flex align-items-center justify-content-center">
+                                    <span class="fa fa-lock"></span>
+                                </div>
+                                <input type="text" class="form-control my-2 mx-2" id="salePrice" name="salePrice"
+                                    placeholder="Sale price" 
+                                    <% if (locals.product) { %>
+                                        value="<%= product.salePrice %>"
+                                    <% } %>
+                                />
+                                <div class="error"></div>
+                            </div>
+                            <div class="form-group finput d-flex mt-3" >
+                                <div class="icon d-flex align-items-center justify-content-center">
+                                    <span class="fa fa-lock"></span>
+                                </div>
+                                <input type="text" class="form-control my-2 mx-2" id="quantity" name="quantity"
+                                    placeholder="Enter quantity" 
+                                    <% if (locals.product) { %>
+                                        value="<%= product.quantity %>"
+                                    <% } %>
+                                />
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group finput d-flex mt-3" >
+                            <div class="icon d-flex align-items-center justify-content-center">
+                                <span class="fa fa-lock"></span>
+                            </div>
+                            <input type="file" id="productImage" name="productImage" class="form-control my-2 mx-2" multiple
+                            <% if (locals.product) { %>
+                                value="<%= product.images[0] %>"
+                            <% } %>
+                            />
+                            <div class="error"></div>
+                        </div>
+                        <!-- <div class="form-group finput d-flex mt-3" >
+                            <div class="drag-area m-auto p-4">
+                                <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                                <header>Drag & Drop to Upload File</header>
+                                <span>OR</span>
+                                <button>Choose File</button>
+                                <input type="file" hidden>
+                            </div>
+                        </div> -->
+
+                        
+                        <div class="form-group mt-4 mb-2">
+                            <button id="btn-submit" type="submit" class="btn form-control btn-primary text-white rounded submit px-3">
+                                <% if (locals.product) { %>
+                                    UPDATE PRODUCT
+                                <% } else { %>
+                                    ADD PRODUCT
+                                <% } %>
+                            </button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->   
+                    
+            
+        </section> <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> © JMJ Music House
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets2/js/vendors/select2.min.js"></script>
+    <script src="/assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets2/js/main.js" type="text/javascript"></script>
+    <script src="/js/upload-image.js"></script>
+</body>
+
+</html>

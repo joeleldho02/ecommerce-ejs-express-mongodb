@@ -2,20 +2,9 @@ const express = require('express');
 const router = express.Router(); 
 const adminController = require('../server/controller/adminController');
 
+//------- LOGIN / LOGOUT --------//
 router.get('/', function(req, res){
     res.render('admin-dashboard');
-});
-
-router.get('/products', function(req, res){
-    res.render('page-products');
-});
-
-router.get('/customers', function(req, res){
-    res.render('page-users');
-});
-
-router.get('/orders', function(req, res){
-    res.render('page-orders');
 });
 
 router.get('/login', function(req, res){
@@ -32,8 +21,31 @@ router.get('/logout', function(req, res){
     res.render('admin-login');
 });
 
-router.get('/customers', function(req, res){
-    res.render('adminUsers');
+//------- PRODUCTS --------//
+router.get('/products', adminController.getProducts);
+
+router.get('/add-product', function(req, res){
+    res.render('page-add-product');
+});
+router.get('/edit-product/:id',adminController.editProduct);
+
+router.post('/add-product', adminController.addProduct);
+router.post('/edit-product',adminController.updateProduct);
+router.post('/delete-product', adminController.deleteProduct);
+
+//------- CUSTOMERS --------//
+router.get('/customers', adminController.getUsers);
+
+router.post('/edit-user', adminController.updateUser);
+
+router.post('/delete-user', adminController.deleteUser);
+
+
+
+
+//------- ORDERS --------//
+router.get('/orders', function(req, res){
+    res.render('page-orders');
 });
 
 module.exports = router;  

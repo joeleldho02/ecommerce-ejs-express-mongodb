@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router(); 
 const userController = require('../server/controller/userController');
+const authController = require('../server/middleware/authenticate-user');
 
-router.get('/', function(req, res){
+router.get('/', authController.authenticateUser, function(req, res){
     if(req.session.userLoggedIn && !req.session.isAdmin)
         res.render('user-dashboard',{
-            navTitle: 'Welcome ' + req.session.loggedUser.firstName,
-            user: req.session.loggedUser
+            navTitle: 'Welcome ' + req.session.user.firstName,
+            user: req.session.user
         });
     else
         res.redirect('/user/login');

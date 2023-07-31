@@ -422,10 +422,13 @@
                 </div>
             </div>
         </div>
-        <section class="">
+        <section class="pt-50 pb-50">
             <div class="container">
                 <div class="row">
                             <div class="col-lg-5 m-auto">
+                                <% if (locals.errorMsg) { %>
+                                    <p class="m-auto text-center mb-2"><%= errorMsg %> </p>
+                                <%} %>  
                                 <div class="login_wrap widget-taber-content p-30 background-white border-radius-5">
                                     <div class="padding_eight_all bg-white">
                                         <div class="heading_s1">

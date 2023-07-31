@@ -82,9 +82,10 @@ const productSchema = new mongoose.Schema({
         type:String,
         required: true
     },
+    brand: String,
     regularPrice: Number,
     salePrice:  Number,
-    stock: Number,
+    quantity: Number,
     rating:  Number,
     images: [],
     review: [],
