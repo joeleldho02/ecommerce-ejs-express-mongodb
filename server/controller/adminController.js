@@ -4,33 +4,46 @@ dotenv.config({path:'config.env'});
 const bcrypt = require('bcrypt');
 const {Userdb, Admindb, Categorydb, Productdb} = require('../model/model');
 
-//admin create jwt token
-exports.createToken = function(req, res){
-    let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
-    let jwtSecretKey = process.env.JWT_SECRET_KEY;
-  
-    try {
-        const token = req.header(tokenHeaderKey);
-  
-        const verified = jwt.verify(token, jwtSecretKey);
-        if(verified){
-            return res.send("Successfully Verified");
-        }else{
-            // Access Denied
-            return res.status(401).send(error);
-        }
-    } catch (error) {
-        // Access Denied
-        return res.status(401).send(error);
-    }
+
+async function setSession(req, res, user){  
+    delete req.session.loginEmail;
+    delete req.session.loginErrMsg;
+    delete req.session.loginOTP;
+    delete req.session.loginErr;
+    req.session.loggedIn = true;
+    req.session.user = user;
+    req.session.isAdmin = true;
+    console.log(`Admin Logged in Succesfully : ${req.session.user.name}`)
+    res.redirect('/admin');
 }
+
+//login user to home page
+exports.adminLogin = async function(req, res){
+    console.log(req.body);
+    try{
+        const userData = await adminLoginAuthenticate(req.body);
+        if(userData){
+           delete userData.password;
+           setSession(req, res, userData)
+        }
+        else{
+            let err = "User not found!"
+            console.log("Login Error: " + err);
+            res.render('admin-login',{ errorMsg: err });
+        }
+    }catch(err){
+        console.log("Login Error: " + err);
+        res.render('admin-login',{ errorMsg: err });
+    }
+};
 //admin login validation
-exports.adminLoginAuthenticate = (body) => {
+ const adminLoginAuthenticate = (body) => {
     return new Promise((resolve, reject) => {
         if (!body) {
             reject("Please input credentials");
         }
         else {
+            console.log(body);
             Admindb.findOne({email: body.email})
                 .then(user => {
                     console.log(user);
@@ -55,7 +68,26 @@ exports.adminLogout = function(req, res){
     req.session.destroy();
     res.redirect('/admin');
 }
-
+//admin create jwt token
+exports.createToken = function(req, res){
+    let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+    let jwtSecretKey = process.env.JWT_SECRET_KEY;
+  
+    try {
+        const token = req.header(tokenHeaderKey);
+  
+        const verified = jwt.verify(token, jwtSecretKey);
+        if(verified){
+            return res.send("Successfully Verified");
+        }else{
+            // Access Denied
+            return res.status(401).send(error);
+        }
+    } catch (error) {
+        // Access Denied
+        return res.status(401).send(error);
+    }
+}
 
 
 //find and retrieve all user(s) to display in table
@@ -170,7 +202,7 @@ exports.addProduct = async (req, res) => {
             regularPrice: req.body.regularPrice,
             salePrice: req.body.salePrice,
             quantity: req.body.quantity,
-            images: req.body.productImage,
+            images: req.files, 
             updatedAt: Date.now(),
         })
         newProduct.save()
@@ -216,6 +248,9 @@ exports.getProducts = (req, res) => {
         });
     // }
 };
+
+
+
 //get edit product page and fill details of product in input
 exports.editProduct = async function(req, res){
     console.log(req.params.id);
@@ -232,9 +267,8 @@ exports.editProduct = async function(req, res){
             }
             else {
                 res.render('page-add-product', {
-                    title:'Edit product',       
-                    navTitle: 'Edit user',
-                    product: data,
+                    categories: res.locals.categories,
+                    product: data
                 });
             }
         })
@@ -251,9 +285,11 @@ exports.editProduct = async function(req, res){
 };
 //update product by product id in db
 exports.updateProduct = (req, res) => {
+    console.log(req.body);
+    console.log(req.body.productName);
     if (!req.body) {
         return res.status(500).render('error', {
-            message: err.message || "Data to update cannot be empty"
+            message: "Data to update cannot be empty"
         });
     }
     const id = req.body.productID;
@@ -265,17 +301,21 @@ exports.updateProduct = (req, res) => {
         regularPrice: req.body.regularPrice,
         salePrice: req.body.salePrice,
         quantity: req.body.quantity,
-        images: req.body.productImage,
+        // images: req.files,
         updatedAt: Date.now(),
         _id: id
-    })
+    });
+
+    console.log(product);
+    console.log(id);
     Productdb.findByIdAndUpdate(id, product)
         .then(data => {
+            console.log(data);
             if (!data) {
                 res.status(500).render('error', {
                     message: "Unable to update product",
                     errStatus : 500,
-                    error:{stack: err.message || ""}
+                    error:{stack: "Unable to update product" || ""}
                 });
             }
             else {
@@ -379,7 +419,24 @@ exports.getCategory = (req, res) => {
                 error:{stack: err.message || ""}
             });
         });
-    // }
+};
+
+exports.getCategories = async (req, res, next) => {
+    await Categorydb.find({}, {categoryName: 1, isListed:1})
+        .collation({locale: "en"})
+        .sort({ categoryName: 1 }).lean()
+        .then(data => {
+            console.log("Data received: " + data);
+            res.locals.categories = data;
+            next();
+        })
+        .catch(err => {
+            res.status(400).render('error', {
+                message: "Unable to retrieve data from database",
+                errStatus : 400,
+                error:{stack: err.message || ""}
+            });
+        });
 };
 //update category by category id in db
 exports.updateCategory = (req, res) => {

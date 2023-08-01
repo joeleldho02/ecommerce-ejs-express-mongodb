@@ -97,7 +97,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <h2 class="h2 my-0 py-0">Products List </h2>
+                <h2 class="h2 my-0 py-0">Category</h2>
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
@@ -128,9 +128,7 @@
         </header>
         <section class="content-main">
             <div class="content-header">
-                <div>
-                    <p>Manage product category here.</p>
-                </div>
+                <div></div>
                 <div>
                     <a href="/admin/add-category" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"
                         data-modaltitle="Add new category" data-btnaction="add">
@@ -139,7 +137,7 @@
                 </div>
             </div>
             <!-- Begin Page Content -->
-            <div class="container-fluid">
+            <div class="container-fluid w-75">
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex">
@@ -173,11 +171,14 @@
                                     </tr>
                                 </tfoot>
                                 <tbody>
-                                <% if (locals.categories) { %>
-                                    
+                                <% if (locals.categories) { %>                                    
                                     <% for (let i = 0; i < categories.length; i++) { %>
                                         <tr>
-                                          <td><%= categories[i].categoryName %></td>
+                                          <td>
+                                            <div class="info">
+                                                <h6 class="mb-0"><%= categories[i].categoryName %></h6>
+                                            </div>
+                                          </td>
                                           <td><%= categories[i].description %></td>
                                           <td>                                               
                                             <% if(categories[i].isListed){ %>

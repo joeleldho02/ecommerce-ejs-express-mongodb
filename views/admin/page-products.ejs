@@ -24,7 +24,7 @@
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
-            <a href="/admin" class="brand-wrap">
+            <a href="/admin" class="brand-wrap ">
                 <img src="assets2/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
             </a>
             <div>
@@ -97,7 +97,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <h2 class="h2 my-0 py-0">Products List </h2>
+                <h2 class="h2 my-0 py-0">Products Management</h2>
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
@@ -155,36 +155,46 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Product Name</th>
+                                        <th>Product</th>
                                         <th>Description</th>
                                         <th>Category</th>
                                         <th>Sale Price</th>
                                         <th>Stock</th>
-                                        <th>Image</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>Product Name</th>
+                                        <th>Product</th>
                                         <th>Description</th>
                                         <th>Category</th>
                                         <th>Sale Price</th>
                                         <th>Stock</th>
-                                        <th>Image</th>
                                         <th>Action</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
+                                    <% if (locals.products) { %>  
                                     <% for (let i = 0; i < products.length; i++) { %>
                                         <tr>
-                                          <td><%= products[i].productName %></td>
-                                          <td><%= products[i].description %></td>
-                                          <td><%= products[i].category %></td>
-                                          <td><%= products[i].salePrice %></td>
-                                          <td><%= products[i].quantity %></td>
-                                          <td><%= products[i].images[0] %></td>
                                           <td>
+                                            <div class="col-lg-12 col-sm-4 col-8 flex-grow-1 col-name">
+                                                <a class="itemside" href="#">
+                                                    <div class="left d-none d-lg-block">
+                                                        <img src="/img/products/<%= products[i].images[0].filename %>" class="img-sm img-thumbnail" alt="<%= products[i].productName %>">
+                                                    </div>
+                                                    <div class="info">
+                                                        <h6 class="mb-0"><%= products[i].productName %></h6>
+                                                    </div>  
+                                                </a>                  
+                                            </div>                        
+                                          </td>
+                                          <td style="vertical-align: middle;"><%= products[i].description %></td>
+                                          <td style="vertical-align: middle;"><%= products[i].category %></td>
+                                          <td style="vertical-align: middle;"><%= products[i].salePrice %></td>
+                                          <td style="vertical-align: middle;"><%= products[i].quantity %></td>
+                                          <!-- <td style=" text-overflow: ellipsis;"><%= products[i].images[0] %></td> -->
+                                          <td style="vertical-align: middle;">
                                             <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
                                                 <a class="ms-2" href="/admin/edit-product/<%= products[i]._id %>">
                                                     <span class="material-icons md-edit iconbtn" title="Edit <%= products[i].productName %>">
@@ -203,6 +213,7 @@
                                           </td>
                                         </tr>    
                                        <% } %>
+                                       <% }  %>
                                 </tbody>
                             </table>
                         </div>

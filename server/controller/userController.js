@@ -13,7 +13,7 @@ async function setSession(req, res){
                 delete req.session.loginErrMsg;
                 delete req.session.loginOTP;
                 delete req.session.loginErr;
-                req.session.userLoggedIn = true;
+                req.session.loggedIn = true;
                 req.session.user = user;
                 req.session.isAdmin = false;
                 console.log(`User Logged in Succesfully : ${req.session.user.firstName + req.session.user.firstName}`)
@@ -40,13 +40,14 @@ async function sendOTP(phone){
     const hashedOtp = await bcrypt.hash(String(generatedOtp), 10);
     console.log(`Generated OTP : ${generatedOtp}`)
 //-------------------- TWILIO OTP SENDER CODE ---------------------//
-    // client.messages
-    // .create({
-    //     body: `JMJ Music House - OTP for Login is ${generatedOtp}`,
-    //     from: '+17626002830',
-    //     to: '+919656255604'
-    // })
-    // .catch(err=>console.log(err));
+    client.messages
+    .create({
+        body: `JMJ Music House - OTP for Login is ${generatedOtp}`,
+        from: '+17626002830',
+        to: '+919656255604'
+    })
+    .catch(err=>console.log(err));
+
     return hashedOtp;
 }
 
@@ -114,29 +115,32 @@ async function addUserDetails(req, res) {
 exports.userLogin = async function(req, res){
     //-------- CODE TO ADD ADMIN -----------//
 
-           // req.session.userLoggedIn = true;        
+           // req.session.loggedIn = true;        
            // req.session.isAdmin = true;
            // req.session.loggedUser = userData;     
            // res.redirect('/');
-   try{
-       const userData = await exports.loginAuthenticate(req.body);
-       if(userData){
+    try{
+        const userData = await loginAuthenticate(req.body);
+        if(userData){
            delete userData.password;
            req.session.loginEmail = userData.email;
            req.session.loginOTP = await sendOTP(userData.phone);
            res.render('user-otp',{
                 phone: userData.phone
-            });
+        });
            //setSession(req, res, userData);
-       }
-   }catch(err){
-       console.log("Login Error: " + err);
-       res.render('user-login',{ errorMsg: err });
-   }
+        }
+        else{
+            console.log("Login Error: " + err);
+            res.render('user-login',{ errorMsg: err });
+        }
+    }catch(err){
+        console.log("Login Error: " + err);
+        res.render('user-login',{ errorMsg: err });
+    }
 };
-
-//login validation user and admin
-exports.loginAuthenticate = (body) => {
+//login authenticatin user
+const loginAuthenticate = (body) => {
     return new Promise((resolve, reject) => {
         if (!body) {
             reject("Please input credentials");
@@ -165,7 +169,6 @@ exports.loginAuthenticate = (body) => {
         }
     });
 };
-
 //login OTP verification
 exports.loginOTPVerify = async function(req, res) {
     const otp = req.body.otp;

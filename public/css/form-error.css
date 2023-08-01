@@ -1,0 +1,12 @@
+.form-group.error input{
+  border-color: #ff3860;
+}
+
+.form-group .error {
+  color: #ff3860;
+  font-size: 13px;
+  font-weight: 600;
+  height: 13px;
+  text-align: center;
+  padding-top: 5px;
+}

@@ -2,16 +2,15 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const nocache = require("nocache");
+const bodyparser = require('body-parser');
 const session = require('express-session');
 const { v4:uuidv4 } = require('uuid');
 
 const connectDB = require('./server/database/connection');
 
-const multer  = require('multer');
-const upload = multer({ dest: './public/img/product-img' });
-
 const dotenv = require('dotenv');
 dotenv.config({path:'config.env'});
+
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -31,9 +30,13 @@ app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//parse request to body-parser
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({extended:true}));
+
 app.use(session({
     secret: uuidv4(), 
-    cookie: {maxAge:600000},
+    cookie: {maxAge:1800000},
     saveUninitialized: true
 }))
 
@@ -54,9 +57,9 @@ app.use("/user/assets", express.static(path.join(__dirname, "public/assets")));
 app.use("/assets2", express.static(path.join(__dirname, "public/assets2")));
 app.use("/admin/assets2", express.static(path.join(__dirname, "public/assets2")));
 
-app.use('/', homeRouter);
-app.use('/user', userRouter);
 app.use('/admin', adminRouter);
+app.use('/user', userRouter);
+app.use('/', homeRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
