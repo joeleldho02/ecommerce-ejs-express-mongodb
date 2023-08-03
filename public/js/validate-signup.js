@@ -1,3 +1,5 @@
+//User signup form validation 
+
 const form = document.getElementById('signupForm'); 
 const firstName = document.getElementById('firstName');
 const email = document.getElementById('email');

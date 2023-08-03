@@ -25,8 +25,7 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     lastName:{
-        type: String,
-        required: true
+        type: String
     },
     email:{
         type: String,
@@ -64,7 +63,9 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    description: String,
+    description: {
+        type: String
+    },
     isListed:{
         type: Boolean,
         required: true

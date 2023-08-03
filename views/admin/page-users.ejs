@@ -242,12 +242,11 @@
                     <div class="form-group mt-3">
                         <label for="phone">Status</label>
                         <div class="form-control form-switch">
-                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                            <input class="form-check-input ms-3 py-2 px-4" type="checkbox" name ="isActive" role="switch" id="flexSwitchCheckChecked">
                         </div>
                     </div>
                     <div class="form-group mt-3">
-                        <label for="phone">Status</label>
-                        <input class="form-control edit-isactive" name="isActive" placeholder="Is Active" required>
+                        <input type="hidden" class="form-control edit-isactive" name="isactive" placeholder="Is Active" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -309,16 +308,17 @@
             $(".edit-email").val(email);
             $(".edit-phone").val(phone);
             $(".edit-isactive").val(isActive);
+            if(isActive === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
         });
 
         $('#myModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget); // Button that triggered the modal
-            let recipient = button.data('firstname'); // Extract info from data-* attributes
-            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            let recipient = button.data('firstname');            
             let modal = $(this);
             modal.find('.modal-title').text('Edit details of ' + recipient);
-        })
+        });
+
         $('#myModal').on('shown.bs.modal', function () {
             $('#modalFname').trigger('focus')
         })

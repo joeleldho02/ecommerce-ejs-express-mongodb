@@ -636,6 +636,28 @@
             zoomWindowFadeOut: 750
         });
     })
+    $('#quickViewModal').on('show.bs.modal', function (event) {
+        let button = $(event.relatedTarget); // Button that triggered the modal
+
+        let productName = button.data('productname');
+        let productCategory = button.data('productcategory');
+        let productBrand = button.data('productbrand');
+        let productRegularPrice= button.data('productregularprice');
+        let productSalePrice = button.data('productsaleprice');
+        let productDescription = button.data('productdescription');
+        let productQuantity = button.data('productquantity');
+        let productImage = button.data('productimage');
+
+        let modal = $(this);
+        modal.find('.show-product-name ').text(productName);
+        modal.find('.show-product-category').text(productCategory);        
+        modal.find('.show-product-brand').text(productBrand);        
+        modal.find('.show-product-regularprice').text(productRegularPrice);        
+        modal.find('.show-product-saleprice').text(productSalePrice);        
+        modal.find('.show-product-description').text(productDescription);          
+        modal.find('.show-product-quantity').text(productQuantity);          
+        modal.find('.show-product-image').attr('src', productImage);        
+    })
 
     /*--- VSticker ----*/
     $('#news-flash').vTicker({

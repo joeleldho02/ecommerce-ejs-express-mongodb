@@ -196,7 +196,7 @@
                                                         data-id="<%= categories[i]._id %>"
                                                         data-categoryname="<%= categories[i].categoryName %>"
                                                         data-description="<%= categories[i].description %>"
-                                                        data-islisted="<%= categories[i].isListed %>"
+                                                        data-listed="<%= categories[i].isListed %>"
                                                         >
                                                         <span class="material-icons md-edit iconbtn" title="Edit <%= categories[i].categoryName %>">
                                                             <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
@@ -237,22 +237,21 @@
                                 <input type="hidden" class="form-control edit-id" name="id" >
                             </div>
                             <div class="form-group w-100">
-                                <label for="firstName">Category Name</label>
+                                <label for="categoryName">Category Name</label>
                                 <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" required>
                             </div>
                             <div class="form-group mt-3">
-                                <label for="email">Description</label>
-                                <input class="form-control edit-description" name="description" placeholder="Enter description">
+                                <label for="description">Description</label>
+                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter description">
                             </div>  
                             <div class="form-group mt-3">
-                                <label for="phone">List</label>
+                                <label for="flexSwitchCheckChecked">List</label>
                                 <div class="form-control form-switch">
-                                    <input class="form-check-input ms-3" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                                    <input class="form-check-input ms-3  py-2 px-4" type="checkbox" role="switch" name="isListed" id="flexSwitchCheckChecked">
                                 </div>
                             </div>
                             <div class="form-group mt-3">
-                                <label for="phone">List</label>
-                                <input class="form-control edit-islisted" name="isListed" placeholder="Is listed" required>
+                                <input type="hidden" class="form-control edit-islisted" id="listed" name="listed" placeholder="Is listed" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -306,12 +305,14 @@
             const id = $(this).data('id');
             const categoryName = $(this).data('categoryname');
             const description = $(this).data('description');
-            const isListed = $(this).data('islisted');
-
+            const isListed = $(this).data('listed');
+            console.log(isListed);
             $(".edit-id").val(id);
             $(".edit-categoryname").val(categoryName);
             $(".edit-description").val(description);
             $(".edit-islisted").val(isListed);
+            if(isListed === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
         });
 
         $('#myModal').on('show.bs.modal', function (event) {
@@ -325,11 +326,13 @@
 
             if( btnAction === "add" ) {  
                 $('#modalForm').attr('action', '/admin/add-category');
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
             }
             else if( btnAction === "edit" ) {
                 $('#modalForm').attr('action', '/admin/edit-category');
             }
-        })
+        });
+
         $('#myModal').on('shown.bs.modal', function () {
             $('#categoryName').trigger('focus')
         })

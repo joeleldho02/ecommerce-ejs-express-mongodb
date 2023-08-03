@@ -31,7 +31,7 @@
                                 <!-- MAIN SLIDES -->
                                 <div class="product-image-slider">
                                     <figure class="border-radius-10">
-                                        <img src="/assets/imgs/shop/product-16-2.jpg" alt="product image">
+                                        <img class="show-product-image" src="" alt="product image">
                                     </figure>
                                     <figure class="border-radius-10">
                                         <img src="/assets/imgs/shop/product-16-1.jpg" alt="product image">
@@ -54,7 +54,7 @@
                                 </div>
                                 <!-- THUMBNAILS -->
                                 <div class="slider-nav-thumbnails pl-15 pr-15">
-                                    <div><img src="/assets/imgs/shop/thumbnail-3.jpg" alt="product image"></div>
+                                    <div><img class="show-product-image" src="" alt="product image"></div>
                                     <div><img src="/assets/imgs/shop/thumbnail-4.jpg" alt="product image"></div>
                                     <div><img src="/assets/imgs/shop/thumbnail-5.jpg" alt="product image"></div>
                                     <div><img src="/assets/imgs/shop/thumbnail-6.jpg" alt="product image"></div>
@@ -76,10 +76,10 @@
                         </div>
                         <div class="col-md-6 col-sm-12 col-xs-12">
                             <div class="detail-info">
-                                <h3 class="title-detail mt-30">Colorful Pattern Shirts HD450</h3>
+                                <h3 class="title-detail show-product-name mt-30"></h3>
                                 <div class="product-detail-rating">
                                     <div class="pro-details-brand">
-                                        <span> Brands: <a href="shop-grid-right.html">Bootstrap</a></span>
+                                        <span> Brands: <a href="#" class="show-product-brand"></a></span>
                                     </div>
                                     <div class="product-rate-cover text-end">
                                         <div class="product-rate d-inline-block">
@@ -91,17 +91,17 @@
                                 </div>
                                 <div class="clearfix product-price-cover">
                                     <div class="product-price primary-color float-left">
-                                        <ins><span class="text-brand">₹120.00</span></ins>
-                                        <ins><span class="old-price font-md ml-15">₹200.00</span></ins>
+                                        <ins><span class="text-brand show-product-saleprice"></span></ins>
+                                        <ins><span class="old-price font-md ml-15 show-product-regularprice"></span></ins>
                                         <span class="save-price  font-md color3 ml-15">25% Off</span>
                                     </div>
                                 </div>
                                 <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                                 <div class="short-desc mb-30">
-                                    <p class="font-sm">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam rem officia, corrupti reiciendis minima nisi modi,!</p>
+                                    <p class="font-sm show-product-description">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam rem officia, corrupti reiciendis minima nisi modi,!</p>
                                 </div>
                                 
-                                <div class="attr-detail attr-color mb-15">
+                                <!-- <div class="attr-detail attr-color mb-15">
                                     <strong class="mr-10">Color</strong>
                                     <ul class="list-filter color-filter">
                                         <li><a href="#" data-color="Red"><span class="product-color-red"></span></a></li>
@@ -122,7 +122,7 @@
                                         <li><a href="#">XL</a></li>
                                         <li><a href="#">XXL</a></li>
                                     </ul>
-                                </div>
+                                </div> -->
                                 <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                 <div class="detail-extralink">
                                     <div class="detail-qty border radius">
@@ -138,8 +138,8 @@
                                 </div>
                                 <ul class="product-meta font-xs color-grey mt-50">
                                     <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
-                                    <li class="mb-5">Tags: <a href="#" rel="tag">Cloth</a>, <a href="#" rel="tag">Women</a>, <a href="#" rel="tag">Dress</a> </li>
-                                    <li>Availability:<span class="in-stock text-success ml-5">8 Items In Stock</span></li>
+                                    <li class="mb-5">Tags: <a href="#" class="show-product-brand" rel="tag"></a></li>
+                                    <li>Availability:<span class="in-stock text-success ml-5 show-product-quantity"></span></li>
                                 </ul>
                             </div>
                             <!-- Detail Info -->
@@ -195,7 +195,7 @@
                                     <% if (locals.categories) { %>
                                         <% for (let i = 0; i < categories.length; i++) { %>
                                             <% if(categories[i].isListed) { %>
-                                                <option><a href="/<%= categories[i].categoryName %>"><%= categories[i].categoryName %></a></option>
+                                                <option><a href="/<%= categories[i].categoryName.toLowerCase() %>"><%= categories[i].categoryName %></a></option>
                                             <% } %>
                                         <% } %>                                        
                                     <% } %>
@@ -276,7 +276,7 @@
                                     <% if (locals.categories) { %>
                                         <% for (let i = 0; i < categories.length; i++) { %>
                                             <% if(categories[i].isListed) { %>
-                                                <li><a href="/<%= categories[i].categoryName %>"><i class="evara-font-desktop"></i><%= categories[i].categoryName %></a></li>
+                                                <li><a href="/<%= categories[i].categoryName.toLowerCase() %>"><i class="evara-font-desktop"></i><%= categories[i].categoryName %></a></li>
                                             <% } %>
                                         <% } %>                                        
                                     <% } %>
@@ -705,14 +705,24 @@
                                         <div class="product-img-action-wrap">
                                             <div class="product-img product-img-zoom">
                                                 <div class="product-img-inner">
-                                                    <a href="/<%= products[i].category %>/<%= products[i]._id %>">
+                                                    <a href="/<%= products[i].category.toLowerCase() %>/<%= products[i]._id %>">
                                                         <img class="default-img" src="/img/products/<%= products[i].images[0].filename %>" alt="<%= products[i].productName %>">
                                                         <img class="hover-img" src="/img/products/<%= products[i].images[0].filename %>" alt="<%= products[i].productName %>">
                                                     </a>
                                                 </div>
                                             </div>
                                             <div class="product-action-1">
-                                                <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-search"></i></a>
+                                                <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"
+                                                    data-productname="<%= products[i].productName %>"
+                                                    data-productcategory="<%= products[i].category %>"
+                                                    data-productbrand="<%= products[i].brand %>"
+                                                    data-productregularprice="₹<%= products[i].regularPrice %>"
+                                                    data-productsaleprice="₹<%= products[i].salePrice %>"
+                                                    data-productdescription="<%= products[i].description %>"
+                                                    data-productquantity="<%= products[i].quantity %> Items In Stock"
+                                                    data-productimage="/img/products/<%= products[i].images[0].filename %>"
+
+                                                ><i class="fi-rs-search"></i></a>
                                                 <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
                                                 <a aria-label="Compare" class="action-btn hover-up" href="#"><i class="fi-rs-shuffle"></i></a>
                                             </div>
@@ -722,9 +732,9 @@
                                         </div>
                                         <div class="product-content-wrap">
                                             <div class="product-category">
-                                                <a href="/<%= products[i].category %>"><%= products[i].category %></a>
+                                                <a href="/<%= products[i].category.toLowerCase() %>"><%= products[i].category %></a>
                                             </div>
-                                            <h2><a href="/<%= products[i].category %>/<%= products[i]._id %>"><%= products[i].productName %></a></h2>
+                                            <h2><a href="/<%= products[i].category.toLowerCase() %>/<%= products[i]._id %>"><%= products[i].productName %></a></h2>
                                             <div class="product-price">
                                                 <span>₹<%= products[i].salePrice %> </span>
                                                 <span class="old-price">₹<%= products[i].regularPrice %></span>
@@ -765,7 +775,7 @@
                                 <% if (locals.categories) { %>
                                     <% for (let i = 0; i < categories.length; i++) { %>
                                         <% if(categories[i].isListed) { %>
-                                            <li><a href="/<%= categories[i].categoryName %>"><%= categories[i].categoryName %></a></li>
+                                            <li><a href="/<%= categories[i].categoryName.toLowerCase() %>"><%= categories[i].categoryName %></a></li>
                                         <% } %>
                                     <% } %>                                        
                                 <% } %>
@@ -1019,8 +1029,8 @@
     <script src="/assets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="/assets/js/plugins/jquery.elevatezoom.js"></script>
     <!-- Template  JS -->
-    <script src=".//assets/js/main.js?v=3.4"></script>
-    <script src=".//assets/js/shop.js?v=3.4"></script>
+    <script src="./assets/js/main.js?v=3.4"></script>
+    <script src="./assets/js/shop.js?v=3.4"></script>
 </body>
 
 </html>

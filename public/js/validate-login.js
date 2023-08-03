@@ -1,3 +1,5 @@
+//User login form validation 
+
 const form = document.getElementById('loginForm'); 
 const email = document.getElementById('email');
 const password = document.getElementById('password');
@@ -67,5 +69,7 @@ function validateInputs(e) {
 form.addEventListener('submit', function(e) {
     //e.preventDefault();
     console.log('Login submit button recorded');
-    validateInputs(e);
+    if(validateInputs(e)){
+        console.log("VALIDATION Success");
+    }
 })

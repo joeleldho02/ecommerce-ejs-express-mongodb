@@ -15,6 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="/css/form-error.css" />
 </head>
 
 <body>
@@ -452,12 +453,14 @@
                                         <div class="heading_s1">
                                             <h3 class="mb-30">Login</h3>
                                         </div>
-                                        <form action="/user/login" method="post">
+                                        <form id="loginForm" action="/user/login" method="post">
                                             <div class="form-group">
-                                                <input type="text" name="email" placeholder="Your Email" value="donpaul@gmail.com">
+                                                <input type="text" id="email" name="email" placeholder="Your Email" value="donpaul@gmail.com">
+                                                <div class="error text-danger ms-2"></div>
                                             </div>
                                             <div class="form-group">
-                                                <input type="password" name="password" placeholder="Password" value="1234">
+                                                <input type="password" id="password" name="password" placeholder="Password" value="1234">
+                                                <div class="error text-danger ms-2"></div>
                                             </div>
                                             <div class="login_footer form-group">
                                                 <a></a>
@@ -625,6 +628,7 @@
     <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
+    <script src="/js/validate-login.js"></script>    
 </body>
 
 </html>

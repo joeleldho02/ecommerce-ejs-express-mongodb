@@ -179,9 +179,11 @@
                                         <tr>
                                           <td>
                                             <div class="col-lg-12 col-sm-4 col-8 flex-grow-1 col-name">
-                                                <a class="itemside" href="#">
+                                                <a class="itemside" href="/<%= products[i].category.toLowerCase() %>/<%= products[i]._id %>" target="_blank">
                                                     <div class="left d-none d-lg-block">
-                                                        <img src="/img/products/<%= products[i].images[0].filename %>" class="img-sm img-thumbnail" alt="<%= products[i].productName %>">
+                                                        <% if (products[i].images.length > 0) { %>  
+                                                            <img src="/img/products/<%= products[i].images[0].filename %>" class="img-sm img-thumbnail" alt="<%= products[i].productName %>">
+                                                        <% } %>
                                                     </div>
                                                     <div class="info">
                                                         <h6 class="mb-0"><%= products[i].productName %></h6>
