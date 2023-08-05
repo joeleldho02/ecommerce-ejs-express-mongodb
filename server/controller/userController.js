@@ -2,38 +2,53 @@ const {Userdb} = require('../model/model');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 dotenv.config({path:'.env'});
-const client = require('twilio')(process.env.ACCOUNTSID, process.env.AUTHTOKEN);
+const client = require('twilio')(process.env.TWILIO_ACCOUNTSID, process.env.TWILIO_AUTHTOKEN);
 
-async function setSession(req, res){
+async function setSession(req, res, userData){
     try{
-        await Userdb.findOne({ email: req.session.loginEmail})
-        .then(user => {
-            if (user !== null){
-                delete user.password
-                delete req.session.loginEmail;
-                delete req.session.loginErrMsg;
-                delete req.session.loginOTP;
-                delete req.session.loginErr;
-                req.session.loggedIn = true;
-                req.session.user = user;
-                req.session.isAdmin = false;
-                console.log(`User Logged in Succesfully : ${req.session.user.firstName + req.session.user.firstName}`)
-                res.redirect('/user');
-            }
-            else {
-                res.status(500).render('error', {
-                    message: "Unable to get userdata from database",
-                    errStatus : 500
-                });
-                console.log("Unable to get userdata from database");
-            }
-            }).catch(err => {
-                res.status(500).render('error', {
-                    message: "Unable to get userdata from database",
-                    errStatus : 500
-                });
-                console.log(err.message);
-            });    
+        if(userData){            
+            delete req.session.signupEmail;
+            delete req.session.signupPhone;
+            delete req.session.loginErrMsg;
+            delete req.session.loginOTP;
+            delete req.session.loginErr;
+            delete req.session.registeredUser;
+            req.session.loggedIn = true;
+            req.session.user = userData;
+            req.session.isAdmin = false;
+            console.log(`User Logged in Succesfully : ${userData.firstName + userData.lastName}`)
+            res.redirect('/user');
+        } else{
+            // await Userdb.findOne({ email: req.session.signupEmail})
+            // .then(user => {
+            //     console.log("USER : " + user);
+            //     if (user !== null){
+            //         delete user.password
+            //         delete req.session.signupEmail;
+            //         delete req.session.loginErrMsg;
+            //         delete req.session.loginOTP;
+            //         delete req.session.loginErr;
+            //         req.session.loggedIn = true;
+            //         req.session.user = user;
+            //         req.session.isAdmin = false;
+            //         console.log(`User Logged in Succesfully : ${req.session.user.firstName + req.session.user.firstName}`)
+            //         res.redirect('/user');
+            //     }
+            //     else {
+            //         res.status(404).render('error', {
+            //             message: "Oops..! Page not available",
+            //             errStatus : 404
+            //         }); 
+            //         console.log("Oops..! Page not available");     
+            //     }
+            //     }).catch(err => {
+            //         res.status(500).render('error', {
+            //             message: "Unable to get userdata from database",
+            //             errStatus : 500
+            //         });
+            //         console.log(err.message);
+            //     });
+        }            
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to get userdata from database",
@@ -59,10 +74,10 @@ async function sendOTP(phone){
         return hashedOtp;
     } catch(err){
         res.status(500).render('error', {
-            message: "Unable to generate OTP. Please try again later",
+            message: "Unable to send OTP. Please try again later",
             errStatus : 500
         });
-        console.log("Unable to generate OTP. Please try again later" + err.message);
+        console.log("Unable to send OTP. Please try again later" + err.message);
     }
 }
 
@@ -76,22 +91,21 @@ exports.registerUser = async (req, res) => {
         }
         else {
             await Userdb.findOne({ email: req.body.email })
-            .then(user => {
-                if (user !== null) {
-                    console.log("User already exsits!");
-                    res.status(500).render('error', {
-                        message: "Oops..!! User with entered email ID already exsits.",
-                        errStatus : 500
-                    });                
-                    // res.render('add-user', {
-                    //     title:'Signup',
-                    //     signupErr: "Oops..!! User with entered email ID already exsits.",
-                    //     inputData: req.body
-                    // });
-                }
-                else {
-                    addUserDetails(req, res);
-                }
+                .then(async user => {
+                    if (user !== null) {
+                        console.log("User already exsits!");    
+                        res.render('user-signup', {
+                            signupErr: "Oops..!! User with entered email ID already exsits.",
+                            inputData: req.body
+                        });
+                    }
+                    else {
+                        req.session.registeredUser = req.body;
+                        req.session.signupEmail = req.body.email;
+                        req.session.signupPhone = req.body.phone;
+                        req.session.loginOTP = await sendOTP(req.body.phone);
+                        res.redirect('/user/verify-otp');
+                    }
                 }).catch(err => {
                     res.status(500).render('error', {
                         message: "Unable to add user to database",
@@ -110,20 +124,21 @@ exports.registerUser = async (req, res) => {
 };
 async function addUserDetails(req, res) {
     try{
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const registeredUser = req.session.registeredUser
+        const hashedPassword = await bcrypt.hash(registeredUser.password, 10);
         const user = new Userdb({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            phone: req.body.phone,
+            firstName: registeredUser.firstName,
+            lastName: registeredUser.lastName,
+            email: registeredUser.email,
+            phone: registeredUser.phone,
             password: hashedPassword,
             updatedAt: Date.now(),
         })
         user.save()
-            .then(data => {
+            .then(async data => {
                 console.log("Added new user data: " + data)
-                delete data.password; 
-                res.redirect('/user/login');
+                delete data.password;     
+                setSession(req, res, data);     
             })
             .catch(err => {
                 res.status(500).render('error', {
@@ -147,11 +162,12 @@ exports.userLogin = async function(req, res){
         const userData = await loginAuthenticate(req.body);
         if(userData){
             delete userData.password;
-            req.session.loginEmail = userData.email;
-            req.session.loginOTP = await sendOTP(userData.phone);
-            res.render('user-otp',{
-                phone: userData.phone
-            });
+            // req.session.signupEmail = userData.email;
+            // req.session.loginOTP = await sendOTP(userData.phone);
+            // res.render('user-otp',{
+            //     phone: userData.phone
+            // });            
+            setSession(req, res, userData);
         }
         else{
             console.log("Login Error: " + err);
@@ -202,12 +218,13 @@ exports.loginOTPVerify = async function(req, res) {
         const otp = req.body.otp;
         bcrypt.compare(otp, req.session.loginOTP)
             .then((status) => {
-            if(status)
-                setSession(req, res);
+            if(status){
+                addUserDetails(req, res)
+            }
             else{
                 res.status(400).render('error', {
                     message: "Oops..!! Wrong OTP.",
-                    errStatus : 540
+                    errStatus : 400
                 });
                 console.log("Oops..!! Wrong OTP.");
             }

@@ -23,7 +23,7 @@ router.post('/login', adminController.adminLogin);
 
 
 //------- PRODUCTS --------//
-router.get('/products', authController.authenticateAdmin, productController.getAllProducts, serviceRender.getAdminProductPage);
+router.get('/products', authController.authenticateAdmin, categoryController.getListedCategories, productController.getAllProducts, serviceRender.getAdminProductPage);
 router.get('/add-product', authController.authenticateAdmin, categoryController.getListedCategories, serviceRender.getAddProductPage);
 router.get('/edit-product/:id', authController.authenticateAdmin, categoryController.getListedCategories, productController.getEditProductItemDetails, serviceRender.getEditProductPage);
 

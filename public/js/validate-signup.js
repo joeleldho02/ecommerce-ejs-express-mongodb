@@ -119,12 +119,12 @@ function validateInputs(e) {
     }
 
     if(!checkbox.checked){
-        setError(checkbox, 'Accept terms & condtions to continue', e);
+        setError(checkbox.parentElement, 'Accept terms & condtions to continue', e);
         checkbox.focus();
         return false;
     }  
     else{
-        setSuccess(checkbox);
+        setSuccess(checkbox.parentElement);
     }
 
     return true;

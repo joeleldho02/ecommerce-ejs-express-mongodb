@@ -89,7 +89,7 @@ const productSchema = new mongoose.Schema({
     },
     description: String,
     category:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
     brand: String,

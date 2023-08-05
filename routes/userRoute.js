@@ -6,6 +6,7 @@ const serviceRender = require('../server/services/render');
 
 router.get('/', authController.authenticateUser, serviceRender.userDashboardPage);
 router.get('/signup', serviceRender.userSignupPage);
+router.get('/verify-otp', serviceRender.userVerifyOtpPage);
 router.get('/login', serviceRender.userLoginPage);
 router.get('/logout', serviceRender.userLogout);
 

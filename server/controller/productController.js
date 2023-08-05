@@ -1,45 +1,48 @@
 const {Productdb} = require('../model/model');
-const mongoose = require('mongoose');
+const categoryController = require('./categoryController');
 
 //add new product to DB
 exports.addNewProduct = async (req, res) => {
     try{
-        console.log(req.body);
         if (!req.body) {
             console.log("Product data not submitted");
             res.redirect('/admin/products');
         }
         else {
-            const newProduct = new Productdb({
-                productName: req.body.productName,
-                description: req.body.description,
-                category: req.body.category,
-                brand: req.body.brand,
-                regularPrice: req.body.regularPrice,
-                salePrice: req.body.salePrice,
-                quantity: req.body.quantity,
-                images: req.files, 
-                updatedAt: Date.now(),
-            })
-            newProduct.save()
-                .then(data => {
-                    console.log("Added new product: " + data);
-                    res.redirect('/admin/products');
-                })
-                .catch(err => {
-                    res.status(500).render('error', {
-                        message: "Unable to add product to database",
-                        errStatus : 500
+            await categoryController.getCategoryId(req.body.category)
+                .then(catergoryId => {
+                    const newProduct = new Productdb({
+                        productName: req.body.productName,
+                        description: req.body.description,
+                        category: catergoryId,
+                        brand: req.body.brand,
+                        regularPrice: req.body.regularPrice,
+                        salePrice: req.body.salePrice,
+                        quantity: req.body.quantity,
+                        images: req.files, 
+                        updatedAt: Date.now(),
                     });
-                    console.log(err.message);
-                });
+                    console.log(newProduct);
+                    newProduct.save()
+                        .then(data => {
+                            console.log("Added new product: " + data);
+                            res.redirect('/admin/products');
+                        })
+                        .catch(err => {
+                            res.status(500).render('error', {
+                                message: "Unable to add product to database",
+                                errStatus : 500
+                            });
+                            console.log(err);
+                        });
+                })
         }
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to add product to database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 }
 //find and retrieve all product(s) to display in table
@@ -50,15 +53,30 @@ exports.getAllProducts = (req, res, next) => {
         .sort({ category: 1, productName: 1 }).lean()
         .then(data => {
             if(data.length !== 0){
-                console.log("Data received: " + data);
-                res.locals.products = data;
-                next();
+                if(res.locals.categories){
+                    data.forEach(product => {
+                        const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.category) );
+                        product.category = prodCategoryName[0].categoryName;
+                    });    
+                    res.locals.products = data;
+                    next();
+                }
+                else{
+                    res.locals.products = data;
+                    // res.status(404).render('error', {
+                    //     message: "Oops..! Page not available",
+                    //     errStatus : 404
+                    // }); 
+                    // console.log("No categories received!");
+                    next();
+                }
             } else{
-                res.status(404).render('error', {
-                    message: "Oops..! Page not available",
-                    errStatus : 404
-                }); 
-                console.log("Oops..! Page not available");                  
+                next();
+                // res.status(404).render('error', {
+                //     message: "Oops..! Page not available",
+                //     errStatus : 404
+                // }); 
+                console.log("No products available to show!");                  
             }                        
         })
         .catch(err => {
@@ -66,20 +84,21 @@ exports.getAllProducts = (req, res, next) => {
                 message: "Unable to retrieve data from database",
                 errStatus : 500
             });
-            console.log(err.message);
+            console.log(err);
         });
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to retrieve data from database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 };
 //get edit product page and fill details of product in inputs
 exports.getEditProductItemDetails = async function(req, res, next){
     try{
-        await Productdb.find({id :req.params.id}).lean()
+        console.log("ID : " + req.params.id);
+        await Productdb.findOne({_id :req.params.id}).lean()
             .then(data => {
                 if (!data) {
                     res.status(500).render('error', {
@@ -89,8 +108,11 @@ exports.getEditProductItemDetails = async function(req, res, next){
                     console.log("Unable to find product info!");
                 }
                 else {
-                    if(data.length !== 0){
+                    if(data.length !== null){
+                        const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(data.category) );
+                        data.category = prodCategoryName[0].categoryName;
                         res.locals.product = data;
+                        //console.log(JSON.stringify(res.locals.product));
                         next();
                     } else{
                         res.status(404).render('error', {
@@ -106,72 +128,69 @@ exports.getEditProductItemDetails = async function(req, res, next){
                     message: "Oops..! Page not available",
                     errStatus : 404
                 });   
-                console.log(err.message);
+                console.log(err);
             });                
     } catch(err){
+        console.log("5");
         res.status(404).render('error', {
             message: "Oops..! Page not available",
             errStatus : 404
         });   
-        console.log(err.message);
+        console.log(err);
     }
 };
 //update product item by product id in db
-exports.updateProductItem = (req, res) => {
+exports.updateProductItem = async (req, res) => {
     try{
         console.log(req.body);
-    console.log(req.body.productName);
-    if (!req.body) {
-        console.log("Data to update cannot be empty");
-        return res.status(500).render('error', {
-            message: "Data to update cannot be empty"
-        });
-    }
-    const id = req.body.productID;
-    const product = new Productdb({
-        productName: req.body.productName,
-        description: req.body.description,
-        category: req.body.category,
-        brand: req.body.brand,
-        regularPrice: req.body.regularPrice,
-        salePrice: req.body.salePrice,
-        quantity: req.body.quantity,
-        // images: req.files,
-        updatedAt: Date.now(),
-        _id: id
-    });
-
-    console.log(product);
-    console.log(id);
-    Productdb.findByIdAndUpdate(id, product)
-        .then(data => {
-            console.log(data);
-            if (!data) {
-                res.status(500).render('error', {
-                    message: "Unable to update product",
-                    errStatus : 500
-                });
-                console.log("Unable to update product");
-            }
-            else {
-                //res.send(data);   
-                const msg = "Product details updated successfully!"
-                res.redirect('/admin/products');
-            }
-        })
-        .catch(err => {
-            res.status(500).render('error', {
-                message: "Error updating product in Database",
-                errStatus : 500
+        if (!req.body) {
+            console.log("Data to update cannot be empty");
+            return res.status(500).render('error', {
+                message: "Data to update cannot be empty"
             });
-            console.log(err.message);
-        });
+        }
+        await categoryController.getCategoryId(req.body.category)
+                .then(catergoryId => {
+                    const id = req.body.productID;
+                    const product = new Productdb({
+                        productName: req.body.productName,
+                        description: req.body.description,
+                        category: catergoryId,
+                        brand: req.body.brand,
+                        regularPrice: req.body.regularPrice,
+                        salePrice: req.body.salePrice,
+                        quantity: req.body.quantity,
+                        // images: req.files,
+                        updatedAt: Date.now(),
+                        _id: id
+                    });
+                    Productdb.findByIdAndUpdate(id, product)
+                    .then(data => {
+                        if (!data) {
+                            res.status(500).render('error', {
+                                message: "Unable to update product",
+                                errStatus : 500
+                            });
+                            console.log("Unable to update product");
+                        }
+                        else {
+                            res.redirect('/admin/products');
+                        }
+                    })
+                    .catch(err => {
+                        res.status(500).render('error', {
+                            message: "Error updating product in Database",
+                            errStatus : 500
+                        });
+                        console.log(err);
+                    });
+                })   
     } catch(err){
         res.status(500).render('error', {
             message: "Error updating product in Database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 };
 //delete product item with specified productID from DB
@@ -184,7 +203,6 @@ exports.deleteProductItem = (req, res) => {
             });
         }
         const id = req.body.userID;
-        console.log("ID for delete: " + id);
         Productdb.findByIdAndDelete(id)
             .then(data => {
                 if (!data) {
@@ -204,25 +222,26 @@ exports.deleteProductItem = (req, res) => {
                     message: "Unable to delete product. Error deleting product from Database",
                     errStatus : 500
                 });            
-                console.log(err.message);
+                console.log(err);
             });
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to delete product. Error deleting product from Database",
             errStatus : 500
         });            
-        console.log(err.message);
+        console.log(err);
     }
 };
 //get single product details by id
 exports.getProductItemById = async (req, res, next) => {
     try{        
         //if(mongoose.Types.ObjectId.isValid(req.params.id)){}
-        await Productdb.find({id : req.params.id}).lean()
+        await Productdb.findOne({_id : req.params.id}).lean()
         .then(data => {
             if(data){
                 if(data !== null){
-                    console.log("Product retrieved: " + data);
+                    const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(data.category) );
+                    data.category = prodCategoryName[0].categoryName;
                     res.locals.product = data;
                     next();
                 } else{
@@ -237,7 +256,7 @@ exports.getProductItemById = async (req, res, next) => {
                     message: "Unable to retrieve data from database",
                     errStatus : 500,
                 });
-                console.log(err.message);
+                console.log(err);
             }
         })
         .catch(err => {
@@ -245,36 +264,38 @@ exports.getProductItemById = async (req, res, next) => {
                 message: "Oops..! Page not available",
                 errStatus : 404
             });                
-            console.log(err.message);
+            console.log(err);
         });
     } catch(err){
         res.status(404).render('error', {
             message: "Oops..! Page not available",
             errStatus : 404
         });      
-        console.log(err.message);
+        console.log(err);
     }
 };
 //find and retrieve all product(s) of a single category
 exports.getProductsOfSingleCategory = async (req, res, next) => {
     try{
         if(req.params.category){
-            console.log(req.params.category);
-            const category = new RegExp(req.params.category);
-            console.log(category);
-            await Productdb.find({ category: { $regex: category, $options: 'i' }}).lean()
+            const prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
+            await Productdb.find({ category: prodCategoryId}).limit(8).lean()
             .then(data => {
                 if(data.length !== 0){
-                    console.log("Products retrieved: " + data);
+                    data.forEach(product => {
+                        const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.category) );
+                        product.category = prodCategoryName[0].categoryName;
+                    });                 
                     res.locals.products = data;
                     next();
                 }
                 else{
-                    res.status(404).render('error', {
-                        message: "Oops..! Page not available",
-                        errStatus : 404
-                    });                
-                    console.log("Oops..! Page not available");                                  
+                    // res.status(404).render('error', {
+                    //     message: "Oops..! Page not available",
+                    //     errStatus : 404
+                    // });                
+                    console.log("Related products not available!");     
+                    next();                             
                 }
                 
             })           
@@ -283,7 +304,7 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
                     message: "Unable to retrieve data from database",
                     errStatus : 500
                 });
-                console.log("Unable to retrieve data from database"); 
+                console.log("Unable to retrieve data from database! " + err); 
             });
         }else{
             res.status(404).render('error', {
@@ -296,6 +317,6 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
             message: "Unable to retrieve data from database",
             errStatus : 404
         });
-        console.log(err.message);
+        console.log(err);
     }
 };

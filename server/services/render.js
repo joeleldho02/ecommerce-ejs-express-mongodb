@@ -59,6 +59,9 @@ exports.getEditProductPage = (req, res) => {
         categories: res.locals.categories,
         product: res.locals.product
     });
+    console.log(JSON.stringify(res.locals.product));
+    console.log(JSON.stringify(res.locals.product.productName));
+    console.log(res.locals.product.productName);
 };
 exports.getAdminUsersPage = (req, res) => {
     res.render('page-users', {
@@ -101,6 +104,16 @@ exports.userSignupPage = (req, res) => {
     else
         res.render('user-signup');
 };
+exports.userVerifyOtpPage = (req, res) => {
+    if(req.session.loggedIn && !req.session.isAdmin)
+        res.redirect('/user');
+    else if(req.session.loggedIn)
+        res.redirect('/admin');
+    else
+        res.render('user-otp',{
+            phone: req.session.signupPhone
+        });
+}
 exports.userLogout = (req, res) => {
     req.session.destroy();
     res.redirect('/user');

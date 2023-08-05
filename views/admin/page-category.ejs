@@ -189,7 +189,7 @@
                                           </td>
                                           <td>
                                             <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
-                                                <a class="ms-2 edit_button"
+                                                <a class="ms-2 edit_button" id="edit-button"
                                                         data-bs-toggle="modal" data-bs-target="#myModal" 
                                                         data-btnaction="edit"
                                                         data-modaltitle="Edit category"
@@ -238,11 +238,13 @@
                             </div>
                             <div class="form-group w-100">
                                 <label for="categoryName">Category Name</label>
-                                <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" required>
+                                <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" >
+                                <div class="error text-danger ms-2"></div>
                             </div>
                             <div class="form-group mt-3">
                                 <label for="description">Description</label>
                                 <input class="form-control edit-description" id="description" name="description" placeholder="Enter description">
+                                <div class="error text-danger ms-2"></div>
                             </div>  
                             <div class="form-group mt-3">
                                 <label for="flexSwitchCheckChecked">List</label>
@@ -254,11 +256,11 @@
                                 <input type="hidden" class="form-control edit-islisted" id="listed" name="listed" placeholder="Is listed" required>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
                     </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                        <button id="modal-save-btn" type="submit" onclick="confirmEdit('modalForm')" class="btn btn-primary w-50">Save changes</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -289,7 +291,74 @@
     <!-- Page level plugins -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
     <!-- Page level custom scripts -->
+    <script>
+        const form = document.getElementById('loginForm');
+        const categoryName = document.getElementById('categoryName');
+        const description = document.getElementById('description'); 
+        
+        const setError = (element, message) => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = message;
+            inputControl.classList.add('error');
+            inputControl.classList.remove('success');
+        };
+        const setSuccess = element => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = '';
+            inputControl.classList.add('success');
+            inputControl.classList.remove('error');
+        };
+
+        function validateInputs() {
+            const categoryNameValue = categoryName.value.trim();
+            const descriptionValue = description.value.trim();
+
+            if(categoryNameValue === '') {
+                setError(categoryName, 'Please enter category name');
+                categoryName.focus();
+                return false;
+            } else{
+                setSuccess(categoryName);
+            }
+            
+            if(descriptionValue === '') {
+                setError(description, 'Please enter description');
+                description.focus();
+                return false;
+            } else{
+                setSuccess(description);
+            }
+            return true;
+        }
+
+        function confirmEdit(form) {
+            const button = document.getElementById('modal-save-btn');
+            const btnAction = button.innerHTML;
+
+            console.log('Login submit button recorded');
+            if(validateInputs()){
+                console.log("VALIDATION Success");
+                console.log("Action : " + btnAction);
+                if(btnAction === "Save changes"){                    
+                    if (confirm('Save the changes made to the category ?')) {
+                        document.getElementById(form).submit();
+                    }
+                }
+                else{
+                    document.getElementById(form).submit();
+                }
+            } else{
+                console.log("Validation FAILED!");
+            }
+        }
+
+    </script>
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
@@ -301,6 +370,7 @@
                 document.getElementById(formID).submit();
             }
         }
+        
         $(document).on( "click", '.edit_button',function(e) {
             const id = $(this).data('id');
             const categoryName = $(this).data('categoryname');
@@ -327,9 +397,11 @@
             if( btnAction === "add" ) {  
                 $('#modalForm').attr('action', '/admin/add-category');
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+                $('#modal-save-btn').text('Add category');
             }
             else if( btnAction === "edit" ) {
                 $('#modalForm').attr('action', '/admin/edit-category');
+                $('#modal-save-btn').text('Save changes');
             }
         });
 

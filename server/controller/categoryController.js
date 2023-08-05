@@ -101,6 +101,34 @@ exports.getListedCategories = async (req, res, next) => {
         console.log(err.message);    
     }
 };
+
+//get category id of single category 
+exports.getCategoryId = (categoryName) => {
+    return new Promise((resolve, reject) => {
+        try{
+            Categorydb.findOne({categoryName: categoryName})
+            .then(data => {
+                console.log(data);
+                console.log("ID : " + data._id);
+                if(data !== null){
+                    console.log("1");
+                    resolve(data._id)
+                }
+                else{
+                    reject();
+                }
+            })
+            .catch(() => {
+                console.log("3");
+                reject();
+            });
+        } catch{
+            console.log("4");
+            reject();
+        }        
+    });        
+};
+
 //update category by category id in db
 exports.updateCategory = (req, res) => {
     try{

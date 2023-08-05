@@ -5,7 +5,11 @@ const categoryController = require('../server/controller/categoryController');
 const serviceRender = require('../server/services/render');
 
 router.get('/', categoryController.getListedCategories, serviceRender.homePage);
-router.get('/:category', productController.getProductsOfSingleCategory, categoryController.getListedCategories, serviceRender.categoryProductsPage);
-router.get('/:category/:id', productController.getProductItemById, productController.getProductsOfSingleCategory, categoryController.getListedCategories, serviceRender.productDetailsPage);
+router.get('/cart', (req, res) => {
+    res.render('page-cart');
+})
+router.get('/:category', categoryController.getListedCategories, productController.getProductsOfSingleCategory, serviceRender.categoryProductsPage);
+router.get('/:category/:id', categoryController.getListedCategories, productController.getProductsOfSingleCategory, productController.getProductItemById, serviceRender.productDetailsPage);
+
 
 module.exports = router;  

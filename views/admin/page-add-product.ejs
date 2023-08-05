@@ -173,7 +173,7 @@
                                     value="<%= product.productName %>"
                                 <% } %>
                             />
-                            <div class="error"></div>
+                            <div class="error text-danger"></div>
                         </div>
                         <div class="form-group finput d-flex mt-3">
                             <div class="icon d-flex align-items-center justify-content-center">
@@ -181,9 +181,9 @@
                             </div>
                             <textarea class="form-control  my-2 mx-2" id="description" rows="10" name="description"
                                 placeholder="Description"><% if (locals.product) { %><%= product.description %><%} %></textarea>
-                            <div class="error" ></div>
+                            <div class="error text-danger" ></div>
                         </div>                        
-                        <div class=" d-flex align-items-center justify-content-between" style="column-gap: 20px;"> 
+                        <div class=" d-md-flex align-items-center justify-content-between" style="column-gap: 20px;"> 
                             <div class="form-group d-flex w-25 mt-4">
                                 <div class="icon me-2 d-flex align-items-center justify-content-center">
                                     <span class="fa fa-envelope"></span>
@@ -196,7 +196,13 @@
                                     <% } %> 
                                     <% if (locals.categories) { %>
                                         <% for (let i = 0; i < categories.length; i++) { %>
-                                            <option><%= categories[i].categoryName %></option>
+                                            <% if (locals.product) { %>
+                                                <% if (categories[i].categoryName !== product.category) { %>
+                                                    <option><%= categories[i].categoryName %></option>
+                                                <% } %> 
+                                            <% } else { %>
+                                                <option><%= categories[i].categoryName %></option>
+                                            <% } %> 
                                         <% } %>                                        
                                     <% } %>
                                 </select>
@@ -211,7 +217,7 @@
                                         value="<%= product.brand %>"
                                     <% } %>
                                 />
-                                <div class="error"></div>
+                                <div class="error text-danger"></div>
                             </div>
                             <div class="form-group finput d-flex mt-3 ">
                                 <div class="icon d-flex align-items-center justify-content-center">
@@ -223,7 +229,7 @@
                                         value="<%= product.regularPrice %>"
                                     <% } %>
                                 />
-                                <div class="error"></div>
+                                <div class="error text-danger"></div>
                             </div>
                             <div class="form-group finput d-flex mt-3" >
                                 <div class="icon d-flex align-items-center justify-content-center">
@@ -235,7 +241,7 @@
                                         value="<%= product.salePrice %>"
                                     <% } %>
                                 />
-                                <div class="error"></div>
+                                <div class="error text-danger"></div>
                             </div>
                             <div class="form-group finput d-flex mt-3" >
                                 <div class="icon d-flex align-items-center justify-content-center">
@@ -247,7 +253,7 @@
                                         value="<%= product.quantity %>"
                                     <% } %>
                                 />
-                                <div class="error"></div>
+                                <div class="error text-danger"></div>
                             </div>
                         </div>
                         <% if (!locals.product) { %>
@@ -256,23 +262,13 @@
                                     <span class="fa fa-lock"></span>
                                 </div>
                                 <input type="file" id="productImage" name="productImage" class="form-control my-2 mx-2" multiple>
-                                <div class="error"></div>
+                                <div class="error text-danger"></div>
                             </div>
                         <% } %>
-                        <!-- <div class="form-group finput d-flex mt-3" >
-                            <div class="icon d-flex align-items-center justify-content-center">
-                                <span class="fa fa-lock"></span>
-                            </div>
-                            <input type="file" id="productImage" name="productImage" class="form-control my-2 mx-2" multiple
-                            <% if (locals.product) { %>
-                                value="<%= product.images %>"
-                            <% } %>/>
-                            <div class="error"></div>
-                        </div> -->
                         <div class="row mt-50">
                             <div class="col-sm-12">
                               <div class="preview-images">
-                                <% if (locals.product) { %>
+                                <% if (locals.product && locals.product.images) { %>
                                     <% for (let j = 0; j < product.images.length; j++) { %>
                                         <img src="/img/products/<%= product.images[j].filename %>" class="img-sm img-thumbnail" alt="<%= product.productName %>">
                                     <% } %>
@@ -288,9 +284,7 @@
                                 <button>Choose File</button>
                                 <input type="file" hidden>
                             </div>
-                        </div> -->
-
-                        
+                        </div> -->                        
                         <div class="form-group mt-4 mb-2">
                             <button id="btn-submit" type="submit" class="btn form-control btn-primary text-white rounded submit px-3">
                                 <% if (locals.product) { %>
