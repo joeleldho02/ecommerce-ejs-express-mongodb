@@ -22,7 +22,7 @@ exports.addCategory = async (req, res) => {
                         message: "Unable to add category to database",
                         errStatus : 500
                     });
-            console.log(err.message);
+            console.log(err);
                 });
         }
     } catch(err){
@@ -30,7 +30,7 @@ exports.addCategory = async (req, res) => {
             message: "Unable to add category to database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 }
 //find and retrieve all category(s) to display in table

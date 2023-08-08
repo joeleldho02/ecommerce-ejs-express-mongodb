@@ -6,16 +6,29 @@ exports.homePage = (req, res) => {
     });
 };
 exports.categoryProductsPage = (req, res) => {
-    res.render('page-category-products', {
-        categories: res.locals.categories,
-        products : res.locals.products
-    });
+    if(res.locals.categories.length === 0){
+        res.status(404).render('error', {
+                        message: "Oops..! Page not available",
+                        errStatus : 404
+                    });
+    } else{
+        res.render('page-category-products', {
+            categories: res.locals.categories,
+            products : res.locals.products,
+            cartItems : res.locals.cartItems,
+            subTotal : res.locals.subTotal,
+            itemsCount : res.locals.itemsCount
+        });
+    }    
 };
 exports.productDetailsPage = (req, res) => {
     res.render('page-product-details', {
         categories: res.locals.categories,
         product: res.locals.product,
-        relatedProducts: res.locals.products
+        relatedProducts: res.locals.products,
+        cartItems : res.locals.cartItems,
+        subTotal : res.locals.subTotal,
+        itemsCount : res.locals.itemsCount
     });
 };
 

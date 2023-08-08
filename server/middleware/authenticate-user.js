@@ -28,11 +28,12 @@ exports.authenticateUser = async (req, res, next) => {
                 res.status(500).render('error', {
                     message: "Unable to authenticate user right now. Please try again some time later",
                     errStatus : 500,
-                    error:{stack: err.message}
+                    error:{stack: err}
                 });
         }); 
     }
     else{
-        next();
+        res.redirect('/user/login');
+        //next();
     }   
 };

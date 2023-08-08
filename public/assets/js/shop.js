@@ -64,20 +64,23 @@
         });
         //Qty Up-Down
         $('.detail-qty').each(function () {
-            var qtyval = parseInt($(this).find('.qty-val').text(), 10);
+            let qtyval = parseInt($(this).find('.qty-val').text(), 10);
             $('.qty-up').on('click', function (event) {
                 event.preventDefault();
                 qtyval = qtyval + 1;
                 $(this).prev().text(qtyval);
+                $('#quantityInput').val(qtyval);
             });
             $('.qty-down').on('click', function (event) {
                 event.preventDefault();
                 qtyval = qtyval - 1;
                 if (qtyval > 1) {
                     $(this).next().text(qtyval);
+                    $('#quantityInput').val(qtyval);
                 } else {
                     qtyval = 1;
                     $(this).next().text(qtyval);
+                    $('#quantityInput').val(qtyval);
                 }
             });
         });

@@ -108,7 +108,7 @@ exports.getEditProductItemDetails = async function(req, res, next){
                     console.log("Unable to find product info!");
                 }
                 else {
-                    if(data.length !== null){
+                    if(data !== null){
                         const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(data.category) );
                         data.category = prodCategoryName[0].categoryName;
                         res.locals.product = data;

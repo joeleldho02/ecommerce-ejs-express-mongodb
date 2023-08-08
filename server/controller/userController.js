@@ -5,8 +5,7 @@ dotenv.config({path:'.env'});
 const client = require('twilio')(process.env.TWILIO_ACCOUNTSID, process.env.TWILIO_AUTHTOKEN);
 
 async function setSession(req, res, userData){
-    try{
-        if(userData){            
+    try{         
             delete req.session.signupEmail;
             delete req.session.signupPhone;
             delete req.session.loginErrMsg;
@@ -16,39 +15,13 @@ async function setSession(req, res, userData){
             req.session.loggedIn = true;
             req.session.user = userData;
             req.session.isAdmin = false;
-            console.log(`User Logged in Succesfully : ${userData.firstName + userData.lastName}`)
-            res.redirect('/user');
-        } else{
-            // await Userdb.findOne({ email: req.session.signupEmail})
-            // .then(user => {
-            //     console.log("USER : " + user);
-            //     if (user !== null){
-            //         delete user.password
-            //         delete req.session.signupEmail;
-            //         delete req.session.loginErrMsg;
-            //         delete req.session.loginOTP;
-            //         delete req.session.loginErr;
-            //         req.session.loggedIn = true;
-            //         req.session.user = user;
-            //         req.session.isAdmin = false;
-            //         console.log(`User Logged in Succesfully : ${req.session.user.firstName + req.session.user.firstName}`)
-            //         res.redirect('/user');
-            //     }
-            //     else {
-            //         res.status(404).render('error', {
-            //             message: "Oops..! Page not available",
-            //             errStatus : 404
-            //         }); 
-            //         console.log("Oops..! Page not available");     
-            //     }
-            //     }).catch(err => {
-            //         res.status(500).render('error', {
-            //             message: "Unable to get userdata from database",
-            //             errStatus : 500
-            //         });
-            //         console.log(err.message);
-            //     });
-        }            
+            console.log(`User Logged in Succesfully : ${userData.firstName + userData.lastName}`);
+            if(res.locals.requestFrom){
+                res.redirect(res.locals.requestFrom);
+                delete res.locals.requestFrom;
+            } 
+            else         
+                res.redirect('/user'); 
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to get userdata from database",

@@ -75,50 +75,42 @@
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
-                                    <a href="shop-wishlist.html">
+                                    <a href="/wishlist">
                                         <img class="svgInject" alt="Evara" src="/assets/imgs/theme/icons/icon-heart.svg">
-                                        <span class="pro-count blue">4</span>
+                                        <span class="pro-count blue">0</span>
                                     </a>
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a class="mini-cart-icon" href="shop-cart.html">
-                                        <img alt="Evara" src="/assets/imgs/theme/icons/icon-cart.svg">
-                                        <span class="pro-count blue">2</span>
+                                    <a class="mini-cart-icon" href="/cart">
+                                        <img alt="Logo" src="/assets/imgs/theme/icons/icon-cart.svg">
+                                        <span class="pro-count blue" id="cartItemsCount"><% if(locals.itemsCount) { %> <%= itemsCount %> <% } else { %> 0<% }%></span>
                                     </a>
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2">
                                         <ul>
+                                            <% if (locals.cartItems) { %>                                    
+                                                <% for (let i = 0; i < cartItems.length; i++) { %>
                                             <li>
                                                 <div class="shopping-cart-img">
-                                                    <a href="shop-product-right.html"><img alt="Evara" src="/assets/imgs/shop/thumbnail-3.jpg"></a>
+                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>"></a>
                                                 </div>
                                                 <div class="shopping-cart-title">
-                                                    <h4><a href="shop-product-right.html">Daisy Casual Bag</a></h4>
-                                                    <h4><span>1 × </span>$800.00</h4>
+                                                    <h4><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
+                                                    <h4><span><%= cartItems[i].quantity %> × </span>₹<%= cartItems[i].salePrice %></h4>
                                                 </div>
                                                 <div class="shopping-cart-delete">
-                                                    <a href="#"><i class="fi-rs-cross-small"></i></a>
+                                                    <a href="/remove-cart-item/<%= cartItems[i].productInfo[0]._id %>"><i class="fi-rs-cross-small"></i></a>
                                                 </div>
                                             </li>
-                                            <li>
-                                                <div class="shopping-cart-img">
-                                                    <a href="shop-product-right.html"><img alt="Evara" src="/assets/imgs/shop/thumbnail-2.jpg"></a>
-                                                </div>
-                                                <div class="shopping-cart-title">
-                                                    <h4><a href="shop-product-right.html">Corduroy Shirts</a></h4>
-                                                    <h4><span>1 × </span>$3200.00</h4>
-                                                </div>
-                                                <div class="shopping-cart-delete">
-                                                    <a href="#"><i class="fi-rs-cross-small"></i></a>
-                                                </div>
-                                            </li>
+                                                <% } %>
+                                            <% }  %>
                                         </ul>
                                         <div class="shopping-cart-footer">
-                                            <div class="shopping-cart-total">
-                                                <h4>Total <span>$4000.00</span></h4>
+                                            <div class="shopping-cart-total ">
+                                                <h4>Total <span>₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></h4>
                                             </div>
                                             <div class="shopping-cart-button">
-                                                <a href="shop-cart.html" class="outline">View cart</a>
-                                                <a href="shop-checkout.html">Checkout</a>
+                                                <a href="/cart" class="outline">View cart</a>
+                                                <a href="/checkout">Checkout</a>
                                             </div>
                                         </div>
                                     </div>
@@ -537,63 +529,42 @@
                                     <% if (locals.cartItems) { %>                                    
                                         <% for (let i = 0; i < cartItems.length; i++) { %>
                                     <tr>
-                                        <td class="image product-thumbnail"><img src="/assets/imgs/shop/product-1-2.jpg" alt="#"></td>
+                                        <td class="image product-thumbnail"><img src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>" alt="#"></td>
                                         <td class="product-des product-name">
-                                            <h5 class="product-name"><a href="shop-product-right.html">J.Crew Mercantile Women's Short-Sleeve</a></h5>
-                                            <p class="font-xs">Maboriosam in a tonto nesciung eget<br> distingy magndapibus.
-                                            </p>
+                                            <h4 class="product-name"><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
+                                            <p class="font-xs"><%= cartItems[i].productInfo[0].brand %> - <%= cartItems[i].productInfo[0].category %> </p>
                                         </td>
-                                        <td class="price" data-title="Price"><span>$65.00 </span></td>
+                                        <td class="price" data-title="Price"><span>₹<%= cartItems[i].salePrice %></span></td>
                                         <td class="text-center" data-title="Stock">
                                             <div class="detail-qty border radius  m-auto">
                                                 <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                                                <span class="qty-val">1</span>
+                                                <span class="qty-val"><%= cartItems[i].quantity %> </span>
                                                 <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                                             </div>
                                         </td>
                                         <td class="text-right" data-title="Cart">
-                                            <span>$65.00 </span>
+                                            <span>₹<%= cartItems[i].salePrice * cartItems[i].quantity %></span>
                                         </td>
-                                        <td class="action" data-title="Remove"><a href="#" class="text-muted"><i class="fi-rs-trash"></i></a></td>
+                                        <td class="action" data-title="Remove"><a href="/remove-cart-item/<%= cartItems[i].productInfo[0]._id %>" class="text-muted"><i class="fi-rs-trash"></i></a></td>
                                     </tr>
                                         <% } %>
                                     <% }  %>
                                     <tr>
-                                        <td class="image product-thumbnail"><img src="/assets/imgs/shop/product-1-2.jpg" alt="#"></td>
-                                        <td class="product-des product-name">
-                                            <h5 class="product-name"><a href="shop-product-right.html">J.Crew Mercantile Women's Short-Sleeve</a></h5>
-                                            <p class="font-xs">Maboriosam in a tonto nesciung eget<br> distingy magndapibus.
-                                            </p>
-                                        </td>
-                                        <td class="price" data-title="Price"><span>$65.00 </span></td>
-                                        <td class="text-center" data-title="Stock">
-                                            <div class="detail-qty border radius  m-auto">
-                                                <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                                                <span class="qty-val">1</span>
-                                                <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
-                                            </div>
-                                        </td>
-                                        <td class="text-right" data-title="Cart">
-                                            <span>$65.00 </span>
-                                        </td>
-                                        <td class="action" data-title="Remove"><a href="#" class="text-muted"><i class="fi-rs-trash"></i></a></td>
-                                    </tr>
-                                    <tr>
                                         <td colspan="6" class="text-end">
-                                            <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a>
+                                            <!-- <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a> -->
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="cart-action text-end">
-                            <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
+                            <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
                             <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                         </div>
                         <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                         <div class="row mb-50">
                             <div class="col-lg-6 col-md-12">
-                                <div class="heading_s1 mb-3">
+                                <!-- <div class="heading_s1 mb-3">
                                     <h4>Calculate Shipping</h4>
                                 </div>
                                 <p class="mt-15 mb-30">Flat rate: <span class="font-xl text-brand fw-900">5%</span></p>
@@ -864,7 +835,7 @@
                                             <button class="btn  btn-sm"><i class="fi-rs-shuffle mr-10"></i>Update</button>
                                         </div>
                                     </div>
-                                </form>
+                                </form> -->
                                 <div class="mb-30 mt-50">
                                     <div class="heading_s1 mb-3">
                                         <h4>Apply Coupon</h4>
@@ -897,7 +868,9 @@
                                             <tbody>
                                                 <tr>
                                                     <td class="cart_total_label">Cart Subtotal</td>
-                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">$240.00</span></td>
+                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">
+                                                        ₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %>
+                                                        </span></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="cart_total_label">Shipping</td>
@@ -905,12 +878,12 @@
                                                 </tr>
                                                 <tr>
                                                     <td class="cart_total_label">Total</td>
-                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">$240.00</span></strong></td>
+                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <a href="#" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                    <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                                 </div>
                             </div>
                         </div>

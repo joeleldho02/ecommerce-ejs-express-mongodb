@@ -106,7 +106,39 @@ const productSchema = new mongoose.Schema({
 });
 const Productdb = mongoose.model('product', productSchema);
 
+//-----   Cart Model   -----//
+const cartSchema = new mongoose.Schema({
+    customerId: mongoose.Schema.Types.ObjectId,
+    products:[{
+        productId: mongoose.Schema.Types.ObjectId,
+        quantity: Number,
+    }],
+    createdAt: {
+        type: Date,
+        default: () => Date.now()
+    },
+    updatedAt:{
+        type: Date,
+        default: () => Date.now()
+    }
+});
+const Cartdb = mongoose.model('cart', cartSchema);
+
 //-----   Order Model   -----//
+const orderSchema = new mongoose.Schema({
+    customerId: mongoose.Schema.Types.ObjectId,
+    cartId: mongoose.Schema.Types.ObjectId,
+    createdAt: {
+        type: Date,
+        default: () => Date.now()
+    },
+    updatedAt:{
+        type: Date,
+        default: () => Date.now()
+    }
+});
+const Orderdb = mongoose.model('order', orderSchema);
+
 //-----   Wallet Model   -----//
 //-----   Coupon Model   -----//
 //-----   Banner Model   -----//
@@ -116,5 +148,6 @@ module.exports = {
     Userdb,
     Admindb,
     Categorydb,
-    Productdb
+    Productdb,
+    Cartdb
 };

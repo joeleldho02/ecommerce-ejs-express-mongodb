@@ -724,7 +724,6 @@
 
                                                 ><i class="fi-rs-search"></i></a>
                                                 <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
-                                                <a aria-label="Compare" class="action-btn hover-up" href="#"><i class="fi-rs-shuffle"></i></a>
                                             </div>
                                             <div class="product-badges product-badges-position product-badges-mrg">
                                                 <span class="hot">Hot</span>
@@ -741,7 +740,7 @@
                                             </div>
                                             <p class="mt-15"><%= products[i].description %></p>
                                             <div class="product-action-1 show">
-                                                <a aria-label="Buy now" class="action-btn" href="#"><i class="fi-rs-shopping-bag-add"></i>Add to Cart</a>
+                                                <a aria-label="Add to cart" class="action-btn" href="/add-to-cart/<%= products[i]._id %>"><i class="fi-rs-shopping-bag-add"></i>Add to Cart</a>
                                                 <div class="rating-result" title="90%">
                                                     <span>
                                                         <span>90%</span>
