@@ -2,7 +2,8 @@
 //------- HOME PAGE --------//
 exports.homePage = (req, res) => {
     res.render('home',{
-        categories: res.locals.categories
+        categories: res.locals.categories,
+
     });
 };
 exports.categoryProductsPage = (req, res) => {
@@ -31,6 +32,29 @@ exports.productDetailsPage = (req, res) => {
         itemsCount : res.locals.itemsCount
     });
 };
+exports.getUserCartPage = (req, res) => {
+    res.render('page-cart', {
+        categories: res.locals.categories,
+        cartItems : res.locals.cartItems,
+        subTotal : res.locals.subTotal,
+        itemsCount : res.locals.itemsCount
+    });
+};
+exports.getUserCheckoutPage = (req, res) => {
+    res.render('page-checkout', {
+        categories: res.locals.categories,
+        cartItems : res.locals.cartItems,
+        subTotal : res.locals.subTotal,
+        itemsCount : res.locals.itemsCount,
+        addresses: res.locals.addresses
+    });
+};
+exports.getOrderPlacedPage = (req, res) => {
+    res.render('page-order-placed',{
+        categories: res.locals.categories,        
+        itemsCount : res.locals.itemsCount,
+    });
+};
 
 //------- ADMIN SIDE --------//
 exports.adminLoginPage = (req, res) => {
@@ -53,9 +77,20 @@ exports.adminLogout = (req, res) => {
     req.session.destroy();
     res.render('admin-login');
 };
+
 exports.getAdminOrdersPage = (req, res) => {
-    res.render('page-orders');
+    res.render('page-order', {
+        orders: res.locals.orders
+    });
 };
+exports.getAdminViewOrderPage = (req, res) => {
+    res.render('page-view-order', {
+        categories: res.locals.categories,
+        subTotal : res.locals.subTotal,
+        order: res.locals.order
+    });
+};
+
 exports.getAdminProductPage = (req, res) => {
     res.render('page-products', {
         products: res.locals.products
@@ -93,6 +128,12 @@ exports.userDashboardPage = (req, res) => {
         res.render('user-dashboard',{
             navTitle: 'Welcome ' + req.session.user.firstName,
             user: req.session.user,
+            categories: res.locals.categories,
+            cartItems : res.locals.cartItems,
+            subTotal : res.locals.subTotal,
+            itemsCount : res.locals.itemsCount,
+            addresses : res.locals.addresses,
+            orders: res.locals.orders
         });
     else if(req.session.loggedIn)
         res.redirect('/admin');
@@ -131,6 +172,17 @@ exports.userLogout = (req, res) => {
     req.session.destroy();
     res.redirect('/user');
 };
+exports.getUserOrderDetailsPage = (req, res) => {
+    res.render('user-order-view', {
+        categories: res.locals.categories,
+        cartItems : res.locals.cartItems,
+        itemsCount : res.locals.itemsCount,
+        order: res.locals.order,
+        totalAmount : res.locals.subTotal
+    })
+}
+
+
 
 //------- ORDERS SIDE --------//
 

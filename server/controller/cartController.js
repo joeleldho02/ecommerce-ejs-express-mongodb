@@ -1,24 +1,46 @@
 const {Cartdb} = require('../model/model');
 const mongoose = require('mongoose');
 
+exports.getUserCart = async (req, res, next) => {
+    try{
+        if(req.session.user){
+            let cart = await Cartdb.findOne({customerId: req.session.user._id}).lean();
+            console.log("Items : " + cart);
+            if(cart){
+                res.locals.userCart = cart;
+                next();
+            }
+            else{
+                next();
+            }
+        }else{
+            res.locals.requestFrom = "/user/cart";
+            res.redirect('/user/login');
+        }
+    } catch(err){
+        next();
+    }
+};
+
 //find and retrieve all product(s) to display in table
 exports.getAllCartItems = async (req, res, next) => {
     try{
         if(req.session.user){
             let cartItems = await Cartdb.aggregate([
-                {$match: { customerId: new mongoose.Types.ObjectId('64c636ad19a271c05a79a53d')}},
+                {$match: { customerId: new mongoose.Types.ObjectId(req.session.user._id)}},
                 {$unwind: '$products'},
                 {$lookup: {
                          from: 'products',
                          localField: 'products.productId',
                          foreignField: '_id',
-                         as: 'productInfo'
-                }},
+                         as: 'productInfo'}
+                },
                 {$project: {
                     productInfo : 1, 
                     quantity:'$products.quantity', 
                     _id:0, 
-                    salePrice:'$productInfo.salePrice'}}
+                    salePrice:'$productInfo.salePrice'}
+                }
             ])
             if(cartItems.length === 0){
                 console.log(" No items in cart!!");
@@ -64,7 +86,7 @@ exports.addToCart = async (req, res, next) => {
                 productId: prodId,
                 quantity: qty ?? 1
             }]
-        })
+        });
         console.log(newCart);
         newCart.save()
             .then(data => {
@@ -83,7 +105,7 @@ exports.addToCart = async (req, res, next) => {
         console.log("Cart already exists!");
         //res.send("Product added to cart!")
         let flag = 0;
-        for( item of userCart.products){
+        for(item of userCart.products){
             if(item.productId.equals(new mongoose.Types.ObjectId(prodId)) ){
                 flag = 1;
                 item.quantity += Number(qty);
@@ -147,3 +169,35 @@ exports.getCartItemsCount = async (req, res, next) => {
     }
     
 }
+
+exports.getTotalAmount = async (req, res, next) => {
+    try{
+        let total = await Cartdb.aggregate([
+            {$match: { customerId: req.session.user._id}},
+            {$unwind: '$products'},
+            {$lookup: {
+                     from: 'products',
+                     localField: 'products.productId',
+                     foreignField: '_id',
+                     as: 'productInfo'}
+            },
+            {$project: {
+                productInfo : 1, 
+                quantity:'$products.quantity', 
+                _id:0, 
+                salePrice:'$productInfo.salePrice'}
+            },
+            {$group: {
+                _id: null,
+                total:{$sum:{$multiply:['quantity', 'salePrice']}}
+            }}
+        ])
+        console.log(JSON.stringify(total));
+        console.log("Total Amount of cart: " + total); 
+        //res.locals.totalAmt = total;
+        next();
+    } catch(err){
+
+    }
+}
+

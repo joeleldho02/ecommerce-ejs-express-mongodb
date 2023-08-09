@@ -1,5 +1,6 @@
 const {Userdb} = require('../model/model');
 const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config({path:'.env'});
 const client = require('twilio')(process.env.TWILIO_ACCOUNTSID, process.env.TWILIO_AUTHTOKEN);
@@ -27,7 +28,7 @@ async function setSession(req, res, userData){
             message: "Unable to get userdata from database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 }
 async function sendOTP(phone){
@@ -36,7 +37,7 @@ async function sendOTP(phone){
         const hashedOtp = await bcrypt.hash(String(generatedOtp), 10);
         console.log(`Generated OTP : ${generatedOtp}`)
     //-------------------- TWILIO OTP SENDER CODE ---------------------//
-        // client.messages
+        // clients
         // .create({
         //     body: `JMJ Music House - OTP for Login is ${generatedOtp}`,
         //     from: '+17626002830',
@@ -50,7 +51,7 @@ async function sendOTP(phone){
             message: "Unable to send OTP. Please try again later",
             errStatus : 500
         });
-        console.log("Unable to send OTP. Please try again later" + err.message);
+        console.log("Unable to send OTP. Please try again later" + err);
     }
 }
 
@@ -84,7 +85,7 @@ exports.registerUser = async (req, res) => {
                         message: "Unable to add user to database",
                         errStatus : 500
                     });
-                    console.log(err.message);
+                    console.log(err);
                 });
         }
     } catch(err){
@@ -92,7 +93,7 @@ exports.registerUser = async (req, res) => {
             message: "Unable to add user to database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 };
 async function addUserDetails(req, res) {
@@ -118,14 +119,14 @@ async function addUserDetails(req, res) {
                     message: "Unable to add user to database",
                     errStatus : 500
                 });
-                console.log(err.message);
+                console.log(err);
             });
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to add user to database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 }
 
@@ -232,14 +233,14 @@ exports.getAllUsers = (req, res, next) => {
                 message: "Unable to retrieve data from database",
                 errStatus : 500
             });
-            console.log(err.message);
+            console.log(err);
         });
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to retrieve data from database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 };
 //update single user by user_id in db
@@ -247,10 +248,7 @@ exports.updateSinlgleUser = (req, res) => {
     try{
         if (!req.body) {
             console.log("Data to update cannot be empty");
-            return res.status(500).render('error', {
-                message: "Data to update cannot be empty",
-                errStatus : 500
-            });
+            return res.redirect('back');
         }
         const id = req.body.id;
         const user = new Userdb({
@@ -260,7 +258,7 @@ exports.updateSinlgleUser = (req, res) => {
             isActive: req.body.isActive === "on" ? true : false,
             updatedAt: Date.now(),
             _id: id
-        })
+        });
         Userdb.findByIdAndUpdate(id, user)
             .then(data => {
                 if (!data) {
@@ -281,14 +279,14 @@ exports.updateSinlgleUser = (req, res) => {
                     message: "Error updating user in Database",
                     errStatus : 500
                 });
-                console.log(err.message);
+                console.log(err);
             });
     } catch(err){
         res.status(500).render('error', {
             message: "Error updating user in Database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
     }
 };
 //delete user with specified user_id from DB
@@ -322,13 +320,231 @@ exports.deleteUser = (req, res) => {
                     message: "Unable to delete user. Error deleting user in Database",
                     errStatus : 500
                 });
-                console.log(err.message);
+                console.log(err);
             });
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to delete user. Error deleting user in Database",
             errStatus : 500
         });
-        console.log(err.message);
+        console.log(err);
+    }
+};
+
+
+//add new address to user address array
+exports.addNewAddress = async (req, res) => {
+    try{
+        console.log("ADDING NEW ADDRESS ---------------->");
+        console.log(req.body);
+        if (!req.body) {
+            console.log("Data to add cannot be empty");
+            return res.redirect('back');
+        }
+        const id = req.session.user._id;
+        const newAddress = {
+            customerName: req.body.customerName,
+            addressLine1: req.body.addressLine1,
+            addressLine2: req.body.addressLine2,
+            city: req.body.city,
+            state: req.body.state,
+            country: req.body.country,
+            pincode: req.body.pincode,
+            email: req.body.email,
+            phone: req.body.phone,
+            notes: req.body.notes,
+            isDefault: req.body.isDefault === "on" ? true : false,
+        };
+        const user = await Userdb.findOne({_id: id}).lean();
+        console.log(user);
+        if(user){
+            let editUser;
+        if(user.address.length === 0){            
+            editUser = new Userdb({
+                _id: id,
+                address: newAddress,
+                updatedAt: Date.now()
+            });
+            console.log(editUser);            
+        } else{
+            user.address.push(newAddress);
+            editUser = new Userdb(user);
+        }
+        await Userdb.findByIdAndUpdate(id, editUser)
+            .then(data => {
+                if (!data) {
+                    res.status(500).render('error', {
+                        message: "Unable to add new address to user data",
+                        errStatus : 500
+                    });
+                    console.log("Unable to add new address to user data");
+                }
+                else {
+                    const msg = "New address added successfully!";
+                    console.log(msg);
+                    res.redirect('/user#address');
+                }
+            })
+            .catch(err => {
+                res.status(500).render('error', {
+                    message: "Error adding new address!",
+                    errStatus : 500
+                });
+                console.log(err);
+            });
+        } else{
+            res.status(500).render('error', {
+                message: "Unable to add new address to user data",
+                errStatus : 500
+            });
+            console.log(err);
+        }      
+    } catch{
+        res.status(500).render('error', {
+            message: "Unable to add new address to user data",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+};
+
+exports.getAllAddresses = async (req, res, next) => {
+    try{
+        const id = req.session.user._id;
+        await Userdb.findById(id)
+            .then((user) => {
+                console.log(user);
+                if (user !== null){
+                    res.locals.addresses = user.address;
+                    console.log("Address: " + JSON.stringify(res.locals.addresses));
+                }
+                else{                    
+                    console.log("Unable to find user to get addresses from database");
+                }
+                next();
+            })
+            .catch(err => {
+                res.status(500).render('error', {
+                    message: "Unable to retrieve data from database",
+                    errStatus : 500
+                });
+                console.log("Unable to get addresses from database");
+            })
+    } catch{
+        next();
+    }
+};
+
+exports.editAddress = async (req, res) => {
+    try{        
+        console.log("EDITING EXISTING ADDRESS ---------------->");
+        console.log(req.body);
+        if (!req.body) {
+            console.log("Data to update cannot be empty");
+            return res.redirect('back');
+        }
+        const id = req.session.user._id;
+        const editAddress = {
+            customerName: req.body.customerName,
+            addressLine1: req.body.addressLine1,
+            addressLine2: req.body.addressLine2,
+            city: req.body.city,
+            state: req.body.state,
+            country: req.body.country,
+            pincode: req.body.pincode,
+            email: req.body.email,
+            phone: req.body.phone,
+            notes: req.body.notes,
+            isDefault: req.body.isDefault === "on" ? true : false,
+            _id : req.body.id
+        };
+        const user = await Userdb.findOne({_id: id}).lean();
+        console.log(user);
+        if(user){
+            let editUser;
+            if(user.address.length !== 0){  
+                for(let i in user.address){
+                    if(user.address[i]._id.equals(new mongoose.Types.ObjectId(req.body.id)) ){
+                        user.address.splice(i, 1);
+                        user.address.push(editAddress);
+                        //address = editAddress;
+                        break;
+                    }
+                }          
+                editUser = new Userdb({
+                    _id: id,
+                    address: user.address,
+                    updatedAt: Date.now()
+                });
+                console.log("EDITED USER ------------>>" + editUser);     
+                await Userdb.findByIdAndUpdate(id, editUser)
+                    .then(data => {
+                        if (!data) {
+                            res.status(500).render('error', {
+                                message: "Unable to add new address to user data",
+                                errStatus : 500
+                            });
+                            console.log("Unable to add new address to user data");
+                        }
+                        else {
+                            const msg = "New address added successfully!";
+                            console.log(msg);
+                            res.redirect('/user#address');
+                        }
+                    })
+                    .catch(err => {
+                        res.status(500).render('error', {
+                            message: "Error adding new address!",
+                            errStatus : 500
+                        });
+                        console.log(err);
+                    });     
+            } else{
+                res.status(500).render('error', {
+                    message: "Error adding new address!",
+                    errStatus : 500
+                });
+                console.log("User not found!");
+            }        
+        } else{
+            res.status(500).render('error', {
+                message: "Unable to add new address to user data",
+                errStatus : 500
+            });
+            console.log(err);
+        }      
+    } catch{
+        res.status(500).render('error', {
+            message: "Unable to add new address to user data",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+};
+
+exports.deleteAddress = async (req, res, next) => {
+    try{
+        console.log("DELETEING ADDRESS -------->");
+        const addId = req.body.addressId;
+        await Userdb.findOneAndUpdate({_id: req.session.user._id}, {
+            $pull:{address: {_id: new mongoose.Types.ObjectId(addId)}}
+            })
+            .then(()=>{
+                console.log("removed address from user data");
+                res.redirect('back');
+            })
+            .catch(err => {
+                res.status(500).render('error', {
+                    message: "Unable to remove address from user data",
+                    errStatus : 500
+                });
+                console.log(err);
+            });
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Unable to remove address from user data",
+            errStatus : 500
+        });
+        console.log(err);
     }
 };

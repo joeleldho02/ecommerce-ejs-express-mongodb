@@ -14,7 +14,7 @@
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
-    <link rel="stylesheet" href="assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
 </head>
 
 <body>
@@ -52,7 +52,7 @@
                                         <li><a href="#"><img src="assets/imgs/theme/flag-ru.png" alt="">Pусский</a></li>
                                     </ul>
                                 </li>
-                                <li><i class="fi-rs-user"></i><a href="page-login-register.html">Log In / Sign Up</a></li>
+                                <li><i class="fi-rs-user"></i><a href="/">Logout</a></li>
                             </ul>
                         </div>
                     </div>
@@ -191,70 +191,60 @@
                         <div class="search-style-2">
                             <form action="#">
                                 <select class="select-active">
-                                    <option>Search in</option>
-                                    <option>Women's Clothing</option>
-                                    <option>Men's Clothing</option>
-                                    <option>Cellphones</option>
-                                    <option>Computer & Office</option>
-                                    <option>Consumer Electronics</option>
-                                    <option>Jewelry & Accessories</option>
-                                    <option>Home & Garden</option>
-                                    <option>Luggage & Bags</option>
-                                    <option>Shoes</option>
-                                    <option>Mother & Kids</option>
+                                    <% if (locals.categories) { %>
+                                        <% for (let i = 0; i < categories.length; i++) { %>
+                                            <% if(categories[i].isListed) { %>
+                                                <option><a href="/<%= categories[i].categoryName.toLowerCase() %>"><%= categories[i].categoryName %></a></option>
+                                            <% } %>
+                                        <% } %>                                        
+                                    <% } %>
                                 </select>
                                 <input type="text" placeholder="Search for items…">
                             </form>
                         </div>
                         <div class="header-action-2">
                             <div class="header-action-icon-2">
-                                <a href="shop-wishlist.html">
+                                <a href="/wishlist">
                                     <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
                                     <span class="pro-count blue">4</span>
                                 </a>
                             </div>
                             <div class="header-action-icon-2">
-                                <a class="mini-cart-icon" href="shop-cart.html">
-                                    <img alt="Evara" src="assets/imgs/theme/icons/icon-cart.svg">
-                                    <span class="pro-count blue">2</span>
+                                <a class="mini-cart-icon" href="/cart">
+                                    <img alt="Logo" src="assets/imgs/theme/icons/icon-cart.svg">
+                                    <span class="pro-count blue"><% if(locals.itemsCount) { %> <%= itemsCount %> <% } else { %> 0<% }%></span>
                                 </a>
-                                <div class="cart-dropdown-wrap cart-dropdown-hm2">
-                                    <ul>
-                                        <li>
-                                            <div class="shopping-cart-img">
-                                                <a href="shop-product-right.html"><img alt="Evara" src="assets/imgs/shop/thumbnail-3.jpg"></a>
-                                            </div>
-                                            <div class="shopping-cart-title">
-                                                <h4><a href="shop-product-right.html">Plain Striola Shirts</a></h4>
-                                                <h3><span>1 × </span>$800.00</h3>
-                                            </div>
-                                            <div class="shopping-cart-delete">
-                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="shopping-cart-img">
-                                                <a href="shop-product-right.html"><img alt="Evara" src="assets/imgs/shop/thumbnail-1.jpg"></a>
-                                            </div>
-                                            <div class="shopping-cart-title">
-                                                <h4><a href="shop-product-right.html">Macbook Pro 2022</a></h4>
-                                                <h3><span>1 × </span>$3200.00</h3>
-                                            </div>
-                                            <div class="shopping-cart-delete">
-                                                <a href="#"><i class="fi-rs-cross-small"></i></a>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <div class="shopping-cart-footer">
-                                        <div class="shopping-cart-total">
-                                            <h4>Total <span>$4000.00</span></h4>
-                                        </div>
-                                        <div class="shopping-cart-button">
-                                            <a href="shop-cart.html">View cart</a>
-                                            <a href="shop-checkout.html">Checkout</a>
-                                        </div>
+                                <% if(locals.cartItems) { %>
+                                    <div class="cart-dropdown-wrap cart-dropdown-hm2">
+                                        <ul>
+                                            <% if (locals.cartItems) { %>                                    
+                                                <% for (let i = 0; i < cartItems.length; i++) { %>
+                                            <li>
+                                                <div class="shopping-cart-img">
+                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>"></a>
+                                                </div>
+                                                <div class="shopping-cart-title">
+                                                    <h4><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
+                                                    <h4><span><%= cartItems[i].quantity %> × </span>₹<%= cartItems[i].salePrice %></h4>
+                                                </div>
+                                                <div class="shopping-cart-delete">
+                                                    <a href="/remove-cart-item/<%= cartItems[i].productInfo[0]._id %>"><i class="fi-rs-cross-small"></i></a>
+                                                </div>
+                                            </li>
+                                                <% } %>
+                                             <% }  %>
+                                        </ul>
+                                                <div class="shopping-cart-footer">
+                                                    <div class="shopping-cart-total ">
+                                                        <h4>Total <span>₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></h4>
+                                                    </div>
+                                                    <div class="shopping-cart-button">
+                                                        <a href="/cart" class="outline">View cart</a>
+                                                        <a href="/checkout">Checkout</a>
+                                                    </div>
+                                                </div>
                                     </div>
-                                </div>
+                                <% }%>
                             </div>
                             <div class="header-action-icon d-block d-lg-none">
                                 <div class="burger-icon">
@@ -444,7 +434,7 @@
                 <div class="row">
                     <div class="col-lg-10 m-auto">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="dashboard-menu">
                                     <ul class="nav flex-column" role="tablist">
                                         <li class="nav-item">
@@ -468,7 +458,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-9">
                                 <div class="tab-content dashboard-content">
                                     <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
                                         <div class="card">
@@ -498,27 +488,22 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            <% if (locals.orders) { %>                                    
+                                                                <% for (let i = 0; i < orders.length; i++) { %>
                                                             <tr>
-                                                                <td>#1357</td>
-                                                                <td>March 45, 2020</td>
-                                                                <td>Processing</td>
-                                                                <td>$125.00 for 2 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
+                                                                <td><%= orders[i]._id%></td>
+                                                                <td><%= orders[i].createdAt.toLocaleDateString("en-US") %></td>
+                                                                <td><%= orders[i].status %></td>
+                                                                <td>₹<%= orders[i].totalAmount %><br> for <%= orders[i].products.length %> items</td>
+                                                                <td>
+                                                                    <a href="/user/view-order/<%= orders[i]._id %>" class="btn-small d-block">View</a>
+                                                                    <% if(orders[i].status !== "DELIVERED") { %>
+                                                                        <a href="/user/cancel-order/<%= orders[i]._id %>" class="btn-small d-block">Cancel</a>
+                                                                    <% } %>
+                                                                </td>
                                                             </tr>
-                                                            <tr>
-                                                                <td>#2468</td>
-                                                                <td>June 29, 2020</td>
-                                                                <td>Completed</td>
-                                                                <td>$364.00 for 5 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>#2366</td>
-                                                                <td>August 02, 2020</td>
-                                                                <td>Completed</td>
-                                                                <td>$280.00 for 3 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
+                                                                <% } %>
+                                                            <% }  %>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -551,32 +536,61 @@
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                        <div class="row mb-5">
+                                            <div class="float-end">
+                                                <a href="/user/add-new-address" class="btn btn-primary add_address_button p-2" data-bs-toggle="modal" data-bs-target="#addAddress"
+                                                    data-modaltitle="Add new address" data-btnaction="add">
+                                                    <i class="material-icons md-plus"></i> Add new address
+                                                </a>
+                                            </div>
+                                        </div>
                                         <div class="row">
+                                            <% if (locals.addresses) { %>                                    
+                                                <% for (let i = 0; i < addresses.length; i++) { %>
                                             <div class="col-lg-6">
                                                 <div class="card mb-3 mb-lg-0">
                                                     <div class="card-header">
-                                                        <h5 class="mb-0">Billing Address</h5>
+                                                        <h5 class="mb-0">Address <%= i+1 %> 
+                                                            <% if(addresses[i].isDefault) { %> <span class=" float-end text-success">Default</span> <% } %>
+                                                        </h5>                                                        
                                                     </div>
                                                     <div class="card-body">
-                                                        <address>3522 Interstate<br> 75 Business Spur,<br> Sault Ste. <br>Marie, MI 49783</address>
-                                                        <p>New York</p>
-                                                        <a href="#" class="btn-small">Edit</a>
+                                                        <p><strong><%= addresses[i].customerName %></strong></p>
+                                                        <address><%= addresses[i].addressLine1 %><br><%= addresses[i].addressLine2 %>,<br><%= addresses[i].city %>, <%= addresses[i].state %><br><%= addresses[i].pincode %></address>
+                                                        <p>Email: <%= addresses[i].email %></p>
+                                                        <address>Phone: <%= addresses[i].phone %></address>                                                        
+                                                        <a class="btn-small edit_address_button" id="edit-address-button"
+                                                            data-bs-toggle="modal" data-bs-target="#addAddress" 
+                                                            data-btnaction="edit"
+                                                            data-modaltitle="Edit address"
+                                                            data-id="<%= addresses[i]._id %>"
+                                                            data-customername="<%= addresses[i].customerName %>"
+                                                            data-addressline1="<%= addresses[i].addressLine1 %>"
+                                                            data-addressline2="<%= addresses[i].addressLine2 %>"
+                                                            data-city="<%= addresses[i].city %>"
+                                                            data-state="<%= addresses[i].state %>"
+                                                            data-country="<%= addresses[i].country %>"
+                                                            data-pincode="<%= addresses[i].pincode %>"
+                                                            data-email="<%= addresses[i].email %>"
+                                                            data-phone="<%= addresses[i].phone %>"
+                                                            data-notes="<%= addresses[i].notes %>"
+                                                            data-isdefault="<%= addresses[i].isDefault %>"
+                                                            > 
+                                                            <span title="Edit Address <%= i+1 %>">
+                                                                Edit
+                                                            </span>
+                                                        </a>
+                                                        <form id="hidden-form-<%= i %>" action="/user/delete-address" method="POST" style="display: none;">
+                                                            <input type="hidden" name="addressId" value="<%= addresses[i]._id %>" />
+                                                        </form>
+                                                        <a  onclick="confirmDelete('hidden-form-<%= i %>', 'Address <%= i+1 %>')" class="btn-small ms-5">
+                                                            <span title="Delete Address <%= i+1 %>">Delete</span>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h5 class="mb-0">Shipping Address</h5>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <address>4299 Express Lane<br>
-                                                            Sarasota, <br>FL 34249 USA <br>Phone: 1.941.227.4444</address>
-                                                        <p>Sarasota</p>
-                                                        <a href="#" class="btn-small">Edit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                <% } %>
+                                            <% }  %>                                            
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
@@ -632,6 +646,344 @@
             </div>
         </section>
     </main>
+    <!-- Modal for Order View -->
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">View order details</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Modal for Edit button -->
+
+    <!-- Modal for Edit button -->
+    <div class="modal fade" id="addAddress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add new address</h4>
+                    <button type="button" class="close rounded-3 border-0" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <form name="addAddressForm" id="addAddressForm" method="post" action="">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" id="customerName" name="customerName" placeholder="Customer name *" class="edit-customername" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <div class="custom_select w-50">
+                                <select class="form-control select-active">
+                                    <option value="">Select an option...</option>
+                                    <option value="AX">Aland Islands</option>
+                                    <option value="AF">Afghanistan</option>
+                                    <option value="AL">Albania</option>
+                                    <option value="DZ">Algeria</option>
+                                    <option value="AD">Andorra</option>
+                                    <option value="AO">Angola</option>
+                                    <option value="AI">Anguilla</option>
+                                    <option value="AQ">Antarctica</option>
+                                    <option value="AG">Antigua and Barbuda</option>
+                                    <option value="AR">Argentina</option>
+                                    <option value="AM">Armenia</option>
+                                    <option value="AW">Aruba</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="AT">Austria</option>
+                                    <option value="AZ">Azerbaijan</option>
+                                    <option value="BS">Bahamas</option>
+                                    <option value="BH">Bahrain</option>
+                                    <option value="BD">Bangladesh</option>
+                                    <option value="BB">Barbados</option>
+                                    <option value="BY">Belarus</option>
+                                    <option value="PW">Belau</option>
+                                    <option value="BE">Belgium</option>
+                                    <option value="BZ">Belize</option>
+                                    <option value="BJ">Benin</option>
+                                    <option value="BM">Bermuda</option>
+                                    <option value="BT">Bhutan</option>
+                                    <option value="BO">Bolivia</option>
+                                    <option value="BQ">Bonaire, Saint Eustatius and Saba</option>
+                                    <option value="BA">Bosnia and Herzegovina</option>
+                                    <option value="BW">Botswana</option>
+                                    <option value="BV">Bouvet Island</option>
+                                    <option value="BR">Brazil</option>
+                                    <option value="IO">British Indian Ocean Territory</option>
+                                    <option value="VG">British Virgin Islands</option>
+                                    <option value="BN">Brunei</option>
+                                    <option value="BG">Bulgaria</option>
+                                    <option value="BF">Burkina Faso</option>
+                                    <option value="BI">Burundi</option>
+                                    <option value="KH">Cambodia</option>
+                                    <option value="CM">Cameroon</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="CV">Cape Verde</option>
+                                    <option value="KY">Cayman Islands</option>
+                                    <option value="CF">Central African Republic</option>
+                                    <option value="TD">Chad</option>
+                                    <option value="CL">Chile</option>
+                                    <option value="CN">China</option>
+                                    <option value="CX">Christmas Island</option>
+                                    <option value="CC">Cocos (Keeling) Islands</option>
+                                    <option value="CO">Colombia</option>
+                                    <option value="KM">Comoros</option>
+                                    <option value="CG">Congo (Brazzaville)</option>
+                                    <option value="CD">Congo (Kinshasa)</option>
+                                    <option value="CK">Cook Islands</option>
+                                    <option value="CR">Costa Rica</option>
+                                    <option value="HR">Croatia</option>
+                                    <option value="CU">Cuba</option>
+                                    <option value="CW">CuraÇao</option>
+                                    <option value="CY">Cyprus</option>
+                                    <option value="CZ">Czech Republic</option>
+                                    <option value="DK">Denmark</option>
+                                    <option value="DJ">Djibouti</option>
+                                    <option value="DM">Dominica</option>
+                                    <option value="DO">Dominican Republic</option>
+                                    <option value="EC">Ecuador</option>
+                                    <option value="EG">Egypt</option>
+                                    <option value="SV">El Salvador</option>
+                                    <option value="GQ">Equatorial Guinea</option>
+                                    <option value="ER">Eritrea</option>
+                                    <option value="EE">Estonia</option>
+                                    <option value="ET">Ethiopia</option>
+                                    <option value="FK">Falkland Islands</option>
+                                    <option value="FO">Faroe Islands</option>
+                                    <option value="FJ">Fiji</option>
+                                    <option value="FI">Finland</option>
+                                    <option value="FR">France</option>
+                                    <option value="GF">French Guiana</option>
+                                    <option value="PF">French Polynesia</option>
+                                    <option value="TF">French Southern Territories</option>
+                                    <option value="GA">Gabon</option>
+                                    <option value="GM">Gambia</option>
+                                    <option value="GE">Georgia</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="GH">Ghana</option>
+                                    <option value="GI">Gibraltar</option>
+                                    <option value="GR">Greece</option>
+                                    <option value="GL">Greenland</option>
+                                    <option value="GD">Grenada</option>
+                                    <option value="GP">Guadeloupe</option>
+                                    <option value="GT">Guatemala</option>
+                                    <option value="GG">Guernsey</option>
+                                    <option value="GN">Guinea</option>
+                                    <option value="GW">Guinea-Bissau</option>
+                                    <option value="GY">Guyana</option>
+                                    <option value="HT">Haiti</option>
+                                    <option value="HM">Heard Island and McDonald Islands</option>
+                                    <option value="HN">Honduras</option>
+                                    <option value="HK">Hong Kong</option>
+                                    <option value="HU">Hungary</option>
+                                    <option value="IS">Iceland</option>
+                                    <option value="IN">India</option>
+                                    <option value="ID">Indonesia</option>
+                                    <option value="IR">Iran</option>
+                                    <option value="IQ">Iraq</option>
+                                    <option value="IM">Isle of Man</option>
+                                    <option value="IL">Israel</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="CI">Ivory Coast</option>
+                                    <option value="JM">Jamaica</option>
+                                    <option value="JP">Japan</option>
+                                    <option value="JE">Jersey</option>
+                                    <option value="JO">Jordan</option>
+                                    <option value="KZ">Kazakhstan</option>
+                                    <option value="KE">Kenya</option>
+                                    <option value="KI">Kiribati</option>
+                                    <option value="KW">Kuwait</option>
+                                    <option value="KG">Kyrgyzstan</option>
+                                    <option value="LA">Laos</option>
+                                    <option value="LV">Latvia</option>
+                                    <option value="LB">Lebanon</option>
+                                    <option value="LS">Lesotho</option>
+                                    <option value="LR">Liberia</option>
+                                    <option value="LY">Libya</option>
+                                    <option value="LI">Liechtenstein</option>
+                                    <option value="LT">Lithuania</option>
+                                    <option value="LU">Luxembourg</option>
+                                    <option value="MO">Macao S.A.R., China</option>
+                                    <option value="MK">Macedonia</option>
+                                    <option value="MG">Madagascar</option>
+                                    <option value="MW">Malawi</option>
+                                    <option value="MY">Malaysia</option>
+                                    <option value="MV">Maldives</option>
+                                    <option value="ML">Mali</option>
+                                    <option value="MT">Malta</option>
+                                    <option value="MH">Marshall Islands</option>
+                                    <option value="MQ">Martinique</option>
+                                    <option value="MR">Mauritania</option>
+                                    <option value="MU">Mauritius</option>
+                                    <option value="YT">Mayotte</option>
+                                    <option value="MX">Mexico</option>
+                                    <option value="FM">Micronesia</option>
+                                    <option value="MD">Moldova</option>
+                                    <option value="MC">Monaco</option>
+                                    <option value="MN">Mongolia</option>
+                                    <option value="ME">Montenegro</option>
+                                    <option value="MS">Montserrat</option>
+                                    <option value="MA">Morocco</option>
+                                    <option value="MZ">Mozambique</option>
+                                    <option value="MM">Myanmar</option>
+                                    <option value="NA">Namibia</option>
+                                    <option value="NR">Nauru</option>
+                                    <option value="NP">Nepal</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="AN">Netherlands Antilles</option>
+                                    <option value="NC">New Caledonia</option>
+                                    <option value="NZ">New Zealand</option>
+                                    <option value="NI">Nicaragua</option>
+                                    <option value="NE">Niger</option>
+                                    <option value="NG">Nigeria</option>
+                                    <option value="NU">Niue</option>
+                                    <option value="NF">Norfolk Island</option>
+                                    <option value="KP">North Korea</option>
+                                    <option value="NO">Norway</option>
+                                    <option value="OM">Oman</option>
+                                    <option value="PK">Pakistan</option>
+                                    <option value="PS">Palestinian Territory</option>
+                                    <option value="PA">Panama</option>
+                                    <option value="PG">Papua New Guinea</option>
+                                    <option value="PY">Paraguay</option>
+                                    <option value="PE">Peru</option>
+                                    <option value="PH">Philippines</option>
+                                    <option value="PN">Pitcairn</option>
+                                    <option value="PL">Poland</option>
+                                    <option value="PT">Portugal</option>
+                                    <option value="QA">Qatar</option>
+                                    <option value="IE">Republic of Ireland</option>
+                                    <option value="RE">Reunion</option>
+                                    <option value="RO">Romania</option>
+                                    <option value="RU">Russia</option>
+                                    <option value="RW">Rwanda</option>
+                                    <option value="ST">São Tomé and Príncipe</option>
+                                    <option value="BL">Saint Barthélemy</option>
+                                    <option value="SH">Saint Helena</option>
+                                    <option value="KN">Saint Kitts and Nevis</option>
+                                    <option value="LC">Saint Lucia</option>
+                                    <option value="SX">Saint Martin (Dutch part)</option>
+                                    <option value="MF">Saint Martin (French part)</option>
+                                    <option value="PM">Saint Pierre and Miquelon</option>
+                                    <option value="VC">Saint Vincent and the Grenadines</option>
+                                    <option value="SM">San Marino</option>
+                                    <option value="SA">Saudi Arabia</option>
+                                    <option value="SN">Senegal</option>
+                                    <option value="RS">Serbia</option>
+                                    <option value="SC">Seychelles</option>
+                                    <option value="SL">Sierra Leone</option>
+                                    <option value="SG">Singapore</option>
+                                    <option value="SK">Slovakia</option>
+                                    <option value="SI">Slovenia</option>
+                                    <option value="SB">Solomon Islands</option>
+                                    <option value="SO">Somalia</option>
+                                    <option value="ZA">South Africa</option>
+                                    <option value="GS">South Georgia/Sandwich Islands</option>
+                                    <option value="KR">South Korea</option>
+                                    <option value="SS">South Sudan</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="LK">Sri Lanka</option>
+                                    <option value="SD">Sudan</option>
+                                    <option value="SR">Suriname</option>
+                                    <option value="SJ">Svalbard and Jan Mayen</option>
+                                    <option value="SZ">Swaziland</option>
+                                    <option value="SE">Sweden</option>
+                                    <option value="CH">Switzerland</option>
+                                    <option value="SY">Syria</option>
+                                    <option value="TW">Taiwan</option>
+                                    <option value="TJ">Tajikistan</option>
+                                    <option value="TZ">Tanzania</option>
+                                    <option value="TH">Thailand</option>
+                                    <option value="TL">Timor-Leste</option>
+                                    <option value="TG">Togo</option>
+                                    <option value="TK">Tokelau</option>
+                                    <option value="TO">Tonga</option>
+                                    <option value="TT">Trinidad and Tobago</option>
+                                    <option value="TN">Tunisia</option>
+                                    <option value="TR">Turkey</option>
+                                    <option value="TM">Turkmenistan</option>
+                                    <option value="TC">Turks and Caicos Islands</option>
+                                    <option value="TV">Tuvalu</option>
+                                    <option value="UG">Uganda</option>
+                                    <option value="UA">Ukraine</option>
+                                    <option value="AE">United Arab Emirates</option>
+                                    <option value="GB">United Kingdom (UK)</option>
+                                    <option value="US">USA (US)</option>
+                                    <option value="UY">Uruguay</option>
+                                    <option value="UZ">Uzbekistan</option>
+                                    <option value="VU">Vanuatu</option>
+                                    <option value="VA">Vatican</option>
+                                    <option value="VE">Venezuela</option>
+                                    <option value="VN">Vietnam</option>
+                                    <option value="WF">Wallis and Futuna</option>
+                                    <option value="EH">Western Sahara</option>
+                                    <option value="WS">Western Samoa</option>
+                                    <option value="YE">Yemen</option>
+                                    <option value="ZM">Zambia</option>
+                                    <option value="ZW">Zimbabwe</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <input type="text" id="addressLine1" name="addressLine1" class="edit-addressline1" placeholder="Address line 1 *" value="">                            
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="addressLine2" name="addressLine2" class="edit-addressline2" placeholder="Address line 2" value="">
+                        </div>
+                        <div class="form-group">
+                            <input  type="text" id="city" name="city" class="edit-city" placeholder="City / Town" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input  type="text" id="state" name="state" class="edit-state" placeholder="State" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input  type="text" id="country" name="country" class="edit-country" placeholder="Country" value="India" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="pincode" name="pincode" class="edit-pincode" placeholder="Pincode *" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="phone" name="phone" class="edit-phone" placeholder="Phone *" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="email" name="email" class="edit-email" placeholder="Email address" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="mb-20">
+                            <h5>Additional information</h5>
+                        </div>
+                        <div class="form-group mb-30">
+                            <textarea rows="2" id="notes" class="edit-notes" placeholder="Order notes" name="notes"></textarea>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="flexSwitchCheckChecked">List</label>
+                            <div class="form-control form-switch">
+                                <input class="form-check-input ms-3 px-5 py-0" type="checkbox" role="switch" name="isDefault" id="flexSwitchCheckChecked">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" class="form-control edit-id" name="id">
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    <button id="modal-save-btn" type="submit" onclick="confirmEdit('addAddressForm')" class="btn btn-primary w-50">Add address</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Modal for Edit button -->
     <footer class="main">
         <section class="newsletter p-30 text-white wow fadeIn animated">
             <div class="container">
@@ -760,7 +1112,7 @@
     </div>
     <!-- Vendor JS-->
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
-    <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
     <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
     <script src="assets/js/plugins/slick.js"></script>
@@ -778,8 +1130,248 @@
     <script src="assets/js/plugins/scrollup.js"></script>
     <script src="assets/js/plugins/jquery.vticker-min.js"></script>
     <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
+    <!-- Page level custom scripts -->
+    <script>
+        const form = document.getElementById('addAddress');
+        const customerName = document.getElementById('customerName');
+        const addressLine1 = document.getElementById('addressLine1');
+        const city = document.getElementById('city');
+        const state = document.getElementById('state');
+        const country = document.getElementById('country');
+        const pincode = document.getElementById('pincode');
+        const phone = document.getElementById('phone');
+        const email = document.getElementById('email');
+        
+        const setError = (element, message) => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = message;
+            inputControl.classList.add('error');
+            inputControl.classList.remove('success');
+        };
+        const setSuccess = element => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = '';
+            inputControl.classList.add('success');
+            inputControl.classList.remove('error');
+        };
+        const isValidEmail = email => {
+            //const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            const re =/[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}/;
+            return re.test(String(email).toLowerCase());
+        }
+        
+        function validateInputs() {
+            setSuccess(customerName);
+            setSuccess(addressLine1);
+            setSuccess(city);
+            setSuccess(state);
+            setSuccess(country);
+            setSuccess(pincode);
+            setSuccess(phone);
+            setSuccess(email);
+
+            const customerNameValue = customerName.value.trim();
+            const addressLine1Value = addressLine1.value.trim();
+            const cityValue = city.value.trim();
+            const stateValue = state.value.trim();
+            const countryValue = country.value.trim();
+            const pincodeValue = pincode.value.trim();
+            const phoneValue = phone.value.trim();
+            const emailValue = email.value.trim();
+
+            if(customerNameValue === '') {
+                setError(customerName, 'Please enter customer name');
+                customerName.focus();
+                return false;
+            } else{
+                setSuccess(customerName);
+            }
+            
+            if(addressLine1Value === '') {
+                setError(addressLine1, 'Please enter address');
+                addressLine1.focus();
+                return false;
+            } else{
+                setSuccess(addressLine1);
+            }
+
+            if(cityValue === '') {
+                setError(city, 'Please enter city');
+                city.focus();
+                return false;
+            } else{
+                setSuccess(city);
+            }
+            
+            if(stateValue === '') {
+                setError(state, 'Please enter state');
+                state.focus();
+                return false;
+            } else{
+                setSuccess(state);
+            }
+            
+            const pincodeRegex = /^\d{6}$/;
+            if(pincodeValue === '') {
+                setError(pincode, 'Please enter pincode');
+                pincode.focus();
+                return false;
+            } if(!pincodeValue.match(pincodeRegex)){
+                setError(pincode, 'Enter valid pincode');
+                pincode.focus();
+                return false;
+            }
+            else{
+                setSuccess(pincode);
+            }
+
+            const phonenoRegex = /^\d{10}$/;
+            if(phoneValue === ""){
+                setError(phone, 'Enter phone number');
+                phone.focus();
+                return false;
+            }
+            else if(!phoneValue.match(phonenoRegex)){
+                setError(phone, 'Enter valid number');
+                phone.focus();
+                return false;
+            }
+            else{
+                setSuccess(phone);
+            }
+
+            if (!isValidEmail(emailValue)) {
+                setError(email, 'Provide a valid email address');
+                email.focus();
+                return false;
+            } 
+            else{
+                setSuccess(email);
+            }
+
+            return true;
+        }
+
+        function confirmEdit(form) {
+            const button = document.getElementById('modal-save-btn');
+            const btnAction = button.innerHTML;
+            console.log('Login submit button recorded');
+            if(validateInputs()){
+                console.log("VALIDATION Success");
+                console.log("Action : " + btnAction);
+                if(btnAction === "Save changes"){                    
+                    if (confirm('Save the changes made to the address ?')) {
+                        document.getElementById(form).submit();
+                    }
+                }
+                else{
+                    document.getElementById(form).submit();
+                }
+            } else{
+                console.log("Validation FAILED!");
+            }
+        }
+
+    </script>
+    <script>
+        // Call the dataTables jQuery plugin
+        // $(document).ready(function() {
+        //     $('#dataTable').DataTable();
+        // });
+    
+        function confirmDelete(formID, name) {
+            if (confirm(`Are you sure to delete the ${name}?`)) {
+                document.getElementById(formID).submit();
+            }
+        }
+        
+        $(document).on( "click", '.edit_address_button',function(e) {
+            const id = $(this).data('id');
+            const customerName = $(this).data('customername');
+            const addressLine1 = $(this).data('addressline1');
+            const addressLine2 = $(this).data('addressline2');
+            const city = $(this).data('city');
+            const state = $(this).data('state');
+            const country = $(this).data('country');
+            const pincode = $(this).data('pincode');
+            const email = $(this).data('email');
+            const phone = $(this).data('phone');
+            const notes = $(this).data('notes');
+            const isDefault = $(this).data('isdefault');
+            console.log(isDefault);
+            $(".edit-id").val(id);
+            $(".edit-customername").val(customerName);
+            $(".edit-addressline1").val(addressLine1);
+            $(".edit-addressline2").val(addressLine2);
+            $(".edit-city").val(city);
+            $(".edit-state").val(state);
+            $(".edit-country").val(country);
+            $(".edit-pincode").val(pincode);
+            $(".edit-email").val(email);
+            $(".edit-phone").val(phone);
+            $(".edit-notes").val(notes);
+            if(isDefault === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+        });
+
+        $(document).on( "click", '.add_address_button',function(e) {
+            const id = $(this).data('id');
+            const customerName = $(this).data('customername');
+            const addressLine1 = $(this).data('addressline1');
+            const addressLine2 = $(this).data('addressline2');
+            const city = $(this).data('city');
+            const state = $(this).data('state');
+            const country = $(this).data('country');
+            const pincode = $(this).data('pincode');
+            const email = $(this).data('email');
+            const phone = $(this).data('phone');
+            const notes = $(this).data('notes');
+            const isDefault = $(this).data('isdefault');
+            console.log(isDefault);
+            $(".edit-id").val(id);
+            $(".edit-customername").val(customerName);
+            $(".edit-addressline1").val(addressLine1);
+            $(".edit-addressline2").val(addressLine2);
+            $(".edit-city").val(city);
+            $(".edit-state").val(state);
+            $(".edit-country").val(country);
+            $(".edit-pincode").val(pincode);
+            $(".edit-email").val(email);
+            $(".edit-phone").val(phone);
+            $(".edit-notes").val(notes);
+        });
+        
+        $('#addAddress').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget); // Button that triggered the modal
+            let btnAction = button.data('btnaction');
+            console.log("BUTTON ACTION : " + btnAction);
+            let title = button.data('modaltitle');
+            let recipient = button.data('categoryname') || "";             
+            let modal = $(this);
+            modal.find('.modal-title').text(title);
+
+            if( btnAction === "add" ) {  
+                $('#addAddressForm').attr('action', '/user/add-new-address');
+                $('#modal-save-btn').text('Add new Address');
+            }
+            else if( btnAction === "edit" ) {
+                $('#addAddressForm').attr('action', '/user/edit-address');
+                $('#modal-save-btn').text('Save changes');
+            }
+        });
+
+        $('#addAddress').on('shown.bs.modal', function () {
+            $('#customerName').trigger('focus')
+        })
+    </script>
 </body>
 
 </html>

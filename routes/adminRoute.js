@@ -5,6 +5,7 @@ const adminController = require('../server/controller/adminController');
 const userController = require('../server/controller/userController');
 const productController = require('../server/controller/productController');
 const categoryController = require('../server/controller/categoryController');
+const orderController = require('../server/controller/orderController');
 const authController = require('../server/middleware/authenticate-admin');
 const uploadController = require('../server/middleware/upload-image');
 const serviceRender = require('../server/services/render');
@@ -54,7 +55,7 @@ router.post('/delete-category', authController.authenticateAdmin, categoryContro
 
 
 //------- ORDERS --------//
-router.get('/orders', authController.authenticateAdmin, serviceRender.getAdminOrdersPage);
-
+router.get('/orders', authController.authenticateAdmin, orderController.getAllUsersOrders, serviceRender.getAdminOrdersPage);
+router.get('/view-order/:id', authController.authenticateAdmin, categoryController.getListedCategories, orderController.getOrderDetails, serviceRender.getAdminViewOrderPage)
 
 module.exports = router;  

@@ -239,19 +239,19 @@
                                                     <a href="/remove-cart-item/<%= cartItems[i].productInfo[0]._id %>"><i class="fi-rs-cross-small"></i></a>
                                                 </div>
                                             </li>
+                                        </ul>
                                                 <% } %>
                                             <% }  %>
-                                        </ul>
-                                        <div class="shopping-cart-footer">
-                                            <div class="shopping-cart-total ">
-                                                <h4>Total <span>₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></h4>
+                                                <div class="shopping-cart-footer">
+                                                    <div class="shopping-cart-total ">
+                                                        <h4>Total <span>₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></h4>
+                                                    </div>
+                                                    <div class="shopping-cart-button">
+                                                        <a href="/cart" class="outline">View cart</a>
+                                                        <a href="/checkout">Checkout</a>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="shopping-cart-button">
-                                                <a href="/cart" class="outline">View cart</a>
-                                                <a href="/checkout">Checkout</a>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <% }%>
                                 </div>
                             </div>
@@ -770,7 +770,6 @@
                                             <div class="product-extra-link2">
                                                 <form action="/add-to-cart/<% if (locals.product) { %><%= product._id %><% } %>">
                                                     <input type="hidden" name="qty" id="quantityInput" value="1">
-                                                    <input type="submit" class="button button-add-to-cart" value="Add to cart">
                                                 </form>
                                                 <button id="addToCartBtn" type="submit" class="button button-add-to-cart" onclick="addToCart('<% if (locals.product) { %><%= product._id %><%} %>')">Add to cart</button>    
                                                 <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>

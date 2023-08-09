@@ -43,7 +43,22 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: () => true
     },
-    address:[],
+    address:[{
+        customerName: String,
+        addressLine1 : String,
+        addressLine2 : String,
+        city : String,
+        state : String,
+        country : String,
+        pincode : String,
+        email : String,   
+        phone : String,
+        notes : String,
+        isDefault: {
+            type: Boolean,
+            default: () => false
+        }     
+    }],
     cart:[],
     wishlist :[],
     createdAt: {
@@ -127,7 +142,17 @@ const Cartdb = mongoose.model('cart', cartSchema);
 //-----   Order Model   -----//
 const orderSchema = new mongoose.Schema({
     customerId: mongoose.Schema.Types.ObjectId,
-    cartId: mongoose.Schema.Types.ObjectId,
+    products: [{
+        productId: mongoose.Schema.Types.ObjectId,
+        quantity: Number,
+    }],
+    paymentMethod : String,
+    totalAmount : Number,
+    shippingAddress : {},
+    status: {
+        type : String,
+        default: () => "PENDING"
+    },
     createdAt: {
         type: Date,
         default: () => Date.now()
@@ -149,5 +174,6 @@ module.exports = {
     Admindb,
     Categorydb,
     Productdb,
-    Cartdb
+    Cartdb,
+    Orderdb
 };

@@ -1,0 +1,391 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Order Management</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/datatable.css">
+
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="/admin" class="brand-wrap">
+                <img src="/assets2/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/orders"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Category</span> </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Brands</span> </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/customers"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Customers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/coupons"> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Coupons</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/banners"> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Banners</span>
+                    </a>
+                </li>                
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/sales"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Sales Report</span>
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <ul class="menu-aside">
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/settings"> <i class="icon material-icons md-settings"></i>
+                        <span class="text">Settings</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/logout"> <i class="icon material-icons md-exit_to_app"></i>
+                        <span class="text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+            <br>
+            <br>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <h2 class="h2 my-0 py-0">Order Management</h2>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon" href="#">
+                            <i class="material-icons md-notifications animation-shake"></i>
+                            <span class="badge rounded-pill">3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#" > <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="assets2/imgs/people/avatar2.jpg" alt="User"></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            <a class="dropdown-item" href="/admin/profile"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                            <a class="dropdown-item" href="/admin/settings"><i class="material-icons md-settings"></i>Account Settings</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="content-header">
+                <div></div>
+                <!-- <div>
+                    <a href="/admin/add-category" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"
+                        data-modaltitle="Add new category" data-btnaction="add">
+                        <i class="material-icons md-plus"></i> Add Category
+                    </a>
+                </div> -->
+            </div>
+            <!-- Begin Page Content -->
+            <div class="container-fluid w-75">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex">
+                        <h6 class="my-auto font-weight-bold text-primary">Orders</h6>
+                        <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
+                            <select class="form-select">
+                                <option selected>All category</option>
+                                <option>Electronics</option>
+                                <option>Clothes</option>
+                                <option>Automobile</option>
+                            </select>
+                        </div> -->
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Order No.</th>
+                                        <th>Order Date</th>
+                                        <th>Items</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>Order No.</th>
+                                        <th>Order Date</th>
+                                        <th>Items</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    <% if (locals.orders) { %>                                    
+                                        <% for (let i = 0; i < orders.length; i++) { %>
+                                    <tr>
+                                        <td><%= orders[i]._id%></td>
+                                        <td><%= orders[i].createdAt.toLocaleDateString("en-US") %></td>
+                                        <td><%= orders[i].products.length %></td>
+                                        <td>₹<%= orders[i].totalAmount %></td>
+                                        <td><%= orders[i].status %></td>
+                                        <td>
+                                            <a href="/admin/view-order/<%= orders[i]._id %>" class="btn-small d-block">View</a>
+                                            <% if(orders[i].status !== "DELIVERED") { %>
+                                                <a href="/admin/cancel-order/<%= orders[i]._id %>" class="btn-small d-block">Edit</a>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                        <% } %>
+                                    <% }  %>
+                                </tbody>
+                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->   
+        </section> <!-- content-main end// -->
+        <!-- Modal for Edit button -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Edit category details</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <form name="modalForm" id="modalForm" method="post" action="/admin/edit-category">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input type="hidden" class="form-control edit-id" name="id" >
+                            </div>
+                            <div class="form-group w-100">
+                                <label for="categoryName">Category Name</label>
+                                <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" >
+                                <div class="error text-danger ms-2"></div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="description">Description</label>
+                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter description">
+                                <div class="error text-danger ms-2"></div>
+                            </div>  
+                            <div class="form-group mt-3">
+                                <label for="flexSwitchCheckChecked">List</label>
+                                <div class="form-control form-switch">
+                                    <input class="form-check-input ms-3  py-2 px-4" type="checkbox" role="switch" name="isListed" id="flexSwitchCheckChecked">
+                                </div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <input type="hidden" class="form-control edit-islisted" id="listed" name="listed" placeholder="Is listed" required>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                        <button id="modal-save-btn" type="submit" onclick="confirmEdit('modalForm')" class="btn btn-primary w-50">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Modal for Edit button -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> © JMJ Music House
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets2/js/vendors/select2.min.js"></script>
+    <script src="assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets2/js/main.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Page level plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Page level custom scripts -->
+    <script>
+        const form = document.getElementById('loginForm');
+        const categoryName = document.getElementById('categoryName');
+        const description = document.getElementById('description'); 
+        
+        const setError = (element, message) => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = message;
+            inputControl.classList.add('error');
+            inputControl.classList.remove('success');
+        };
+        const setSuccess = element => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = '';
+            inputControl.classList.add('success');
+            inputControl.classList.remove('error');
+        };
+
+        function validateInputs() {
+            const categoryNameValue = categoryName.value.trim();
+            const descriptionValue = description.value.trim();
+
+            if(categoryNameValue === '') {
+                setError(categoryName, 'Please enter category name');
+                categoryName.focus();
+                return false;
+            } else{
+                setSuccess(categoryName);
+            }
+            
+            if(descriptionValue === '') {
+                setError(description, 'Please enter description');
+                description.focus();
+                return false;
+            } else{
+                setSuccess(description);
+            }
+            return true;
+        }
+
+        function confirmEdit(form) {
+            const button = document.getElementById('modal-save-btn');
+            const btnAction = button.innerHTML;
+
+            console.log('Login submit button recorded');
+            if(validateInputs()){
+                console.log("VALIDATION Success");
+                console.log("Action : " + btnAction);
+                if(btnAction === "Save changes"){                    
+                    if (confirm('Save the changes made to the category ?')) {
+                        document.getElementById(form).submit();
+                    }
+                }
+                else{
+                    document.getElementById(form).submit();
+                }
+            } else{
+                console.log("Validation FAILED!");
+            }
+        }
+
+    </script>
+    <script>
+        // Call the dataTables jQuery plugin
+        $(document).ready(function() {
+            $('#dataTable').DataTable();
+        });
+    
+        function confirmDelete(formID, name) {
+            if (confirm(`Are you sure to delete the category '${name}'?`)) {
+                document.getElementById(formID).submit();
+            }
+        }
+        
+        $(document).on( "click", '.edit_button',function(e) {
+            const id = $(this).data('id');
+            const categoryName = $(this).data('categoryname');
+            const description = $(this).data('description');
+            const isListed = $(this).data('listed');
+            console.log(isListed);
+            $(".edit-id").val(id);
+            $(".edit-categoryname").val(categoryName);
+            $(".edit-description").val(description);
+            $(".edit-islisted").val(isListed);
+            if(isListed === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+        });
+
+        $('#myModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget); // Button that triggered the modal
+
+            let btnAction = button.data('btnaction');
+            let title = button.data('modaltitle');
+            let recipient = button.data('categoryname') || "";             
+            let modal = $(this);
+            modal.find('.modal-title').text(title + " " + recipient);
+
+            if( btnAction === "add" ) {  
+                $('#modalForm').attr('action', '/admin/add-category');
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+                $('#modal-save-btn').text('Add category');
+            }
+            else if( btnAction === "edit" ) {
+                $('#modalForm').attr('action', '/admin/edit-category');
+                $('#modal-save-btn').text('Save changes');
+            }
+        });
+
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#categoryName').trigger('focus')
+        })
+    </script>
+</body>
+
+</html>
