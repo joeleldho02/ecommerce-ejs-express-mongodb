@@ -1,4 +1,4 @@
-const {Categorydb} = require('../model/model');
+const Categorydb = require('../model/categoryModel');
 
 //add new category to DB
 exports.addCategory = async (req, res) => {

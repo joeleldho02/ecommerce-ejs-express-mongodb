@@ -52,10 +52,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/css", express.static(path.join(__dirname, "public/css")));
 app.use("/js", express.static(path.join(__dirname, "public/js")));
 app.use("/img", express.static(path.join(__dirname, "public/img")));
-app.use("assets/", express.static(path.join(__dirname, "public/assets")));
-app.use("/user/assets", express.static(path.join(__dirname, "public/assets")));
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 app.use("/assets2", express.static(path.join(__dirname, "public/assets2")));
-app.use("/admin/assets2", express.static(path.join(__dirname, "public/assets2")));
 
 app.use('/admin', adminRouter);
 app.use('/user', userRouter);

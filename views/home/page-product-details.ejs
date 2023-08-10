@@ -778,7 +778,7 @@
                                         <ul class="product-meta font-xs color-grey mt-50">
                                             <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
                                             <li class="mb-5">Tags: <a href="/<% if (locals.product) { %> <%= product.category.toLowerCase() %> <% } %>" rel="tag"><% if (locals.product) { %> <%= product.category %> <% } %></a></li>
-                                            <li>Availability:<span class="in-stock text-success ml-5"><% if (locals.product) { %> <%= product.quantity %> <% } %> Items In Stock</span></li>
+                                            <li>Availability:<span class="in-stock text-success ml-5"><% if (locals.product) { %> <%= product.stock %> <% } %> Items In Stock</span></li>
                                         </ul>
                                     </div>
                                     <!-- Detail Info -->
@@ -1094,7 +1094,7 @@
                                                         data-productregularprice="₹<%= relatedProducts[i].regularPrice %>"
                                                         data-productsaleprice="₹<%= relatedProducts[i].salePrice %>"
                                                         data-productdescription="<%= relatedProducts[i].description %>"
-                                                        data-productquantity="<%= relatedProducts[i].quantity %> Items In Stock"
+                                                        data-productstock="<%= relatedProducts[i].stock %> Items In Stock"
                                                         data-productimage="/img/products/<%= relatedProducts[i].images[0].filename %>"
     
                                                     ><i class="fi-rs-search"></i></a>

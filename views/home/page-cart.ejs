@@ -538,9 +538,9 @@
                                         <td class="text-center" data-title="Stock">
                                             <span class="qty-val"><%= cartItems[i].quantity %> </span>
                                             <!-- <div class="detail-qty border radius  m-auto">
-                                                <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id',-1)" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                                                 <span class="qty-val"><%= cartItems[i].quantity %> </span>
-                                                <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id', 1)" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                                             </div> -->
                                         </td>
                                         <td class="text-right" data-title="Cart">
@@ -1041,6 +1041,22 @@
     <!-- Template  JS -->
     <script src="/assets/js/main.js?v=3.4"></script>
     <script src="/assets/js/shop.js?v=3.4"></script>
+    <script>
+        function changeQuantity(cartId, prodId, val){
+            $ajax({
+                url:'/change-product-quantity',
+                data : {
+                    cart: cartId,
+                    prooduct: prodId,
+                    val: val
+                },
+                method: 'post',
+                success: (response) => {
+                    alert(response);
+                }
+            })
+        } 
+    </script>
 </body>
 
 </html>

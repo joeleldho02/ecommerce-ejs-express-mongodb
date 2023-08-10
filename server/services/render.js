@@ -67,7 +67,7 @@ exports.adminLoginPage = (req, res) => {
 };
 exports.adminDashboardPage = (req, res) => {
     if(req.session.loggedIn && req.session.isAdmin)
-        res.render('admin-dashboard');
+        res.render('admin-dashboard',{pageTitle: "Dashboard"});
     else if(req.session.loggedIn)
         res.redirect('/user');
     else    
@@ -80,11 +80,13 @@ exports.adminLogout = (req, res) => {
 
 exports.getAdminOrdersPage = (req, res) => {
     res.render('page-order', {
+        pageTitle: "Order Management",
         orders: res.locals.orders
     });
 };
 exports.getAdminViewOrderPage = (req, res) => {
     res.render('page-view-order', {
+        pageTitle: "Order Management",
         categories: res.locals.categories,
         subTotal : res.locals.subTotal,
         order: res.locals.order
@@ -93,17 +95,20 @@ exports.getAdminViewOrderPage = (req, res) => {
 
 exports.getAdminProductPage = (req, res) => {
     res.render('page-products', {
+        pageTitle: "Product Management",
         products: res.locals.products
     });
 };
 //get add product page
 exports.getAddProductPage = (req, res) => {
     res.render('page-add-product',{
+        pageTitle: "Product Management",
         categories: res.locals.categories
     });
 };
 exports.getEditProductPage = (req, res) => {
     res.render('page-add-product', {
+        pageTitle: "Product Management",
         categories: res.locals.categories,
         product: res.locals.product
     });
@@ -113,11 +118,13 @@ exports.getEditProductPage = (req, res) => {
 };
 exports.getAdminUsersPage = (req, res) => {
     res.render('page-users', {
+        pageTitle: "Customer Management",
         users: res.locals.users
     });
 };
 exports.getAdminCategoryPage = (req, res) => {
     res.render('page-category', {
+        pageTitle: "Category Management",
         categories: res.locals.categories,
     });
 };

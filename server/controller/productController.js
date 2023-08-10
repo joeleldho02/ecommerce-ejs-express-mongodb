@@ -1,4 +1,4 @@
-const {Productdb} = require('../model/model');
+const Productdb = require('../model/productModel');
 const categoryController = require('./categoryController');
 
 //add new product to DB
@@ -18,7 +18,7 @@ exports.addNewProduct = async (req, res) => {
                         brand: req.body.brand,
                         regularPrice: req.body.regularPrice,
                         salePrice: req.body.salePrice,
-                        quantity: req.body.quantity,
+                        stock: req.body.stock,
                         images: req.files, 
                         updatedAt: Date.now(),
                     });
@@ -56,7 +56,7 @@ exports.getAllProducts = (req, res, next) => {
                 if(res.locals.categories){
                     data.forEach(product => {
                         const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.category) );
-                        product.category = prodCategoryName[0].categoryName;
+                        product.category = prodCategoryName[0]?.categoryName;
                     });    
                     res.locals.products = data;
                     next();
@@ -159,7 +159,7 @@ exports.updateProductItem = async (req, res) => {
                         brand: req.body.brand,
                         regularPrice: req.body.regularPrice,
                         salePrice: req.body.salePrice,
-                        quantity: req.body.quantity,
+                        stock: req.body.stock,
                         // images: req.files,
                         updatedAt: Date.now(),
                         _id: id

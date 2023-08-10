@@ -1,4 +1,5 @@
-const {Cartdb, Orderdb} = require('../model/model');
+const Cartdb = require('../model/cartModel');
+const Orderdb = require('../model/orderModel');
 const mongoose = require('mongoose');
 
 exports.placeOrder = async (req, res, next) => {
@@ -127,7 +128,7 @@ exports.getOrderDetails = async (req, res, next) => {
                 cartItems.forEach(product => {
                     const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.productInfo[0].category) );
                     console.log(JSON.stringify(prodCategoryName));
-                    product.productInfo[0].category = prodCategoryName[0].categoryName;
+                    product.productInfo[0].category = prodCategoryName[0]?.categoryName;
                 });  
                 res.locals.subTotal = cartItems.reduce((sum, item) =>{
                     return sum + (item.quantity*item.salePrice);

@@ -1,4 +1,4 @@
-const {Userdb} = require('../model/model');
+const Userdb = require('../model/userModel');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -37,7 +37,7 @@ async function sendOTP(phone){
         const hashedOtp = await bcrypt.hash(String(generatedOtp), 10);
         console.log(`Generated OTP : ${generatedOtp}`)
     //-------------------- TWILIO OTP SENDER CODE ---------------------//
-        // clients
+        // client
         // .create({
         //     body: `JMJ Music House - OTP for Login is ${generatedOtp}`,
         //     from: '+17626002830',
@@ -47,10 +47,10 @@ async function sendOTP(phone){
 
         return hashedOtp;
     } catch(err){
-        res.status(500).render('error', {
-            message: "Unable to send OTP. Please try again later",
-            errStatus : 500
-        });
+        // res.status(500).render('error', {
+        //     message: "Unable to send OTP. Please try again later",
+        //     errStatus : 500
+        // });
         console.log("Unable to send OTP. Please try again later" + err);
     }
 }

@@ -1,4 +1,4 @@
-const {Cartdb} = require('../model/model');
+const Cartdb = require('../model/cartModel');
 const mongoose = require('mongoose');
 
 exports.getUserCart = async (req, res, next) => {
@@ -201,3 +201,20 @@ exports.getTotalAmount = async (req, res, next) => {
     }
 }
 
+// exports.changeCartProductQty = async (req, res) => {
+//     try{
+//         if (!req.body) {
+//             return res.status(500).render('error', {
+//                 message: err || "Data to update cannot be empty"
+//             });
+//         }
+//         console.log("CHANGING PRODUCT QTY TO CART -------->");
+//         console.log(req.body);
+//     }catch(err){
+//         res.status(500).render('error', {
+//             message: "Unable to add product to cart",
+//             errStatus : 500
+//         });
+//         console.log(err);
+//     }
+// }

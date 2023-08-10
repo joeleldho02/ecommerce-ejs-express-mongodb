@@ -1,4 +1,4 @@
-const {Userdb} = require('../model/model');
+const Userdb = require('../model/userModel');
 
 exports.authenticateUser = async (req, res, next) => {
     console.log("Authenticating User ----->");

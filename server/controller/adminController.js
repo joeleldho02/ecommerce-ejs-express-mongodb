@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const {Admindb} = require('../model/model');
+const Admindb = require('../model/adminModel');
 
 
 async function setSession(req, res, user){  
