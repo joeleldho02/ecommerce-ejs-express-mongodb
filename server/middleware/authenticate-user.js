@@ -2,12 +2,11 @@ const Userdb = require('../model/userModel');
 
 exports.authenticateUser = async (req, res, next) => {
     console.log("Authenticating User ----->");
-    console.log(req.session.user);
-    if(req.session.user !== undefined && !req.session.isAdmin){
+    if(req.session.userLoggedIn === true){
         await Userdb.findOne({ email: req.session.user.email},{isActive:1})
         .then(user => {
             if (user !== null) {   
-                console.log("           User Status : " + user.isActive);           
+                console.log("--------------->> User Status : " + user.isActive);           
                 if(user.isActive)
                     next();
                 else{

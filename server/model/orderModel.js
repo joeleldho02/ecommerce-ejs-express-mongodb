@@ -2,19 +2,35 @@ const mongoose = require('mongoose');
 
 //-----   Order Model   -----//
 const orderSchema = new mongoose.Schema({
+    orderId: String,
     customerId: mongoose.Schema.Types.ObjectId,
     products: [{
         productId: mongoose.Schema.Types.ObjectId,
+        productName: String,
+        category: String,
         quantity: Number,
-        amount: Number
+        salePrice: Number
     }],
     paymentMethod : String,
-    shippingMethod: String,
-    totalAmount : Number,
-    shippingAddress : {},
-    status: {
+    paymentStatus: {
         type : String,
-        default: () => "PENDING"
+        default: "PENDING"
+    },
+    shippingMethod: {
+        type : String,
+        default: "Post Mail Courier"
+    },
+    shippingCost: {
+        type : Number,
+        default: 0
+    },
+    totalItems : Number,
+    totalAmount : Number,
+    discount: Number,
+    shippingAddress : {},
+    orderStatus: {
+        type : String,
+        default: "PENDING"
     },
     createdAt: {
         type: Date,

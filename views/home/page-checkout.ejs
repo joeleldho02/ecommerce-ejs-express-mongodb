@@ -15,6 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="/css/custom-alert.css">
 </head>
 
 <body>
@@ -92,7 +93,7 @@
                                                 <% for (let i = 0; i < cartItems.length; i++) { %>
                                             <li>
                                                 <div class="shopping-cart-img">
-                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>"></a>
+                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0] %>"></a>
                                                 </div>
                                                 <div class="shopping-cart-title">
                                                     <h4><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
@@ -511,7 +512,7 @@
                 </div>
             </div>
         </div>
-        <section class="mt-50 mb-50">
+        <section class="mt-25 mb-50">
             <div class="container">
                 <!-- <div class="row">
                     <div class="col-lg-6 mb-sm-15">
@@ -1196,7 +1197,7 @@
                                         <% if (locals.cartItems) { %>                                    
                                             <% for (let i = 0; i < cartItems.length; i++) { %>
                                         <tr>
-                                            <td class="image product-thumbnail"><img src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>" alt="#"></td>
+                                            <td class="image product-thumbnail"><img src="/img/products/<%= cartItems[i].productInfo[0].images[0] %>" alt="#"></td>
                                             <td>
                                                 <h5><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h5> <span class="product-qty">x <%= cartItems[i].quantity %></span>
                                             </td>
@@ -1219,45 +1220,43 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                            <div class="payment_method">
-                                <div class="mb-25">
-                                    <h5>Payment</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="payment_method">
+                                        <div class="mb-25">
+                                            <h5>Payment</h5>
+                                        </div>
+                                        <div class="payment_option">
+                                            <div class="custome-radio">
+                                                <input class="form-check-input payment_option" required="" type="radio" value="COD" name="payment_option" id="exampleRadios3" checked="">
+                                                <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Cash on Delivery</label>
+                                                <div class="form-group collapse in" id="cashOnDelivery">
+                                                    <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
+                                                </div>
+                                            </div>
+                                            <div class="custome-radio">
+                                                <input class="form-check-input payment_option" required="" type="radio" value="PAYPAL" name="payment_option" id="exampleRadios5" disabled>
+                                                <label class="form-check-label " for="exampleRadios5" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Paypal</label>
+                                                <div class="form-group collapse in" id="paypal">
+                                                    <p class="text-muted mt-5">Pay via PayPal; you can pay with your credit card if you don't have a PayPal account.</p>
+                                                </div>
+                                            </div>
+                                        </div>                                
+                                    </div>
+                                    <form id="hidden-form-placeorder" action="/place-order" method="POST" style="display: none;">
+                                        <input type="hidden" id="addressId" name="addressId" value=""/>
+                                        <input type="hidden" id="paymentMethod" name="paymentMethod" value=""/>
+                                        <input type="hidden" id="totalAmount" name="totalAmount" value="<% if(locals.subTotal) { %><%= subTotal %><% } %>"/>
+                                    </form>
                                 </div>
-                                <div class="payment_option">
-                                    <div class="custome-radio">
-                                        <input class="form-check-input payment_option" required="" type="radio" value="COD" name="payment_option" id="exampleRadios3" checked="">
-                                        <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Cash on Delivery</label>
-                                        <div class="form-group collapse in" id="cashOnDelivery">
-                                            <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
-                                        </div>
-                                    </div>
-                                    <!-- <div class="custome-radio">
-                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" checked="">
-                                        <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#checkPayment" aria-controls="checkPayment">Check Payment</label>
-                                        <div class="form-group collapse in" id="checkPayment">
-                                            <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
-                                        </div>
-                                    </div> -->
-                                    <div class="custome-radio">
-                                        <input class="form-check-input payment_option" required="" type="radio" value="PAYPAL" name="payment_option" id="exampleRadios5" disabled>
-                                        <label class="form-check-label " for="exampleRadios5" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Paypal</label>
-                                        <div class="form-group collapse in" id="paypal">
-                                            <p class="text-muted mt-5">Pay via PayPal; you can pay with your credit card if you don't have a PayPal account.</p>
-                                        </div>
-                                    </div>
-                                </div>                                
-                            </div>
-                            <form id="hidden-form-placeorder" action="/place-order" method="POST" style="display: none;">
-                                <input type="hidden" id="addressId" name="addressId" value=""/>
-                                <input type="hidden" id="paymentMethod" name="paymentMethod" value=""/>
-                                <input type="hidden" id="totalAmount" name="totalAmount" value="<% if(locals.subTotal) { %><%= subTotal %><% } %>"/>
-                              </form>
-                              <a class="ms-3 me-0" onclick="placeOrder('hidden-form-placeorder')">
-                                  <span class=" btn btn-fill-out btn-block mt-30" title="Place Order">
-                                    Place Order
-                                  </span>
-                              </a>
+                                <div class="col-md-6">
+                                    <a class="ms-3 me-0 float-end mt-0" onclick="placeOrder('hidden-form-placeorder')">
+                                        <span class=" btn btn-fill-out btn-block mt-30" title="Place Order">
+                                          Place Order
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>                            
                             <!-- <a href="/place-order" class="btn btn-fill-out btn-block mt-30">Place Order</a> -->
                         </div>
                         <div class="toggle_info  mt-25">
@@ -1392,6 +1391,8 @@
             </div>
         </div>
     </footer>
+    <!-- Custom Alert -->
+    <%- include('./partials/home/custom-alert.ejs') %>
     <!-- Preloader Start -->
     <div id="preloader-active">
         <div class="preloader d-flex align-items-center justify-content-center">
@@ -1428,8 +1429,8 @@
     <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
     <!-- Template  JS -->
     <script src="/assets/js/main.js?v=3.4"></script>
-    <script src="/assets/js/shop.js?v=3.4"></script>
-
+    <script src="/assets/js/shop.js?v=3.4"></script>    
+    <script src="/js/custom-alert.js"></script>
     <script>
         window.onload = function () {
             const cards = document.getElementById("addressCards");
@@ -1448,18 +1449,12 @@
         function placeOrder(formID) {
             const checkedAddress = $('.selectCheckBox:checked').val();
             const paymentMethod = $('.payment_option:checked').val();
-            if(checkedAddress    === undefined){
-                alert("Please choose a shipping address!!")
+            if(checkedAddress === undefined){
+                openPopup('Hello there!', "Please choose a shipping address!!");
             } else {
-                console.log("CHECKED VALUE : " + checkedAddress);
-                console.log("Payment Method : " + paymentMethod);
                 document.getElementById("addressId").value = checkedAddress;
                 document.getElementById("paymentMethod").value = paymentMethod;
-                console.log(document.getElementById("addressId").value);
-                console.log(document.getElementById("paymentMethod").value);
-                if (confirm(`Are you sure to place the order?`)) {
-                    document.getElementById(formID).submit();
-                }
+                document.getElementById(formID).submit();
             }            
         }
     </script>

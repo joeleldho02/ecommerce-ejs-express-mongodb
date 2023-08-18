@@ -15,6 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
     <style>
           h1 {
             color: #88B04B;
@@ -541,17 +542,136 @@
                 </div>
             </div>
         </div>
-        <section class="mt-50 mb-50">
-            <div class="container m-auto">
-                <div class="card m-auto text-center">
-                    <div style="border-radius:200px; height:200px; width:200px; background: #F8FAF5; margin:0 auto;">
-                      <i class="checkmark">✓</i>
+        <div class="row mt-10 mb-50 w-100">
+            <div class="col-md-6">
+                <div class="container m-auto w-75">
+                    <div class="card m-auto text-center w-100">
+                        <div style="border-radius:200px; height:200px; width:200px; background: #f6f6f6; margin:0 auto;">
+                          <i class="checkmark">✓</i>
+                        </div>
+                          <h1>Success</h1> 
+                          <p>We received your purchase request;<br/> we'll be in touch shortly!</p>
                     </div>
-                      <h1>Success</h1> 
-                      <p>We received your purchase request;<br/> we'll be in touch shortly!</p>
                 </div>
-            </div>
-        </section>
+                <div class="text-center m-auto mt-20 w-75">
+                    <a class=" btn btn-primary me-4" href="/">Continue Shopping</a>
+                </div>
+            </div>               
+            <% if(locals.order) { %>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <div class="row order-info-wrap">
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <div class="text">
+                                    <h6 class="mb-1">Order info</h6>
+                                    <p class="mb-1" style="font-size: 14px;">
+                                        Total Items: <%= order[0]?.totalItems %> <br>
+                                        Shipping: <%= order[0]?.shippingMethod %> <br>
+                                        Order status: 
+                                        <% if(typeof order[0]?.orderStatus === 'string') { %>
+                                            <span style="font-size: 14px;"
+                                            <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                            ><%= order[0]?.orderStatus %></span>   
+                                        <% } %>
+                                        </p>
+                                    <!-- <a href="#">Download info</a> -->
+                                </div>
+                            </article>
+                        </div> <!-- col// -->
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <div class="text">
+                                    <h6 class="mb-1">Deliver to</h6>
+                                    <p class="mb-1" style="font-size: 14px;">
+                                        Name: <%= order[0]?.shippingAddress?.customerName %><br>
+                                        <%= order[0]?.shippingAddress?.addressLine1 %>, <%= order[0]?.shippingAddress?.addressLine2 %>, Floor 2 <br>
+                                        City: <%= order[0]?.shippingAddress?.city %>, <%= order[0]?.shippingAddress?.state %>, <%= order[0]?.shippingAddress?.country %> <br>
+                                        Pincode: <%= order[0]?.shippingAddress?.pincode %>
+                                    </p>
+                                </div>
+                            </article>
+                        </div> <!-- col// -->
+                        <div class="col-lg-4">
+                            <article class="icontext align-items-start">
+                                <div class="text">
+                                    <h6 class="mb-1">Payment info</h6>
+                                    <p class="mb-1" style="font-size: 14px;">
+                                        <%= order[0]?.paymentMethod %>
+                                    </p>
+                                </div>
+                            </article>
+                        </div> <!-- col// -->
+                    </div> <!-- row // -->
+                    <div class="row">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="40%">Product</th>
+                                            <th width="20%">Unit Price</th>
+                                            <th width="20%">Quantity</th>
+                                            <th width="20%" class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>                                  
+                                        <% for (let i = 0; i < order.length; i++) { %>
+                                        <tr>
+                                            <td>
+                                                <a class="itemside" href="/<%= order[i].productInfo[0].category%>/<%= order[i].productInfo[0]._id %>" target="_blank">
+                                                    <div class="left">
+                                                        <img src="/img/products/<%= order[i].productInfo[0].images[0] %>" width="" height="40" class="img-xs" alt="Item">
+                                                    </div>
+                                                    <div class="info"><%= order[i].productInfo[0].productName %></div>
+                                                </a>
+                                            </td>
+                                            <td> ₹<%= order[i]?.productInfo[0]?.salePrice %> </td>
+                                            <td> <%= order[i].products?.quantity %> </td>
+                                            <td class="text-end"> ₹<%= order[i].products?.quantity * order[i]?.productInfo[0]?.salePrice %> </td>
+                                        </tr>
+                                        <% }  %>
+                                        <tr>
+                                            <td colspan="4">
+                                                <article class="float-end">
+                                                    <dl class="dlist  d-flex">
+                                                        <dt>Subtotal:</dt>
+                                                        <dd>₹<%= order[0]?.totalAmount %></dd>
+                                                    </dl>
+                                                    <dl class="dlist d-flex">
+                                                        <dt>Shipping cost:</dt>
+                                                        <dd>₹<%= order[0]?.shippingCost || '0' %></dd>
+                                                    </dl>
+                                                    <dl class="dlist d-flex">
+                                                        <dt>Grand total:</dt>
+                                                        <dd> <b class="h5">₹<%= order[0]?.totalAmount %></b> </dd>
+                                                    </dl>
+                                                    <dl class="dlist d-flex">
+                                                        <dt class="text-muted">Payment status:</dt>
+                                                        <dd>
+                                                            <% if(typeof order[0]?.paymentStatus === 'string') { %>
+                                                                <span 
+                                                                <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
+                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
+                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
+                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                                                ><%= order[0]?.paymentStatus %></span>   
+                                                            <% } %>
+                                                        </dd>
+                                                    </dl>
+                                                </article>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> <!-- table-responsive// -->                           
+                    </div>
+                </div> <!-- card-body end// -->
+            </div> 
+            <% } %>         
+        </div>
     </main>
     <footer class="main">
         <section class="newsletter p-30 text-white wow fadeIn animated">
@@ -696,7 +816,6 @@
     <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
     <script src="/assets/js/plugins/images-loaded.js"></script>
     <script src="/assets/js/plugins/isotope.js"></script>
-    <script src="/assets/js/plugins/scrollup.js"></script>
     <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
     <!-- Template  JS -->
     <script src="/assets/js/main.js?v=3.4"></script>

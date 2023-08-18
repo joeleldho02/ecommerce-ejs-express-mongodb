@@ -15,7 +15,7 @@ router.get('/signup', serviceRender.userSignupPage);
 router.get('/verify-otp', serviceRender.userVerifyOtpPage);
 router.get('/login', serviceRender.userLoginPage);
 router.get('/logout', serviceRender.userLogout);
-router.get('/view-order/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderDetailsPage)
+router.get('/view-order/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderDetailsPage)
 
 router.post('/signup', userController.registerUser);
 router.post('/verify-otp', userController.loginOTPVerify);

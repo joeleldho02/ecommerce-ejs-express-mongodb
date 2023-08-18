@@ -9,6 +9,9 @@ const categorySchema = new mongoose.Schema({
     description: {
         type: String
     },
+    slug: {
+        type: String
+    },
     isListed:{
         type: Boolean,
         required: true

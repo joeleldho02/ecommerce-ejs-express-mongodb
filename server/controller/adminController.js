@@ -7,10 +7,9 @@ async function setSession(req, res, user){
     delete req.session.loginErrMsg;
     delete req.session.loginOTP;
     delete req.session.loginErr;
-    req.session.loggedIn = true;
-    req.session.user = user;
-    req.session.isAdmin = true;
-    console.log(`Admin Logged in Succesfully : ${req.session.user.name}`)
+    req.session.adminLoggedIn = true;
+    req.session.adminUser = user;
+    console.log(`Admin Logged in Succesfully : ${req.session.adminUser.name}`)
     res.redirect('/admin');
 }
 

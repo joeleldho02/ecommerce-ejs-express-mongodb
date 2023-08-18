@@ -2829,7 +2829,7 @@ table .product-thumbnail img {
   position: relative;
   overflow: hidden;
   height: 4px;
-  z-index: 9;
+  /* z-index: 9; */
 }
 
 .divider.center_icon {

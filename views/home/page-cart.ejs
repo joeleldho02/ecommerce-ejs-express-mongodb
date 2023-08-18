@@ -15,6 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="/css/custom-alert.css">
 </head>
 
 <body>
@@ -91,7 +92,7 @@
                                                 <% for (let i = 0; i < cartItems.length; i++) { %>
                                             <li>
                                                 <div class="shopping-cart-img">
-                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>"></a>
+                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0] %>"></a>
                                                 </div>
                                                 <div class="shopping-cart-title">
                                                     <h4><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
@@ -529,22 +530,24 @@
                                     <% if (locals.cartItems) { %>                                    
                                         <% for (let i = 0; i < cartItems.length; i++) { %>
                                     <tr>
-                                        <td class="image product-thumbnail"><img src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>" alt="#"></td>
+                                        <td class="image product-thumbnail"><img src="/img/products/<%= cartItems[i].productInfo[0].images[0] %>" alt="#"></td>
                                         <td class="product-des product-name">
                                             <h4 class="product-name"><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
                                             <p class="font-xs"><%= cartItems[i].productInfo[0].brand %> - <%= cartItems[i].productInfo[0].category %> </p>
                                         </td>
-                                        <td class="price" data-title="Price"><span>₹<%= cartItems[i].salePrice %></span></td>
+                                        <td class="price" data-title="Price">₹<span id="itemPrice<%= i %>" ><%= cartItems[i].salePrice %></span></td>
                                         <td class="text-center" data-title="Stock">
-                                            <span class="qty-val"><%= cartItems[i].quantity %> </span>
+                                            <a id="itemDown<%= i %>" onclick="changeQuantity('<%= i %>', '<%= cartItems[i]._id %>','<%= cartItems[i].productInfo[0]._id %>',-1)" class="btn-primary-outline m-auto mx-1 py-0 px-1" style="font-weight: 700; font-size: 18px;">-</a>
+                                            <span id="itemQty<%= i %>" class="qty-val" ><%= cartItems[i].quantity %> </span>
+                                            <a id="itemUp<%= i %>" onclick="changeQuantity('<%= i %>', '<%= cartItems[i]._id %>','<%= cartItems[i].productInfo[0]._id %>', 1)" class="btn-primary-outline m-auto mx-1 py-0 px-1" style="font-weight: 700; font-size: 17px;">+</a>
                                             <!-- <div class="detail-qty border radius  m-auto">
-                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id',-1)" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id', 1)" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                                                 <span class="qty-val"><%= cartItems[i].quantity %> </span>
-                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id', 1)" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id',-1)" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                                             </div> -->
                                         </td>
                                         <td class="text-right" data-title="Cart">
-                                            <span>₹<%= cartItems[i].salePrice * cartItems[i].quantity %></span>
+                                            <span id="itemSubTotal<%= i %>">₹<%= cartItems[i].salePrice * cartItems[i].quantity %></span>
                                         </td>
                                         <td class="action" data-title="Remove"><a href="/remove-cart-item/<%= cartItems[i].productInfo[0]._id %>" class="text-muted"><i class="fi-rs-trash"></i></a></td>
                                     </tr>
@@ -560,7 +563,8 @@
                         </div>
                         <div class="cart-action text-end">
                             <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
-                            <a class="btn " href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                            <a class="btn-primary-outline me-4" href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                            <a href="/checkout" class="btn ms-3"> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                         </div>
                         <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                         <div class="row mb-50">
@@ -869,8 +873,8 @@
                                             <tbody>
                                                 <tr>
                                                     <td class="cart_total_label">Cart Subtotal</td>
-                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">
-                                                        ₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %>
+                                                    <td class="cart_total_amount font-lg fw-900 text-brand">₹<span id="subTotal"  class="">
+                                                        <% if(locals.subTotal) { %> <%= subTotal %> <% } %>
                                                         </span></td>
                                                 </tr>
                                                 <tr>
@@ -879,7 +883,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td class="cart_total_label">Total</td>
-                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">₹<% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></strong></td>
+                                                    <td class="cart_total_amount font-xl text-brand"><strong>₹<span id="totalAmt" class="fw-900"><% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -1004,6 +1008,8 @@
             </div>
         </div>
     </footer>
+    <!-- Custom Alert -->
+    <%- include('./partials/home/custom-alert.ejs') %>
     <!-- Preloader Start -->
     <div id="preloader-active">
         <div class="preloader d-flex align-items-center justify-content-center">
@@ -1041,18 +1047,69 @@
     <!-- Template  JS -->
     <script src="/assets/js/main.js?v=3.4"></script>
     <script src="/assets/js/shop.js?v=3.4"></script>
+    <script src="/js/custom-alert.js"></script>
     <script>
-        function changeQuantity(cartId, prodId, val){
-            $ajax({
-                url:'/change-product-quantity',
+        function changeQuantity(i, cartId, prodId, newCount){
+            const labelId = '#itemQty' + i; 
+            console.log("Clicked : " + newCount);
+            let initialCount = $(labelId).text();
+            if(initialCount < Number(2) && newCount === -1)
+                return;
+            $.ajax({
+                url:'/change-cart-item-quantity',
                 data : {
-                    cart: cartId,
-                    prooduct: prodId,
-                    val: val
+                    cartId: cartId,
+                    prodId: prodId,
+                    count: newCount
                 },
-                method: 'post',
-                success: (response) => {
-                    alert(response);
+                method: 'POST',
+                success: function(response){
+                    
+                    const itemPriceId = '#itemPrice' + i; 
+                    const itemSubTotalId = '#itemSubTotal' + i;
+                    const totalId = '#itemQty' + i;
+                    const btnDown = '#itemDown' + i;
+                    const btnUp = '#itemUp' + i;
+                    console.log(response);
+
+                    if(response.status){
+                        let count = $(labelId).text();
+                        count = parseInt(count) + Number(newCount);
+                        console.log("Count : " + count);
+                        //item label
+                        $(labelId).text(count);
+                        if(count < 2){$(btnDown).off('click');}
+                        else{$(btnDown).on('click');}
+                        //sub Total
+                        let subTotal = $('#subTotal').text();
+                        console.log("subTotal : " + subTotal);
+                        subTotal = parseInt(subTotal) + (parseInt(newCount) * parseInt($(itemPriceId).text()));
+                        console.log("subTotal : " + subTotal);
+                        $('#subTotal').text(subTotal);
+                        $('#totalAmt').text(subTotal);
+                        //item sub total
+                        let itemPrice = $(itemPriceId).text();
+                        itemPrice = parseInt(itemPrice) * count;
+                        console.log("Subtotal : " + itemPrice);
+                        $(itemSubTotalId).text('₹' + itemPrice);
+                        //cart item count
+                        let cartCount = $('#cartItemsCount').text();
+                        cartCount = parseInt(cartCount) + Number(newCount);
+                        console.log("Count : " + cartCount);
+                        $('#cartItemsCount').text(cartCount);
+                        
+                        
+                    } else {
+                        if(response.msg)
+                            //alert(response.msg);
+                            openPopup('Oops..!', response.msg);
+                        else
+                            openPopup('Oops..!', "Unable to change item quantity");
+                            //alert("Unable to change item quantity");
+                    }
+                },
+                error: function(){
+                    openPopup('Oops..!', "Unable to change item quantity");
                 }
             })
         } 

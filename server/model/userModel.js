@@ -41,6 +41,9 @@ const userSchema = new mongoose.Schema({
             default: () => false
         }     
     }],
+    cart: {
+        type: Array
+    },
     wishlist :[ mongoose.Schema.Types.ObjectId ],
     createdAt: {
         type: Date,
@@ -49,7 +52,12 @@ const userSchema = new mongoose.Schema({
     updatedAt:{
         type: Date,
         default: () => Date.now()
-    }
+    },
+    wallet:[{
+        amount: Number,
+        timestamp: Date,
+        type: String
+    }]
 });
 const Userdb = mongoose.model('user', userSchema);
 

@@ -173,7 +173,10 @@
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
-            $('#dataTable').DataTable();
+            $('#dataTable').DataTable({
+                order: [[2, 'desc']],
+                columnDefs: [{ "targets": [4], "orderable": false }]
+            });
         });
 
         function confirmDelete(formID, name) {

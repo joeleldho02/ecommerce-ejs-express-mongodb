@@ -7,7 +7,7 @@ exports.homePage = (req, res) => {
     });
 };
 exports.categoryProductsPage = (req, res) => {
-    if(res.locals.categories.length === 0){
+    if(res.locals.categories.length === 0 || !res.locals.products){
         res.status(404).render('error', {
                         message: "Oops..! Page not available",
                         errStatus : 404
@@ -41,34 +41,40 @@ exports.getUserCartPage = (req, res) => {
     });
 };
 exports.getUserCheckoutPage = (req, res) => {
-    res.render('page-checkout', {
-        categories: res.locals.categories,
-        cartItems : res.locals.cartItems,
-        subTotal : res.locals.subTotal,
-        itemsCount : res.locals.itemsCount,
-        addresses: res.locals.addresses
-    });
+    if(res.locals.cartItems.length === 0){
+        res.redirect('/');
+    } else{
+        res.render('page-checkout', {
+            categories: res.locals.categories,
+            cartItems : res.locals.cartItems,
+            subTotal : res.locals.subTotal,
+            itemsCount : res.locals.itemsCount,
+            addresses: res.locals.addresses
+        });
+    }    
 };
 exports.getOrderPlacedPage = (req, res) => {
     res.render('page-order-placed',{
         categories: res.locals.categories,        
         itemsCount : res.locals.itemsCount,
+        cartItems : res.locals.cartItems,
+        order: res.locals.order,
     });
 };
 
 //------- ADMIN SIDE --------//
 exports.adminLoginPage = (req, res) => {
-    if(req.session.loggedIn && req.session.isAdmin)
+    if(req.session.adminLoggedIn === true)
         res.redirect('/admin');
-    else if(req.session.loggedIn)
+    else if(req.session.userLoggedIn === true)
         res.redirect('/user');
     else
         res.render('admin-login');
 };
 exports.adminDashboardPage = (req, res) => {
-    if(req.session.loggedIn && req.session.isAdmin)
+    if(req.session.adminLoggedIn === true)
         res.render('admin-dashboard',{pageTitle: "Dashboard"});
-    else if(req.session.loggedIn)
+    else if(req.session.userLoggedIn === true)
         res.redirect('/user');
     else    
         res.redirect('/admin/login');
@@ -123,15 +129,22 @@ exports.getAdminUsersPage = (req, res) => {
     });
 };
 exports.getAdminCategoryPage = (req, res) => {
+    console.log("--------------------------------- > HERE2");
     res.render('page-category', {
         pageTitle: "Category Management",
         categories: res.locals.categories,
+        // errMsg: req.session.errMsg,
+        // inputData: req.session.inputData
     });
+    if(req.session.errMsg) {
+        delete req.session.errMsg;
+        delete req.session.inputData;
+    }
 };
 
 //------- USER SIDE --------//
 exports.userDashboardPage = (req, res) => {
-    if(req.session.loggedIn && !req.session.isAdmin)
+    if(req.session.userLoggedIn === true)
         res.render('user-dashboard',{
             navTitle: 'Welcome ' + req.session.user.firstName,
             user: req.session.user,
@@ -142,34 +155,30 @@ exports.userDashboardPage = (req, res) => {
             addresses : res.locals.addresses,
             orders: res.locals.orders
         });
-    else if(req.session.loggedIn)
+    else if(req.session.adminLoggedIn === true)
         res.redirect('/admin');
     else
         res.redirect('/user/login');
 };
 exports.userLoginPage = (req, res) => {
-    if(req.session.loggedIn && !req.session.isAdmin)
+    if(req.session.userLoggedIn === true)
         res.redirect('/user');
-    else if(req.session.loggedIn)
-        res.redirect('/admin');
+    // else if(req.session.adminLoggedIn === true)
+    //     res.redirect('/admin');
     else
         res.render('user-login',{
             errMsg: req.session.loginErrMsg, 
             err: req.session.loginErr});
 };
 exports.userSignupPage = (req, res) => {
-    if(req.session.loggedIn && !req.session.isAdmin)
+    if(req.session.userLoggedIn === true)
         res.redirect('/user');
-    else if(req.session.loggedIn)
-        res.redirect('/admin');
     else
         res.render('user-signup');
 };
 exports.userVerifyOtpPage = (req, res) => {
-    if(req.session.loggedIn && !req.session.isAdmin)
+    if(req.session.userLoggedIn === true)
         res.redirect('/user');
-    else if(req.session.loggedIn)
-        res.redirect('/admin');
     else
         res.render('user-otp',{
             phone: req.session.signupPhone

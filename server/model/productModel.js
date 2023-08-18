@@ -6,6 +6,8 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    SKU: String,
+    shortDescription: String,
     description: String,
     category:{
         type: mongoose.Schema.Types.ObjectId,
@@ -14,9 +16,11 @@ const productSchema = new mongoose.Schema({
     brand: String,
     regularPrice: Number,
     salePrice:  Number,
+    taxRate: Number,
     stock: Number,
     rating:  Number,
     images: [],
+    tags: [],
     review: [],    
     isDeleted:{
         type: Boolean,

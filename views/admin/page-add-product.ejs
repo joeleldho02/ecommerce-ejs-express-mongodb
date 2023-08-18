@@ -27,7 +27,69 @@
         div.preview-images > img {
           width: 20%;
         }
+        .tag-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.tags {
+    display: none;
+    flex-wrap: wrap;
+    flex-direction: row; /* Change to column to display tags below input */
+    gap: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    padding: 3px 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 12px;
+    background-color: #f0f0f0;
+}
+
+.tag-text {
+    margin-right: 5px;
+}
+
+.tag-remove {
+    cursor: pointer;
+}        
     </style>
+    <style>
+        .preview-images {
+          display: flex;
+          flex-wrap: wrap;
+          margin-top: 10px;
+        }
+        .preview-image {
+          position: relative;
+          margin: 10px;
+        }
+        .preview-image img {
+          max-width: 100px;
+          max-height: 100px;
+          border: 1px solid #ccc;
+          padding: 5px;
+        }
+        .remove-button {
+          position: absolute;
+          top: 0;
+          right: 0;
+          background-color: rgba(255, 0, 0, 0.7);
+          color: white;
+          font-weight: bold;
+          cursor: pointer;
+          padding: 3px 4px;
+          border-radius: 100%;
+        }
+      </style>
 </head>
 
 <body>
@@ -35,171 +97,214 @@
     <main class="main-wrap">
         <%- include('./partials/admin/admin-header.ejs') %>
         <section class="content-main">
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
-                <!-- DataTales Example -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex">
-                        <h6 class="my-auto font-weight-bold text-primary">
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-header">
+                        <h2 class="content-title">
                             <% if (locals.product) { %>
                                 Edit Product Details
                             <% } else { %>
                                 Enter Product Details
                             <% } %>
-                        </h6>                        
-                    </div>
-                    <div class="card-body">
-                    <form name="signupForm" id="signupForm" class="login-form px-md-5" method="post"
-                        <% if (locals.product) { %>
-                            action="/admin/edit-product">
-                        <% } else { %>
-                            enctype="multipart/form-data"
-                            action="/admin/add-product">
-                        <% } %>
-                        <% if (locals.product) { %>
-                            <div class="form-group">
-                                <input type="hidden" id="productID" name="productID" class="form-control" value="<%= product._id %>" >
-                            </div>
-                        <% } %>
-                        <div class="form-group finput d-flex">
-                            <div class="icon d-flex align-items-center justify-content-center">
-                                <span class="fa fa-user"></span>
-                            </div>
-                            <input type="text" class="form-control my-2 mx-2" id="productName" name="productName"
-                                placeholder="Name" 
-                                <% if (locals.product) { %>
-                                    value="<%= product.productName %>"
-                                <% } %>
-                            />
-                            <div class="error text-danger"></div>
-                        </div>
-                        <div class="form-group finput d-flex mt-3">
-                            <div class="icon d-flex align-items-center justify-content-center">
-                                <span class="fa fa-phone"></span>
-                            </div>
-                            <textarea class="form-control  my-2 mx-2" id="description" rows="10" name="description"
-                                placeholder="Description"><% if (locals.product) { %><%= product.description %><%} %></textarea>
-                            <div class="error text-danger" ></div>
-                        </div>                        
-                        <div class=" d-md-flex align-items-center justify-content-between" style="column-gap: 20px;"> 
-                            <div class="form-group d-flex w-25 mt-4">
-                                <div class="icon me-2 d-flex align-items-center justify-content-center">
-                                    <span class="fa fa-envelope"></span>
-                                </div>
-                                <select class="form-select form-control" id="category" name="category">
-                                    <% if (locals.product) { %>
-                                        <option selected><%= product.category %></option>
-                                    <% } else { %>
-                                        <option selected>Select category</option>
-                                    <% } %> 
-                                    <% if (locals.categories) { %>
-                                        <% for (let i = 0; i < categories.length; i++) { %>
-                                            <% if (locals.product) { %>
-                                                <% if (categories[i].categoryName !== product.category) { %>
-                                                    <option><%= categories[i].categoryName %></option>
-                                                <% } %> 
-                                            <% } else { %>
-                                                <option><%= categories[i].categoryName %></option>
-                                            <% } %> 
-                                        <% } %>                                        
-                                    <% } %>
-                                </select>
-                            </div>
-                            <div class="form-group finput d-flex mt-3 ">
-                                <div class="icon d-flex align-items-center justify-content-center">
-                                    <span class="fa fa-envelope"></span>
-                                </div>
-                                <input type="text" class="form-control my-2 mx-2" id="brand" name="brand"
-                                    placeholder="Brand" 
-                                    <% if (locals.product) { %>
-                                        value="<%= product.brand %>"
-                                    <% } %>
-                                />
-                                <div class="error text-danger"></div>
-                            </div>
-                            <div class="form-group finput d-flex mt-3 ">
-                                <div class="icon d-flex align-items-center justify-content-center">
-                                    <span class="fa fa-envelope"></span>
-                                </div>
-                                <input type="text" class="form-control my-2 mx-2" id="regularPrice" name="regularPrice"
-                                    placeholder="Regular price" 
-                                    <% if (locals.product) { %>
-                                        value="<%= product.regularPrice %>"
-                                    <% } %>
-                                />
-                                <div class="error text-danger"></div>
-                            </div>
-                            <div class="form-group finput d-flex mt-3" >
-                                <div class="icon d-flex align-items-center justify-content-center">
-                                    <span class="fa fa-lock"></span>
-                                </div>
-                                <input type="text" class="form-control my-2 mx-2" id="salePrice" name="salePrice"
-                                    placeholder="Sale price" 
-                                    <% if (locals.product) { %>
-                                        value="<%= product.salePrice %>"
-                                    <% } %>
-                                />
-                                <div class="error text-danger"></div>
-                            </div>
-                            <div class="form-group finput d-flex mt-3" >
-                                <div class="icon d-flex align-items-center justify-content-center">
-                                    <span class="fa fa-lock"></span>
-                                </div>
-                                <input type="text" class="form-control my-2 mx-2" id="stock" name="stock"
-                                    placeholder="Enter stock" 
-                                    <% if (locals.product) { %>
-                                        value="<%= product.stock %>"
-                                    <% } %>
-                                />
-                                <div class="error text-danger"></div>
-                            </div>
-                        </div>
-                        <% if (!locals.product) { %>
-                            <div class="form-group finput d-flex mt-3" >
-                                <div class="icon d-flex align-items-center justify-content-center">
-                                    <span class="fa fa-lock"></span>
-                                </div>
-                                <input type="file" id="productImage" name="productImage" class="form-control my-2 mx-2" multiple>
-                                <div class="error text-danger"></div>
-                            </div>
-                        <% } %>
-                        <div class="row mt-50">
-                            <div class="col-sm-12">
-                              <div class="preview-images">
-                                <% if (locals.product && locals.product.images) { %>
-                                    <% for (let j = 0; j < product.images.length; j++) { %>
-                                        <img src="/img/products/<%= product.images[j].filename %>" class="img-sm img-thumbnail" alt="<%= product.productName %>">
-                                    <% } %>
-                                <% } %>
-                              </div>
-                            </div>
-                        </div>
-                        <!-- <div class="form-group finput d-flex mt-3" >
-                            <div class="drag-area m-auto p-4">
-                                <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                                <header>Drag & Drop to Upload File</header>
-                                <span>OR</span>
-                                <button>Choose File</button>
-                                <input type="file" hidden>
-                            </div>
-                        </div> -->                        
-                        <div class="form-group mt-4 mb-2">
-                            <button id="btn-submit" type="submit" class="btn form-control btn-primary text-white rounded submit px-3">
-                                <% if (locals.product) { %>
-                                    UPDATE PRODUCT
-                                <% } else { %>
-                                    ADD PRODUCT
-                                <% } %>
+                        </h2>
+                        <div>
+                            <button onclick="submitForm()" class="btn btn-md submit form-control rounded font-sm hover-up">
+                                SAVE PRODUCT
                             </button>
                         </div>
-                    </form>
                     </div>
                 </div>
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>Basic</h4>
+                        </div>
+                        <div class="card-body">
+                            <form name="newProductForm" id="newProductForm" class="login-form px-md-5" method="post" enctype="multipart/form-data"
+                            <% if (locals.product) { %>
+                                action="/admin/edit-product"
+                            <% } else { %>
+                                action="/admin/add-product"
+                            <% } %> >
+                                <% if (locals.product) { %>
+                                    <div class="form-group ">
+                                        <input type="hidden" id="productID" name="productID" class="form-control" value="<%= product._id %>" >
+                                    </div>
+                                <% } %>
+                                <div class="mb-4">
+                                    <label for="product_name" class="form-label">Product title</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="productName" name="productName"
+                                    <% if (locals.product) { %>
+                                        value="<%= product.productName %>"
+                                    <% } %> >
+                                    <div class="error text-danger"></div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="product_name" class="form-label">Short description</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="shortDescription" name="shortDescription"
+                                    <% if (locals.product) { %>
+                                        value="<%= product.shortDescription %>"
+                                    <% } %> >
+                                    <div class="error text-danger"></div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Full description</label>
+                                    <textarea placeholder="Type here" class="form-control" id="description" name="description"rows="4"><% if (locals.product) { %><%= product.description %><% } %></textarea>
+                                    <div class="error text-danger" ></div>
+                                </div>
+                                <div class="row gx-2">
+                                    <div class="col-lg-6 mb-4">
+                                        <label class="form-label">Category</label>
+                                        <select class="form-select" id="category" name="category">
+                                            <% if (locals.product) { %>
+                                                <option value="<%= product.category %>" selected><%= product.category %></option>
+                                            <% } else { %>
+                                                <option value="select" selected>Select category</option>
+                                            <% } %> 
+                                            <% if (locals.categories) { %>
+                                                <% for (let i = 0; i < categories.length; i++) { %>
+                                                    <% if (locals.product) { %>
+                                                        <% if (categories[i].categoryName !== product.category) { %>
+                                                            <option value="<%= categories[i].categoryName %>"><%= categories[i].categoryName %></option>
+                                                        <% } %> 
+                                                    <% } else { %>
+                                                        <option value="<%= categories[i].categoryName %>"><%= categories[i].categoryName %></option>
+                                                    <% } %> 
+                                                <% } %>                                        
+                                            <% } %>
+                                        </select>
+                                        <div class="error text-danger"></div>
+                                    </div>
+                                    <div class="col-lg-6 mb-4">
+                                        <label for="product_name" class="form-label">Brand</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="brand" name="brand"
+                                        <% if (locals.product) { %>
+                                            value="<%= product.brand %>"
+                                        <% } %> >
+                                        <div class="error text-danger"></div>
+                                    </div>
+                                </div> <!-- row.// -->
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Regular price</label>
+                                            <div class="row gx-2">
+                                                <input placeholder="₹" type="text" class="form-control" id="regularPrice" name="regularPrice"
+                                                <% if (locals.product) { %>
+                                                    value="<%= product.regularPrice %>"
+                                                <% } %>>
+                                                <div class="error text-danger"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Sale price</label>
+                                            <input placeholder="₹" type="text" class="form-control" id="salePrice" name="salePrice"
+                                            <% if (locals.product) { %>
+                                                value="<%= product.salePrice %>"
+                                            <% } %> >
+                                            <div class="error text-danger"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Tax rate</label>
+                                            <input type="text" placeholder="%" class="form-control" id="taxRate" name="taxRate"
+                                            <% if (locals.product) { %>
+                                                value="<%= product.taxRate %>"
+                                            <% } %> >
+                                            <div class="error text-danger"></div>
+                                        </div>
+                                    </div>                                    
+                                </div>                                
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Available Stock</label>
+                                            <div class="row gx-2">
+                                                <input placeholder="Nos" type="text" class="form-control" id="stock" name="stock"
+                                                <% if (locals.product) { %>
+                                                    value="<%= product.stock %>"
+                                                <% } %>>
+                                                <div class="error text-danger"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 m-auto">
+                                        <div class="mb-4">
+                                            <label class="form-label">SKU</label>
+                                            <div class="row gx-2">
+                                                <input placeholder="Type here" type="text" class="form-control" id="sku" name="sku"
+                                                <% if (locals.product) { %>
+                                                    value="<%= product.SKU %>"
+                                                <% } %>>
+                                                <div class="error text-danger"></div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                    <div class="col-lg-2 m-auto">
+                                        <button class="btn" onclick="">G</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div> <!-- card end// -->
+                </div>
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>Product Images</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-upload">
+                                <img src="/assets2/imgs/theme/upload.svg" alt="">
+                                <div class="w-100 bg-light rounded-3 p-2 d-flex d-none">
+                                    <label for="productImage" class="custom-input-label py-2 px-3 ms-2 rounded-3 " style="font-size: 13px; background-color: #cfcfcf; color: #000000;"><span>Select Files</span></label>
+                                </div>                                
+                                <input class="form-control" form="newProductForm" type="file" multiple id="productImage" name="productImage"
+                                <% if (locals.product) { %>
+                                    value="<%= product.images.join(', ') %>"
+                                <% } %> >
+                                <div class="error text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="preview-images">
+                                <% if (locals.product && locals.product.images) { %>
+                                    <% for (let j = 0; j < product.images.length; j++) { %>
+                                        <img src="/img/products/<%= product.images[j] %>" class="img-sm img-thumbnail" alt="<%= product.productName %>">
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>Other details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4 tag-container">
+                                <label for="product_name" class="form-label">Product tags - Enter tags separated by comma ','</label>
+                                <input type="hidden" form="newProductForm" class="form-control" id="productTags" name="tags"
+                                <% if (locals.product) { %>
+                                    value="<%= product.tags %>"
+                                <% } %> >
+                                <input type="text" placeholder="Enter tags ..." class="form-control" id="tag-input"
+                                <% if (locals.product) { %>
+                                    value="<%= product.tags %>"
+                                <% } %> >
+                                <div class="tags mt-2" id="tags">
+                                    <!-- Tags will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+                </div>
+                <!-- </form> -->
             </div>
-            <!-- /.container-fluid -->   
-                    
-            
-        </section> <!-- content-main end// -->
+        </section> <!-- content-main end// -->     
+        <!-- Footer -->
         <%- include('./partials/admin/admin-footer.ejs') %>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -209,27 +314,7 @@
     <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
     <script src="/assets2/js/main.js" type="text/javascript"></script>
-    <script>
-        $(document).ready(function() {
-          let imagesPreview = function(input, placeToInsertImagePreview) {
-            if (input.files) {
-              let filesAmount = input.files.length;
-              for (i = 0; i < filesAmount; i++) {
-                let reader = new FileReader();
-                reader.onload = function(event) {
-                  $($.parseHTML("<img>"))
-                    .attr("src", event.target.result)
-                    .appendTo(placeToInsertImagePreview);
-                };
-                reader.readAsDataURL(input.files[i]);
-              }
-            }
-          };
-          $("#productImage").on("change", function() {
-            imagesPreview(this, "div.preview-images");
-          });
-        });
-    </script>
+    <script src="/js/validate-add-product.js"></script>
     <!-- <script src="/js/upload-image.js"></script> -->
 </body>
 

@@ -206,15 +206,15 @@
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
-                                    <a href="shop-wishlist.html">
+                                    <a href="/wishlist">
                                         <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
                                         <span class="pro-count blue">4</span>
                                     </a>
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a class="mini-cart-icon" href="shop-cart.html">
+                                    <a class="mini-cart-icon" href="/cart">
                                         <img alt="Evara" src="assets/imgs/theme/icons/icon-cart.svg">
-                                        <span class="pro-count blue">2</span>
+                                        <span class="pro-count blue" id="cartItemsCount" ><% if(locals.itemsCount) { %> <%= itemsCount %> <% } else { %> 0<% }%></span>
                                     </a>
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2">
                                         <ul>
@@ -706,8 +706,8 @@
                                             <div class="product-img product-img-zoom">
                                                 <div class="product-img-inner">
                                                     <a href="/<%= products[i].category.toLowerCase() %>/<%= products[i]._id %>">
-                                                        <img class="default-img" src="/img/products/<%= products[i].images[0].filename %>" alt="<%= products[i].productName %>">
-                                                        <img class="hover-img" src="/img/products/<%= products[i].images[0].filename %>" alt="<%= products[i].productName %>">
+                                                        <img class="default-img" src="/img/products/<%= products[i].images[0] %>" alt="<%= products[i].productName %>">
+                                                        <img class="hover-img" src="/img/products/<%= products[i].images[0] %>" alt="<%= products[i].productName %>">
                                                     </a>
                                                 </div>
                                             </div>
@@ -720,7 +720,7 @@
                                                     data-productsaleprice="₹<%= products[i].salePrice %>"
                                                     data-productdescription="<%= products[i].description %>"
                                                     data-productstock="<%= products[i].stock %> Items In Stock"
-                                                    data-productimage="/img/products/<%= products[i].images[0].filename %>"
+                                                    data-productimage="/img/products/<%= products[i].images[0] %>"
 
                                                 ><i class="fi-rs-search"></i></a>
                                                 <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
@@ -740,7 +740,7 @@
                                             </div>
                                             <p class="mt-15"><%= products[i].description %></p>
                                             <div class="product-action-1 show">
-                                                <a aria-label="Add to cart" class="action-btn" href="/add-to-cart/<%= products[i]._id %>"><i class="fi-rs-shopping-bag-add"></i>Add to Cart</a>
+                                                <a aria-label="Add to cart" class="action-btn" onclick="addToCart('<%= products[i]._id %>')"><i class="fi-rs-shopping-bag-add"></i>Add to Cart</a>
                                                 <div class="rating-result" title="90%">
                                                     <span>
                                                         <span>90%</span>
@@ -1030,6 +1030,33 @@
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>
+    <script>
+        function addToCart(prodId){
+            console.log(prodId); 
+            const url = "/add-to-cart/"+ prodId;
+            console.log(url); 
+            $.ajax({
+                url: url, //your url
+                method: "GET",
+                success: function(response){
+                    console.log(response);
+                    if(response.status){
+                        let count = $('#cartItemsCount').text();
+                        count = parseInt(count) + Number(1);
+                        console.log("Count : " + count);
+                        $('#cartItemsCount').text(count);
+                    } else {
+                        window.location.href = '/user/login';
+                    }
+                },
+                error: function(){
+                    alert("error");
+                }
+            });
+            //$.get(url);
+            //fetch(url);
+        }
+    </script>
 </body>
 
 </html>

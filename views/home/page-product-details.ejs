@@ -229,7 +229,7 @@
                                                 <% for (let i = 0; i < cartItems.length; i++) { %>
                                             <li>
                                                 <div class="shopping-cart-img">
-                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0].filename %>"></a>
+                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0]   %>"></a>
                                                 </div>
                                                 <div class="shopping-cart-title">
                                                     <h4><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
@@ -665,7 +665,7 @@
                                             <% if (locals.product) { %>
                                                 <% for (let j = 0; j < product.images.length; j++) { %>
                                                     <figure class="border-radius-10">
-                                                        <img src="/img/products/<%= product.images[j].filename %>" alt="product image">
+                                                        <img src="/img/products/<%= product.images[j]    %>" alt="product image">
                                                     </figure>
                                                 <% } %>
                                             <% } %>                                          
@@ -677,7 +677,7 @@
                                          <div class="slider-nav-thumbnails pl-15 pr-15">
                                             <% if (locals.product) { %>
                                                 <% for (let j = 0; j < product.images.length; j++) { %>
-                                                    <div><img src="/img/products/<%= product.images[j].filename %>" alt="product image"></div>
+                                                    <div><img src="/img/products/<%= product.images[j]   %>" alt="product image"></div>
                                                 <% } %>
                                             <% } %>
                                         </div>
@@ -776,8 +776,8 @@
                                             </div>
                                         </div>
                                         <ul class="product-meta font-xs color-grey mt-50">
-                                            <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
-                                            <li class="mb-5">Tags: <a href="/<% if (locals.product) { %> <%= product.category.toLowerCase() %> <% } %>" rel="tag"><% if (locals.product) { %> <%= product.category %> <% } %></a></li>
+                                            <li class="mb-5">SKU: <a href="#"><% if (locals.product) { %><%= product.SKU %><%} %></a></li>
+                                            <li class="mb-5">Tags: <a href="/<% if (locals.product) { %> <%= product.category.toLowerCase() %> <% } %>" rel="tag"><% if (locals.product) { %> <%= product.tags %> <% } %></a></li>
                                             <li>Availability:<span class="in-stock text-success ml-5"><% if (locals.product) { %> <%= product.stock %> <% } %> Items In Stock</span></li>
                                         </ul>
                                     </div>
@@ -1082,8 +1082,8 @@
                                                 <div class="product-img-action-wrap">
                                                     <div class="product-img product-img-zoom">
                                                         <a href="/<%= relatedProducts[i].category %>/<%= relatedProducts[i]._id %>" tabindex="0">
-                                                            <img class="default-img" src="/img/products/<%= relatedProducts[i].images[0].filename %>" alt="<%= relatedProducts[i].productName %>">
-                                                        <img class="hover-img" src="/img/products/<%= relatedProducts[i].images[0].filename %>" alt="<%= relatedProducts[i].productName %>">
+                                                            <img class="default-img" src="/img/products/<%= relatedProducts[i].images[0]     %>" alt="<%= relatedProducts[i].productName %>">
+                                                        <img class="hover-img" src="/img/products/<%= relatedProducts[i].images[0]   %>" alt="<%= relatedProducts[i].productName %>">
                                                         </a>
                                                     </div>
                                                     <div class="product-action-1">
@@ -1095,7 +1095,7 @@
                                                         data-productsaleprice="₹<%= relatedProducts[i].salePrice %>"
                                                         data-productdescription="<%= relatedProducts[i].description %>"
                                                         data-productstock="<%= relatedProducts[i].stock %> Items In Stock"
-                                                        data-productimage="/img/products/<%= relatedProducts[i].images[0].filename %>"
+                                                        data-productimage="/img/products/<%= relatedProducts[i].images[0]    %>"
     
                                                     ><i class="fi-rs-search"></i></a>
                                                         <a aria-label="Add To Wishlist" class="action-btn small hover-up" href="shop-wishlist.html" tabindex="0"><i class="fi-rs-heart"></i></a>
@@ -1403,7 +1403,7 @@
             const url = "/add-to-cart/"+ prodId + "?qty=" + quantity;
             console.log(url); 
             $.ajax({
-                url: "/add-to-cart/"+ prodId + "?qty=" + quantity, //your url
+                url: url, 
                 method: "GET",
                 success: function(response){
                     console.log(response);
@@ -1414,6 +1414,8 @@
                         $('#cartItemsCount').text(count);
                         $('.qty-val').text('1')
                         $('#quantityInput').val(1);
+                    } else {
+                        window.location.href = '/user/login';
                     }
                 },
                 error: function(){

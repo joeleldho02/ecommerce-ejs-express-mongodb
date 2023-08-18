@@ -13,9 +13,8 @@ async function setSession(req, res, userData){
             delete req.session.loginOTP;
             delete req.session.loginErr;
             delete req.session.registeredUser;
-            req.session.loggedIn = true;
+            req.session.userLoggedIn = true;
             req.session.user = userData;
-            req.session.isAdmin = false;
             console.log(`User Logged in Succesfully : ${userData.firstName + userData.lastName}`);
             if(res.locals.requestFrom){
                 res.redirect(res.locals.requestFrom);
@@ -37,20 +36,15 @@ async function sendOTP(phone){
         const hashedOtp = await bcrypt.hash(String(generatedOtp), 10);
         console.log(`Generated OTP : ${generatedOtp}`)
     //-------------------- TWILIO OTP SENDER CODE ---------------------//
-        // client
-        // .create({
+        // client.messages.create({
         //     body: `JMJ Music House - OTP for Login is ${generatedOtp}`,
         //     from: '+17626002830',
         //     to: '+919656255604' //to: phone ---> send to user phone number
         // })
         // .catch(err=>console.log(err));
-
+        
         return hashedOtp;
     } catch(err){
-        // res.status(500).render('error', {
-        //     message: "Unable to send OTP. Please try again later",
-        //     errStatus : 500
-        // });
         console.log("Unable to send OTP. Please try again later" + err);
     }
 }
@@ -78,7 +72,14 @@ exports.registerUser = async (req, res) => {
                         req.session.signupEmail = req.body.email;
                         req.session.signupPhone = req.body.phone;
                         req.session.loginOTP = await sendOTP(req.body.phone);
-                        res.redirect('/user/verify-otp');
+                        if(!req.session.loginOTP || req.session.loginOTP === null || req.session.loginOTP === undefined){
+                            res.status(500).render('error', {
+                                message: "Unable to send OTP at the moment. Please try again later",
+                                errStatus : 500
+                            });
+                        } else{
+                            res.redirect('/user/verify-otp');
+                        }
                     }
                 }).catch(err => {
                     res.status(500).render('error', {
@@ -106,6 +107,7 @@ async function addUserDetails(req, res) {
             email: registeredUser.email,
             phone: registeredUser.phone,
             password: hashedPassword,
+            cart:{},
             updatedAt: Date.now(),
         })
         user.save()

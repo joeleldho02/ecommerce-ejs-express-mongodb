@@ -1,5 +1,6 @@
 const Cartdb = require('../model/cartModel');
 const Orderdb = require('../model/orderModel');
+const Productdb = require('../model/productModel');
 const mongoose = require('mongoose');
 
 exports.placeOrder = async (req, res, next) => {
@@ -12,20 +13,92 @@ exports.placeOrder = async (req, res, next) => {
             const address = res.locals.addresses.filter(item => {
                 return item._id.equals(addressId);
             });
+            const orderId = String((new Date()).getTime()).slice(-6);
 
+            // const products = await Cartdb.aggregate([
+            //     {$match: {customerId: new mongoose.Types.ObjectId(userId)}},
+            //     {$unwind: '$products'},
+            //     {$lookup: {
+            //         from: 'products',
+            //         localField: 'products.productId',
+            //         foreignField: '_id',
+            //         as: 'productInfo'}
+            //     }   
+            // ]);
+            console.log("CART products ::::::");
+            console.log(JSON.stringify(products));
+            const totalItems = products.reduce((tot, product)=>{
+                return product.quantity + tot;
+            },0)
+            // products.forEach((product)=>{
+
+            // })
+            // const product = await Productdb.findOne({_id: req.body.prodId}).lean();
+            // if(product !== null){
+            //     if(item.quantity > product.stock){
+            //         return res.json({status: true, msg:"Unable to add product quantity! Quantity exceeds available stock."});
+            //     }
+            // }
+    
+            console.log("Total Items in order : " + totalItems);
             const newOrder = new Orderdb({
+                orderId: orderId,
                 customerId: userId,
                 paymentMethod: req.body.paymentMethod,
                 products: products,
                 shippingAddress: address[0],
-                totalAmount : req.body.totalAmount
+                totalAmount : req.body.totalAmount,
+                totalItems : totalItems,
             })
             console.log("New ORDER : " + newOrder);
+
+            /////////////////
+            // const placeOrder = newOrder.save();
+            // const deleteCart = await Cartdb.findOneAndDelete({customerId: req.session.user._id});
+            // const changeStock = await Productdb.updateMany({})
+            // Promise.allSettled([placeOrder(), deleteCart(), changeStock()])
+            // .then((data)=>{
+            //     // console.log(JSON.stringify(data));
+            //     console.log("Cleared user cart after order is placed!");
+            //     res.redirect('/place-order')
+            // })
+            // .catch(err => {
+            //     res.status(500).render('error', {
+            //         message: "Unable to place order!",
+            //         errStatus : 500
+            //     });
+            //     console.log(err);
+            // });
+            //////////////////////////////
+            // exports.updateDisplayOrder = async keyValPairArr => {
+            //     try {
+            //         let data = await ContestModel.collection.update(
+            //             { _id: { $in: keyValPairArr.map(o => o.id) } },
+            //             [{
+            //                 $set: {
+            //                     displayOrder: {
+            //                         $let: {
+            //                             vars: { obj: { $arrayElemAt: [{ $filter: { input: keyValPairArr, as: "kvpa", cond: { $eq: ["$$kvpa.id", "$_id"] } } }, 0] } },
+            //                             in:"$$obj.displayOrder"                                    
+            //                         }
+            //                     }
+            //                 }
+            //             }],
+            //             { runValidators: true, multi: true }
+            //             )            
+            //         return data;
+            //     } catch (error) {
+            //         throw error;
+            //     }
+            // }
+            //////////////////////////////
+            
             newOrder.save()
                 .then(async () => {
                     await Cartdb.findOneAndDelete({customerId: req.session.user._id})
-                    .then(()=>{
-                        console.log("CLeared user cart after order is placed!");
+                    .then((data)=>{
+                        // console.log(JSON.stringify(data));
+                        console.log("Cleared user cart after order is placed!");
                         res.redirect('/place-order')
                     })
                     .catch(err => {
@@ -61,10 +134,12 @@ exports.placeOrder = async (req, res, next) => {
 
 exports.getAllUsersOrders = async (req, res, next) => {
     try{
-        if(req.session.isAdmin){
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Orders------------>");
             await Orderdb.find()
                 .sort({createdAt: -1}).lean()
                 .then(data => {
+                    console.log(data);
                     if(data !== null || data.length !== 0){
                         res.locals.orders = data;
                     }
@@ -80,7 +155,7 @@ exports.getAllUsersOrders = async (req, res, next) => {
 
 exports.getAllOrdersOfUser = async (req, res, next) => {
     try{
-        if(req.session.user){
+        if(req.session.userLoggedIn === true){
             await Orderdb.find({customerId: req.session.user._id})
                 .sort({createdAt: -1}).lean()
                 .then(data => {
@@ -97,16 +172,107 @@ exports.getAllOrdersOfUser = async (req, res, next) => {
     }
 };
 
+exports.getSingleOrderDetails = async (req, res, next) => {
+    try{
+        console.log(" PRAMASSSSSSSSSSSSSSSSSSS");
+        console.log(req.params.id);
+        const orderId = { _id: new mongoose.Types.ObjectId(req.params.id)};
+        let order = await Orderdb.aggregate([
+            {$match: orderId},
+            {$unwind: '$products'},
+            {$lookup: {
+                     from: 'products',
+                     localField: 'products.productId',
+                     foreignField: '_id',
+                     as: 'productInfo'}
+            },
+            {$lookup: {
+                from: 'users',
+                localField: 'customerId',
+                foreignField: '_id',
+                as: 'customerInfo'}
+            }
+        ]);
+        console.log("CART ::::::");
+        console.log(JSON.stringify(order));
+
+        if(order.length === 0){
+            console.log(" No items in cart!!");
+        } else{
+            order.forEach(product => {
+                const prodCategoryName = res.locals.categories.filter(cat => cat._id.equals(product.productInfo.category));
+                product.productInfo.category = prodCategoryName[0]?.categoryName;
+            });  
+            res.locals.subTotal = order.reduce((sum, item) =>{
+                return sum + (item.quantity*item.salePrice);
+            },0)
+            console.log(res.locals.subTotal);
+        }
+        console.log("Order Items of user: " + order);
+        res.locals.order = order;
+        next(); 
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Unable to retrieve data from database",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+}
+
+exports.getOrderSummaryDetails = async (req, res, next) => {
+    try{
+        const customerId = { customerId: new mongoose.Types.ObjectId(req.session.user._id)};
+        let order = await Orderdb.aggregate([
+            {$match: customerId},
+            {$sort: {createdAt: -1}},
+            {$limit : 1},
+            {$unwind: '$products'},
+            {$lookup: {
+                     from: 'products',
+                     localField: 'products.productId',
+                     foreignField: '_id',
+                     as: 'productInfo'}
+            }
+        ]);
+        console.log("SUMARY ::::::");
+        console.log(JSON.stringify(order));
+
+        if(order.length === 0){
+            console.log(" No items in cart!!");
+        } else{
+            order.forEach(product => {
+                const prodCategoryName = res.locals.categories.filter(cat => cat._id.equals(product.productInfo.category));
+                product.productInfo.category = prodCategoryName[0]?.categoryName;
+            });  
+            res.locals.subTotal = order.reduce((sum, item) =>{
+                return sum + (item.quantity*item.salePrice);
+            },0)
+            console.log(res.locals.subTotal);
+        }
+        console.log("Order Items of user: " + order);
+        res.locals.order = order;
+        next(); 
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Unable to retrieve data from database",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+}
+
 exports.getOrderDetails = async (req, res, next) => {
     try{
-        if(req.session.user){
+        if(req.session.userLoggedIn === true || req.session.adminLoggedIn === true){
             let customerId;
-            if(req.session.isAdmin){
-                customerId = {}
-            } else{
-                customerId = { customerId: new mongoose.Types.ObjectId(req.session.user._id)}
+            if(req.path.startsWith('/orders')){
+                customerId = {};
+            }else{
+                customerId = {customerId: new mongoose.Types.ObjectId(req.session.user._id)};
             }
-            let cartItems = await Orderdb.aggregate([
+            console.log(customerId);
+            let orderItems = await Orderdb.aggregate([
                 {$match: customerId},
                 {$unwind: '$products'},
                 {$lookup: {
@@ -122,26 +288,29 @@ exports.getOrderDetails = async (req, res, next) => {
                     salePrice:'$productInfo.salePrice'}
                 }
             ])
-            if(cartItems.length === 0){
-                console.log(" No items in cart!!");
+            console.log("ORDER ::::::");
+            console.log(orderItems)
+            console.log(JSON.stringify(orderItems))
+            if(orderItems.length === 0){
+                console.log(" No items in order!!");
             } else{
-                cartItems.forEach(product => {
+                orderItems.forEach(product => {
                     const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.productInfo[0].category) );
-                    console.log(JSON.stringify(prodCategoryName));
                     product.productInfo[0].category = prodCategoryName[0]?.categoryName;
                 });  
-                res.locals.subTotal = cartItems.reduce((sum, item) =>{
+                res.locals.subTotal = orderItems.reduce((sum, item) =>{
                     return sum + (item.quantity*item.salePrice);
                 },0)
                 console.log(res.locals.subTotal);
             }
-            console.log("Cart Items of user: " + cartItems);
-            res.locals.order = cartItems;
+            console.log("Order Items of user: " + orderItems);
+            res.locals.order = orderItems;
             next(); 
-        } else{
-            res.locals.requestFrom = "/user/cart";
-            res.redirect('/user/login');
-        }
+         }
+        //   else{
+        //     res.locals.requestFrom = "/user/cart";
+        //     res.redirect('/user/login');
+        // }
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to retrieve data from database",
@@ -159,10 +328,28 @@ exports.cancelOrder = async (req, res, next) => {
     }
 };
 
-exports.editOrderStatus = async (req, res, next) => {
+exports.updateOrderStatus = async (req, res, next) => {
     try{
-
+        console.log(req.body);
+        const orderID = req.body.orderID;
+        const orderStatus = req.body.orderStatus;
+        const editOrder = {
+            _id: orderID,
+            orderStatus: orderStatus
+        }
+        await Orderdb.findByIdAndUpdate(orderID, editOrder)
+            .then(()=>{
+                res.redirect('/admin/orders');
+                //next();
+            })
+            .catch(err =>{
+                console.log("Error while updating order status!" + err);
+            })
     }catch(err){
-
+        res.status(500).render('error', {
+            message: "Error while updating order status!",
+            errStatus : 500
+        });
+        console.log(err);
     }
 };

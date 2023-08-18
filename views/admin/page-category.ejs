@@ -17,7 +17,7 @@
     <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/datatable.css">
-
+    <link rel="stylesheet" href="/css/custom-alert.css">
 </head>
 
 <body>
@@ -28,8 +28,9 @@
             <div class="content-header">
                 <div></div>
                 <div>
-                    <a href="/admin/add-category" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"
-                        data-modaltitle="Add new category" data-btnaction="add">
+                    <a class="btn btn-primary" id="btn-add-category" data-bs-toggle="modal" data-bs-target="#myModal"
+                        data-modaltitle="<% if (locals.action) { %>Edit category details<% } else { %>Add new category<% } %>" 
+                        data-btnaction="<% if (locals.action) { %><%= action %><% } else { %>add<% } %>">
                         <i class="material-icons md-plus"></i> Add Category
                     </a>
                 </div>
@@ -56,18 +57,19 @@
                                     <tr>
                                         <th>Category</th>
                                         <th>Description</th>
+                                        <th>Slug</th>
                                         <th>List</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
+                                <!-- <tfoot>
                                     <tr>
                                         <th>Category</th>
                                         <th>Description</th>
                                         <th>List</th>
                                         <th>Action</th>
                                     </tr>
-                                </tfoot>
+                                </tfoot> -->
                                 <tbody>
                                 <% if (locals.categories) { %>                                    
                                     <% for (let i = 0; i < categories.length; i++) { %>
@@ -78,6 +80,7 @@
                                             </div>
                                           </td>
                                           <td><%= categories[i].description %></td>
+                                          <td><%= categories[i].slug %></td>
                                           <td>                                               
                                             <% if(categories[i].isListed){ %>
                                                 <span class="badge rounded-pill alert-success">Visible</span>
@@ -87,13 +90,14 @@
                                           </td>
                                           <td>
                                             <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
-                                                <a class="ms-2 edit_button" id="edit-button"
+                                                <a class="ms-2 edit_button" id="edit-button" name="edit-btn"
                                                         data-bs-toggle="modal" data-bs-target="#myModal" 
                                                         data-btnaction="edit"
                                                         data-modaltitle="Edit category"
                                                         data-id="<%= categories[i]._id %>"
                                                         data-categoryname="<%= categories[i].categoryName %>"
                                                         data-description="<%= categories[i].description %>"
+                                                        data-slug="<%= categories[i].slug %>"
                                                         data-listed="<%= categories[i].isListed %>"
                                                         >
                                                         <span class="material-icons md-edit iconbtn" title="Edit <%= categories[i].categoryName %>">
@@ -129,19 +133,25 @@
                         <h4 class="modal-title" id="myModalLabel">Edit category details</h4>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
+                    <p id="errMsg" class="m-auto text-center text-danger my-1"><% if (locals.errMsg) { %><%= errMsg %><% } %></p>                        
                     <form name="modalForm" id="modalForm" method="post" action="/admin/edit-category">
                         <div class="modal-body">
                             <div class="form-group">
-                                <input type="hidden" class="form-control edit-id" name="id" >
+                                <input type="hidden" class="form-control edit-id" name="id"  <% if(locals.inputData) {%>  value = "<%= inputData.id %>"  <% } %> >
                             </div>
                             <div class="form-group w-100">
                                 <label for="categoryName">Category Name</label>
-                                <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" >
+                                <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" <% if(locals.inputData) {%>  value = "<%= inputData.categoryName %>"  <% } %> >
                                 <div class="error text-danger ms-2"></div>
                             </div>
                             <div class="form-group mt-3">
                                 <label for="description">Description</label>
-                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter description">
+                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter description" <% if(locals.inputData) {%>  value = "<%= inputData.description %>"  <% } %> >
+                                <div class="error text-danger ms-2"></div>
+                            </div>  
+                            <div class="form-group mt-3">
+                                <label for="slug">Slug</label>
+                                <input class="form-control edit-slug" id="slug" name="slug" placeholder="Enter /slug" <% if(locals.inputData) {%>  value = "<%= inputData.slug %>"  <% } %> >
                                 <div class="error text-danger ms-2"></div>
                             </div>  
                             <div class="form-group mt-3">
@@ -163,25 +173,29 @@
             </div>
         </div>
         <!-- End of Modal for Edit button -->
+        <!-- Custom Confirm Dialog -->
+        <%- include('./partials/home/custom-confirm-dialog.ejs') %>        
+        <!-- Footer -->
         <%- include('./partials/admin/admin-footer.ejs') %>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="assets2/js/vendors/bootstrap.bundle.min.js"></script>
-    <script src="assets2/js/vendors/select2.min.js"></script>
-    <script src="assets2/js/vendors/perfect-scrollbar.js"></script>
-    <script src="assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets2/js/vendors/select2.min.js"></script>
+    <script src="/assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
-    <script src="assets2/js/main.js" type="text/javascript"></script>
+    <script src="/assets2/js/main.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Page level plugins -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+    <script src="/js/custom-confirm.js"></script>
     <!-- Page level custom scripts -->
     <script>
         const form = document.getElementById('loginForm');
         const categoryName = document.getElementById('categoryName');
         const description = document.getElementById('description'); 
+        const slug = document.getElementById('slug'); 
         
         const setError = (element, message) => {
             const inputControl = element.parentElement;
@@ -203,6 +217,7 @@
         function validateInputs() {
             const categoryNameValue = categoryName.value.trim();
             const descriptionValue = description.value.trim();
+            const slugValue = slug.value.trim();
 
             if(categoryNameValue === '') {
                 setError(categoryName, 'Please enter category name');
@@ -219,7 +234,25 @@
             } else{
                 setSuccess(description);
             }
+
+            if(slugValue === '') {
+                setError(slug, 'Please enter slug');
+                slug.focus();
+                return false;
+            } else if(slugValue[0] !== '/') {
+                setError(slug, 'Please enter valid slug');
+                slug.focus();
+                return false;
+            } else{
+                setSuccess(slug);
+            }
+            
             return true;
+        }
+
+        function submitEditForm(formID){
+            document.getElementById(formID).submit();
+            console.log("category edit form SUBMITTED!!");
         }
 
         function confirmEdit(form) {
@@ -231,9 +264,10 @@
                 console.log("VALIDATION Success");
                 console.log("Action : " + btnAction);
                 if(btnAction === "Save changes"){                    
-                    if (confirm('Save the changes made to the category ?')) {
-                        document.getElementById(form).submit();
-                    }
+                    customConfirm('Hey there!', 'Save the changes made to the category ?', submitEditForm, form);
+                    // if (confirm('Save the changes made to the category ?')) {
+                    //     document.getElementById(form).submit();
+                    // }
                 }
                 else{
                     document.getElementById(form).submit();
@@ -244,27 +278,49 @@
         }
 
     </script>
+    
+    <!-- open modal if there is error message -->
+    <script type="text/javascript">        
+        $(window).on('load', function() {
+            if(document.getElementById('errMsg').innerHTML.length > 1){
+                //$('#myModal').modal('show');   
+                // if(false){                    
+                //     document.getElementByID('btn-add-category').setAttribute('data-btnaction', 'edit')        
+                //     document.getElementByID('btn-add-category').setAttribute('data-modaltitle', 'Edit')        
+                // }
+                document.getElementById('btn-add-category').click();  
+            }
+        });
+    </script>
+
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
-            $('#dataTable').DataTable();
-        });
-    
+            $('#dataTable').DataTable({
+                order: [[0, 'asc']],
+                columnDefs: [{ "targets": [4], "orderable": false }]
+            });
+        });    
+
         function confirmDelete(formID, name) {
-            if (confirm(`Are you sure to delete the category '${name}'?`)) {
-                document.getElementById(formID).submit();
-            }
+            customConfirm('Hey there!', `Are you sure to delete the category '${name}'?`, submitDeleteForm, formID);
+        }
+        function submitDeleteForm(formID){
+            document.getElementById(formID).submit();
+            console.log("category delete form SUBMITTED!!");
         }
         
         $(document).on( "click", '.edit_button',function(e) {
             const id = $(this).data('id');
             const categoryName = $(this).data('categoryname');
             const description = $(this).data('description');
+            const slug = $(this).data('slug');
             const isListed = $(this).data('listed');
             console.log(isListed);
             $(".edit-id").val(id);
             $(".edit-categoryname").val(categoryName);
             $(".edit-description").val(description);
+            $(".edit-slug").val(slug);
             $(".edit-islisted").val(isListed);
             if(isListed === true)
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");

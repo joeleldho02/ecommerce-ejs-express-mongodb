@@ -17,6 +17,7 @@
     <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/datatable.css">
+    <link rel="stylesheet" href="/css/custom-alert.css">
 
 </head>
 
@@ -80,7 +81,7 @@
                                                 <a class="itemside" href="/<%= products[i]?.category?.toLowerCase() %>/<%= products[i]._id %>" target="_blank">
                                                     <div class="left d-none d-lg-block">
                                                         <% if (products[i].images.length > 0) { %>  
-                                                            <img src="/img/products/<%= products[i].images[0].filename %>" class="img-sm img-thumbnail" alt="<%= products[i].productName %>">
+                                                            <img src="/img/products/<%= products[i].images[0] %>" class="img-sm img-thumbnail" alt="<%= products[i].productName %>">
                                                         <% } %>
                                                     </div>
                                                     <div class="info">
@@ -124,6 +125,9 @@
                     
             
         </section> <!-- content-main end// -->
+        <!-- Custom Confirm Dialog -->
+        <%- include('./partials/home/custom-confirm-dialog.ejs') %>        
+        <!-- Footer -->
         <%- include('./partials/admin/admin-footer.ejs') %>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -138,15 +142,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Page level custom scripts -->
+    <script src="/js/custom-confirm.js"></script>
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
-            $('#dataTable').DataTable();
+            $('#dataTable').DataTable({
+                order: [[0, 'asc']]
+            });
         });    
+        // function confirmDelete(formID, name) {
+        //     if (confirm(`Are you sure to delete the product ${name}?`)) {
+        //         document.getElementById(formID).submit();
+        //     }
+        // }
+
         function confirmDelete(formID, name) {
-            if (confirm(`Are you sure to delete the product ${name}?`)) {
-                document.getElementById(formID).submit();
-            }
+            customConfirm('Hey there!', `Are you sure to delete the product '${name}'?`, submitDeleteForm, formID);
+        }
+        function submitDeleteForm(formID){
+            document.getElementById(formID).submit();
+            console.log("category delete form SUBMITTED!!");
         }
     </script>
 </body>

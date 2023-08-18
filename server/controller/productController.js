@@ -4,23 +4,33 @@ const categoryController = require('./categoryController');
 //add new product to DB
 exports.addNewProduct = async (req, res) => {
     try{
+        console.log(req.body);
         if (!req.body) {
             console.log("Product data not submitted");
             res.redirect('/admin/products');
-        }
-        else {
+        } else if(req.files.length <= 0){
+            console.log("Product images not submitted");
+            res.redirect('/admin/products');
+        } else {
             await categoryController.getCategoryId(req.body.category)
-                .then(catergoryId => {
+                .then(catergoryId => {                    
+                    const imageFiles = req.files.map(file => {
+                        return file.filename;
+                    });
                     const newProduct = new Productdb({
                         productName: req.body.productName,
+                        shortDescription: req.body.shortDescription,
                         description: req.body.description,
                         category: catergoryId,
                         brand: req.body.brand,
                         regularPrice: req.body.regularPrice,
                         salePrice: req.body.salePrice,
+                        taxRate: req.body.taxRate,
                         stock: req.body.stock,
-                        images: req.files, 
-                        updatedAt: Date.now(),
+                        tags: req.body.tags,
+                        SKU:req.body.sku,
+                        images: imageFiles, 
+                        updatedAt: Date.now()
                     });
                     console.log(newProduct);
                     newProduct.save()
@@ -142,28 +152,58 @@ exports.getEditProductItemDetails = async function(req, res, next){
 //update product item by product id in db
 exports.updateProductItem = async (req, res) => {
     try{
+        console.log("LENGTH OF IMAGES : " + req.files.length);
         console.log(req.body);
         if (!req.body) {
             console.log("Data to update cannot be empty");
             return res.status(500).render('error', {
                 message: "Data to update cannot be empty"
             });
-        }
+        }       
+        
         await categoryController.getCategoryId(req.body.category)
                 .then(catergoryId => {
                     const id = req.body.productID;
-                    const product = new Productdb({
-                        productName: req.body.productName,
-                        description: req.body.description,
-                        category: catergoryId,
-                        brand: req.body.brand,
-                        regularPrice: req.body.regularPrice,
-                        salePrice: req.body.salePrice,
-                        stock: req.body.stock,
-                        // images: req.files,
-                        updatedAt: Date.now(),
-                        _id: id
-                    });
+                    let imageFiles = [];
+                    let product;
+                    if(req.files.length > 0){
+                        imageFiles = req.files.map(file => {
+                            return file.filename;
+                        });
+                        product = {
+                            productName: req.body.productName,
+                            shortDescription: req.body.shortDescription,
+                            description: req.body.description,
+                            category: catergoryId,
+                            brand: req.body.brand,
+                            regularPrice: req.body.regularPrice,
+                            salePrice: req.body.salePrice,
+                            taxRate: req.body.taxRate,
+                            stock: req.body.stock,
+                            tags: req.body.tags,
+                            SKU:req.body.sku,
+                            images: imageFiles,
+                            updatedAt: Date.now(),
+                            _id: id
+                        }   ;
+                    } else{
+                        product = {
+                            productName: req.body.productName,
+                            shortDescription: req.body.shortDescription,
+                            description: req.body.description,
+                            category: catergoryId,
+                            brand: req.body.brand,
+                            regularPrice: req.body.regularPrice,
+                            salePrice: req.body.salePrice,
+                            taxRate: req.body.taxRate,
+                            stock: req.body.stock,
+                            tags: req.body.tags,
+                            SKU:req.body.sku,
+                            updatedAt: Date.now(),
+                            _id: id
+                        };
+                    }
+                    console.log("EDITED PRODUCT --------> " + product);
                     Productdb.findByIdAndUpdate(id, product)
                     .then(data => {
                         if (!data) {
@@ -256,7 +296,7 @@ exports.getProductItemById = async (req, res, next) => {
                     message: "Unable to retrieve data from database",
                     errStatus : 500,
                 });
-                console.log(err);
+                console.log("Unable to retrieve data from database");
             }
         })
         .catch(err => {
@@ -279,12 +319,15 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
     try{
         if(req.params.category){
             const prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
+            console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
+            console.log(JSON.stringify(prodCategoryId));
             await Productdb.find({ category: prodCategoryId}).limit(8).lean()
-            .then(data => {
+            .then(data => {                
+                console.log(JSON.stringify(data));
                 if(data.length !== 0){
                     data.forEach(product => {
                         const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.category) );
-                        product.category = prodCategoryName[0].categoryName;
+                        product.category = prodCategoryName[0]?.categoryName;
                     });                 
                     res.locals.products = data;
                     next();

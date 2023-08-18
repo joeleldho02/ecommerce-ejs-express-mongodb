@@ -1090,8 +1090,8 @@ textarea.form-control {
 }
 
 .card:hover {
-  -webkit-transform: translateY(-2px);
-          transform: translateY(-2px);
+  /* -webkit-transform: translateY(-2px);
+          transform: translateY(-2px); */
   -webkit-transition-duration: 0.3s;
           transition-duration: 0.3s;
   -webkit-box-shadow: none;

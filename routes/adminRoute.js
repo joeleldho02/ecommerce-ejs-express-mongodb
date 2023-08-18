@@ -22,14 +22,18 @@ router.post('/login', adminController.adminLogin);
 
 
 
-
 //------- PRODUCTS --------//
 router.get('/products', authController.authenticateAdmin, categoryController.getListedCategories, productController.getAllProducts, serviceRender.getAdminProductPage);
 router.get('/add-product', authController.authenticateAdmin, categoryController.getListedCategories, serviceRender.getAddProductPage);
 router.get('/edit-product/:id', authController.authenticateAdmin, categoryController.getListedCategories, productController.getEditProductItemDetails, serviceRender.getEditProductPage);
 
 router.post('/add-product', authController.authenticateAdmin, uploadController.uploadProductImage.array('productImage', 5), productController.addNewProduct);// , uploadController.resizeImages
-router.post('/edit-product', authController.authenticateAdmin, productController.updateProductItem);
+
+// (req, res)=>{
+//     console.log(req.body); 
+//     res.send(req.body);
+// })
+router.post('/edit-product', authController.authenticateAdmin, uploadController.uploadProductImage.array('productImage', 5), productController.updateProductItem);
 router.post('/delete-product', authController.authenticateAdmin, productController.deleteProductItem);
 
 
@@ -55,7 +59,8 @@ router.post('/delete-category', authController.authenticateAdmin, categoryContro
 
 
 //------- ORDERS --------//
+router.get('/orders/:id', authController.authenticateAdmin, categoryController.getListedCategories, orderController.getSingleOrderDetails, serviceRender.getAdminViewOrderPage)
 router.get('/orders', authController.authenticateAdmin, orderController.getAllUsersOrders, serviceRender.getAdminOrdersPage);
-router.get('/view-order/:id', authController.authenticateAdmin, categoryController.getListedCategories, orderController.getOrderDetails, serviceRender.getAdminViewOrderPage)
+router.post('/update-order', orderController.updateOrderStatus);
 
 module.exports = router;  
