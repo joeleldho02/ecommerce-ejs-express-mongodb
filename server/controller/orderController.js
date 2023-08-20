@@ -2,6 +2,7 @@ const Cartdb = require('../model/cartModel');
 const Orderdb = require('../model/orderModel');
 const Productdb = require('../model/productModel');
 const mongoose = require('mongoose');
+const paymentHelper = require('../helper/razorpay'); 
 
 exports.placeOrder = async (req, res, next) => {
     try{
@@ -94,12 +95,21 @@ exports.placeOrder = async (req, res, next) => {
             //////////////////////////////
             
             newOrder.save()
-                .then(async () => {
+                .then(async (savedOrder) => {
                     await Cartdb.findOneAndDelete({customerId: req.session.user._id})
-                    .then((data)=>{
-                        // console.log(JSON.stringify(data));
+                    .then(async ()=>{
                         console.log("Cleared user cart after order is placed!");
-                        res.redirect('/place-order')
+                        console.log(savedOrder._id);
+                        console.log(savedOrder);
+                        if(savedOrder.paymentMethod === 'COD'){
+                            console.log("COD: "+savedOrder.paymentMethod);
+                            res.json({payment:true});                            
+                        } else if(savedOrder.paymentMethod === 'RAZORPAY'){
+                            console.log("RAZORPAY: "+savedOrder.paymentMethod);
+                            const generatedOrder = await paymentHelper.generateRazorpay(savedOrder._id, savedOrder.totalAmount)
+                            console.log("GENERATED ORDER : "+generatedOrder);
+                            res.json(generatedOrder);                            
+                        }
                     })
                     .catch(err => {
                         res.status(500).render('error', {
@@ -130,6 +140,35 @@ exports.placeOrder = async (req, res, next) => {
         });
         console.log(err);
     }
+}
+exports.changePaymentStatus = (orderId) => {
+    const editOrder = {
+        _id: orderId,
+        paymentStatus: "PAID"
+    }
+    return new Promise((resolve, reject) => {
+        Orderdb.findByIdAndUpdate(orderId, editOrder)
+        .then(()=>{
+            resolve();
+        })
+        .catch(err =>{
+            reject(err);
+        })
+    })
+};
+exports.verifyRazorpayPayment = (req, res)=>{
+    console.log(req.body);
+    paymentHelper.verifyPayment(req.body).then(()=>{
+        console.log("ORDER: ID :" + req.body.order.receipt);
+        console.log("Payment SUCCESSFUL");
+        orderController.changePaymentStatus(req.body.order.receipt).then(()=>{
+            console.log("STATUS PAID");
+            res.json({status:true});
+        });
+    }).catch((err)=>{
+        console.log(err);
+        res.json({status: false, errMsg:'Payment failed!'});
+    });
 }
 
 exports.getAllUsersOrders = async (req, res, next) => {
@@ -195,7 +234,7 @@ exports.getSingleOrderDetails = async (req, res, next) => {
         ]);
         console.log("CART ::::::");
         console.log(JSON.stringify(order));
-
+        delete order.customerInfo.password;
         if(order.length === 0){
             console.log(" No items in cart!!");
         } else{

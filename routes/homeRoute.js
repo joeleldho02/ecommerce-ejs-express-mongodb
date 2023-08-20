@@ -17,9 +17,8 @@ router.get('/add-to-cart/:id', cartController.addToCart);
 router.get('/remove-cart-item/:id', authController.authenticateUser, cartController.removeCartItem);
 router.post('/change-cart-item-quantity', cartController.changeCartItemQty);
 
-
 router.post('/place-order', authController.authenticateUser, categoryController.getListedCategories, cartController.getUserCart, userController.getAllAddresses, orderController.placeOrder);
-
+router.post('/verify-payment', orderController.verifyRazorpayPayment)
 router.get('/:category', categoryController.getListedCategories, productController.getProductsOfSingleCategory, cartController.getCartItemsCount, serviceRender.categoryProductsPage);
 router.get('/:category/:id', categoryController.getListedCategories, productController.getProductsOfSingleCategory, productController.getProductItemById, cartController.getCartItemsCount, serviceRender.productDetailsPage);
 

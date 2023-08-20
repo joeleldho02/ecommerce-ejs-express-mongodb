@@ -1228,10 +1228,17 @@
                                         </div>
                                         <div class="payment_option">
                                             <div class="custome-radio">
-                                                <input class="form-check-input payment_option" required="" type="radio" value="COD" name="payment_option" id="exampleRadios3" checked="">
+                                                <input class="form-check-input payment_option" required="" type="radio" value="COD" name="payment_option" id="exampleRadios3" >
                                                 <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Cash on Delivery</label>
                                                 <div class="form-group collapse in" id="cashOnDelivery">
                                                     <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
+                                                </div>
+                                            </div>
+                                            <div class="custome-radio">
+                                                <input class="form-check-input payment_option" required="" type="radio" value="RAZORPAY" name="payment_option" id="exampleRadios5" checked="" >
+                                                <label class="form-check-label " for="exampleRadios5" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Other Methods (RazorPay)</label>
+                                                <div class="form-group collapse in" id="paypal">
+                                                    <p class="text-muted mt-5">Pay via PayPal; you can pay with your credit card if you don't have a PayPal account.</p>
                                                 </div>
                                             </div>
                                             <div class="custome-radio">
@@ -1431,6 +1438,7 @@
     <script src="/assets/js/main.js?v=3.4"></script>
     <script src="/assets/js/shop.js?v=3.4"></script>    
     <script src="/js/custom-alert.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         window.onload = function () {
             const cards = document.getElementById("addressCards");
@@ -1454,10 +1462,82 @@
             } else {
                 document.getElementById("addressId").value = checkedAddress;
                 document.getElementById("paymentMethod").value = paymentMethod;
-                document.getElementById(formID).submit();
+                //document.getElementById(formID).submit();
+                submitFormRequest();
             }            
         }
-    </script>
+        function submitFormRequest() {
+            console.log("form fubmitting...");
+            $.ajax({
+                url:'/place-order',
+                method:'POST',
+                data:$("#hidden-form-placeorder").serialize(),
+                success:(response)=>{
+                    if(response.payment){
+                        location.href='/place-order'
+                    } else{
+                        razorpayPayment(response);
+                    }
+                }
+            })
+        }
+        function razorpayPayment(order){
+            const options = {
+                "key": "rzp_test_8UfeOJggaoD0lS", // Enter the Key ID generated from the Dashboard
+                "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "INR",
+                "name": "JMJ Music House",
+                "description": "Test Transaction",
+                "image": "/assets/imgs/theme/logo.svg",
+                "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "handler": function (response){
+                    //alert(JSON.stringify(response));
+                    // alert(response.razorpay_order_id);
+                    // alert(response.razorpay_signature)
+                    verifyPayment(response, order);
+                },
+                "prefill": {
+                    "name": "Gaurav Kumar",
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "9000090000"
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#990718"
+                }
+            };
+            const rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response){
+                    alert(JSON.stringify(error));
+                    // alert(response.error.description);
+                    // alert(response.error.source);
+                    // alert(response.error.step);
+                    // alert(response.error.reason);
+                    // alert(response.error.metadata.order_id);
+                    // alert(response.error.metadata.payment_id);
+            });
+            rzp1.open();
+        }
+        function verifyPayment(payment, order){
+            $.ajax({
+                url:'/verify-payment',
+                method: 'post',
+                data:{
+                    payment,
+                    order
+                },
+                success:(response)=>{
+                    if(response.status){                        
+                        location.href='/place-order'
+                    } else{
+                        alert("Payment failed!" + response.errMsg)
+                    }
+                }
+            });
+        }
+        </script>
 </body>
 
-</html>
+</html> 
