@@ -15,6 +15,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/custom-alert.css">
 </head>
 
 <body>
@@ -193,8 +195,8 @@
                                 <select class="select-active">
                                     <% if (locals.categories) { %>
                                         <% for (let i = 0; i < categories.length; i++) { %>
-                                            <% if(categories[i].isListed) { %>
-                                                <option><a href="/<%= categories[i].categoryName.toLowerCase() %>"><%= categories[i].categoryName %></a></option>
+                                            <% if(categories[i]?.isListed) { %>
+                                                <option><a href="/<%= categories[i]?.categoryName.toLowerCase() %>"><%= categories[i]?.categoryName %></a></option>
                                             <% } %>
                                         <% } %>                                        
                                     <% } %>
@@ -221,14 +223,14 @@
                                                 <% for (let i = 0; i < cartItems.length; i++) { %>
                                             <li>
                                                 <div class="shopping-cart-img">
-                                                    <a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i].productInfo[0].images[0] %>"></a>
+                                                    <a href="/<%= cartItems[i]?.productInfo[0].category%>/<%= cartItems[i]?.productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i]?.productInfo[0].images[0] %>"></a>
                                                 </div>
                                                 <div class="shopping-cart-title">
-                                                    <h4><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
-                                                    <h4><span><%= cartItems[i].quantity %> × </span>₹<%= cartItems[i].salePrice %></h4>
+                                                    <h4><a href="/<%= cartItems[i]?.productInfo[0].category%>/<%= cartItems[i]?.productInfo[0]._id %>"><%= cartItems[i]?.productInfo[0].productName %></a></h4>
+                                                    <h4><span><%= cartItems[i]?.quantity %> × </span>₹<%= cartItems[i]?.salePrice %></h4>
                                                 </div>
                                                 <div class="shopping-cart-delete">
-                                                    <a href="/remove-cart-item/<%= cartItems[i].productInfo[0]._id %>"><i class="fi-rs-cross-small"></i></a>
+                                                    <a href="/remove-cart-item/<%= cartItems[i]?.productInfo[0]._id %>"><i class="fi-rs-cross-small"></i></a>
                                                 </div>
                                             </li>
                                                 <% } %>
@@ -444,10 +446,10 @@
                                             <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
+                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                            <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="true"><i class="fi-rs-smartphone mr-10"></i>My Wallet</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
@@ -477,13 +479,13 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table class="table" id="orderTable">
                                                         <thead>
                                                             <tr>
-                                                                <th>#Order ID</th>
                                                                 <th>Date</th>
-                                                                <th>Status</th>
+                                                                <th>Order Status</th>
                                                                 <th>Total</th>
+                                                                <th>Payment Status</th>
                                                                 <th>Actions</th>
                                                             </tr>
                                                         </thead>
@@ -491,17 +493,21 @@
                                                             <% if (locals.orders) { %>                                    
                                                                 <% for (let i = 0; i < orders.length; i++) { %>
                                                             <tr>
-                                                                <td><%= orders[i]._id%></td>
                                                                 <td>
-                                                                    <%= orders[i].createdAt.toLocaleDateString() %><br>
-                                                                    <%= orders[i].createdAt.toLocaleTimeString() %>
+                                                                    <%= orders[i]?.createdAt.toLocaleDateString() %><br>
+                                                                    <%= orders[i]?.createdAt.toLocaleTimeString() %>
                                                                 </td>
-                                                                <td><%= orders[i].orderStatus %></td>
-                                                                <td>₹<%= orders[i].totalAmount %><br> for <%= orders[i]?.totalItems %> items</td>
+                                                                <td><%= orders[i]?.orderStatus %></td>
+                                                                <td>₹ <strong><%= orders[i]?.totalAmount %></strong><br> for <%= orders[i]?.totalItems %> items</td>
+                                                                <td><%= orders[i]?.paymentStatus %></td>
                                                                 <td>
-                                                                    <a href="/user/view-order/<%= orders[i]._id %>" class="btn-small d-block">View</a>
-                                                                    <% if(orders[i].status !== "DELIVERED") { %>
-                                                                        <a href="/user/cancel-order/<%= orders[i]._id %>" class="btn-small d-block">Cancel</a>
+                                                                    <a href="/user/view-order/<%= orders[i]?._id %>" class="btn-small d-block">View</a>
+                                                                    <% if(orders[i]?.orderStatus !== "DELIVERED" && orders[i]?.orderStatus !== "CANCELLED" && orders[i]?.orderStatus !== "RETURNED") { %>
+                                                                        <a href="/user/cancel-order/<%= orders[i]?._id %>" class="btn-small d-inline-block">Cancel</a>
+                                                                    <!-- Return Period 14 Days :- new Date(orders[i]?.createdAt).setDate(new Date().getDate()+1) > Date.now() -->
+                                                                    <!-- Return Period 5 mins :- new Date(orders[i]?.createdAt.getTime() + 5*60000) -->
+                                                                    <% } else if(new Date(orders[i]?.createdAt.getTime() + 5*60000) > Date.now() && orders[i]?.orderStatus !== "CANCELLED" && orders[i]?.orderStatus !== "RETURNED") { %>
+                                                                        <a href="/user/return-order/<%= orders[i]?._id %>" class="btn-small d-inline-block">Return</a>
                                                                     <% } %>
                                                                 </td>
                                                             </tr>
@@ -512,32 +518,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Orders tracking</h5>
-                                            </div>
-                                            <div class="card-body contact-from-area">
-                                                <p>To track your order please enter your OrderID in the box below and press "Track" button. This was given to you on your receipt and in the confirmation email you should have received.</p>
-                                                <div class="row">
-                                                    <div class="col-lg-8">
-                                                        <form class="contact-form-style mt-30 mb-50" action="#" method="post">
-                                                            <div class="input-style mb-20">
-                                                                <label>Order ID</label>
-                                                                <input name="order-id" placeholder="Found in your order confirmation email" type="text" class="square">
-                                                            </div>
-                                                            <div class="input-style mb-20">
-                                                                <label>Billing email</label>
-                                                                <input name="billing-email" placeholder="Email you used during checkout" type="email" class="square">
-                                                            </div>
-                                                            <button class="submit submit-auto-width" type="submit">Track</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    </div>  
                                     <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
                                         <div class="row mb-5">
                                             <div class="float-end">
@@ -554,39 +535,39 @@
                                                 <div class="card mb-3 mb-lg-0">
                                                     <div class="card-header">
                                                         <h5 class="mb-0">Address <%= i+1 %> 
-                                                            <% if(addresses[i].isDefault) { %> <span class=" float-end text-success">Default</span> <% } %>
+                                                            <% if(addresses[i]?.isDefault) { %> <span class=" float-end text-success">Default</span> <% } %>
                                                         </h5>                                                        
                                                     </div>
                                                     <div class="card-body">
-                                                        <p><strong><%= addresses[i].customerName %></strong></p>
-                                                        <address><%= addresses[i].addressLine1 %><br><%= addresses[i].addressLine2 %>,<br><%= addresses[i].city %>, <%= addresses[i].state %><br><%= addresses[i].pincode %></address>
-                                                        <p>Email: <%= addresses[i].email %></p>
-                                                        <address>Phone: <%= addresses[i].phone %></address>                                                        
+                                                        <p><strong><%= addresses[i]?.customerName %></strong></p>
+                                                        <address><%= addresses[i]?.addressLine1 %><br><%= addresses[i]?.addressLine2 %>,<br><%= addresses[i]?.city %>, <%= addresses[i]?.state %><br><%= addresses[i]?.pincode %></address>
+                                                        <p>Email: <%= addresses[i]?.email %></p>
+                                                        <address>Phone: <%= addresses[i]?.phone %></address>                                                        
                                                         <a class="btn-small edit_address_button" id="edit-address-button"
                                                             data-bs-toggle="modal" data-bs-target="#addAddress" 
                                                             data-btnaction="edit"
                                                             data-modaltitle="Edit address"
-                                                            data-id="<%= addresses[i]._id %>"
-                                                            data-customername="<%= addresses[i].customerName %>"
-                                                            data-addressline1="<%= addresses[i].addressLine1 %>"
-                                                            data-addressline2="<%= addresses[i].addressLine2 %>"
-                                                            data-city="<%= addresses[i].city %>"
-                                                            data-state="<%= addresses[i].state %>"
-                                                            data-country="<%= addresses[i].country %>"
-                                                            data-pincode="<%= addresses[i].pincode %>"
-                                                            data-email="<%= addresses[i].email %>"
-                                                            data-phone="<%= addresses[i].phone %>"
-                                                            data-notes="<%= addresses[i].notes %>"
-                                                            data-isdefault="<%= addresses[i].isDefault %>"
+                                                            data-id="<%= addresses[i]?._id %>"
+                                                            data-customername="<%= addresses[i]?.customerName %>"
+                                                            data-addressline1="<%= addresses[i]?.addressLine1 %>"
+                                                            data-addressline2="<%= addresses[i]?.addressLine2 %>"
+                                                            data-city="<%= addresses[i]?.city %>"
+                                                            data-state="<%= addresses[i]?.state %>"
+                                                            data-country="<%= addresses[i]?.country %>"
+                                                            data-pincode="<%= addresses[i]?.pincode %>"
+                                                            data-email="<%= addresses[i]?.email %>"
+                                                            data-phone="<%= addresses[i]?.phone %>"
+                                                            data-notes="<%= addresses[i]?.notes %>"
+                                                            data-isdefault="<%= addresses[i]?.isDefault %>"
                                                             > 
                                                             <span title="Edit Address <%= i+1 %>">
                                                                 Edit
                                                             </span>
                                                         </a>
                                                         <form id="hidden-form-<%= i %>" action="/user/delete-address" method="POST" style="display: none;">
-                                                            <input type="hidden" name="addressId" value="<%= addresses[i]._id %>" />
+                                                            <input type="hidden" name="addressId" value="<%= addresses[i]?._id %>" />
                                                         </form>
-                                                        <a  onclick="confirmDelete('hidden-form-<%= i %>', 'Address <%= i+1 %>')" class="btn-small ms-5">
+                                                        <a  onclick="confirmDeleteAddress('hidden-form-<%= i %>', 'Address <%= i+1 %>')" class="btn-small ms-5">
                                                             <span title="Delete Address <%= i+1 %>">Delete</span>
                                                         </a>
                                                     </div>
@@ -594,6 +575,69 @@
                                             </div>
                                                 <% } %>
                                             <% }  %>                                            
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="row d-flex">
+                                                    <div class="col-6">
+                                                        <h5 class="mb-0 float-left">Your Wallet</h5>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <h5 class="mb-0 float-end">Wallet balance : ₹<span id="walletBalance"><% if(locals.walletBalance) { %> <%= walletBalance %> <% } else { %> 0 <% } %></span></h5>
+                                                    </div>
+                                                </div>
+                                            </div>                                        
+                                              
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <div class="row mb-5 w-100">
+                                                        <% if (locals.walletDetails) { %>
+                                                            <% if (walletDetails.length > 0) { %> 
+                                                                 <h5 class="col">Wallet Transactions</h5>
+                                                            <% } %>
+                                                        <% } %>
+                                                        <div class="col">
+                                                            <a class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#addToWalletModal">
+                                                                <i class="material-icons md-plus"></i> Add money to wallet
+                                                            </a>
+                                                        </div>
+                                                    </div>    
+                                                    <% if (locals.walletDetails) { %> 
+                                                        <% if (walletDetails.length > 0) { %>                                                  
+                                                    <table class="table" id="walletTable"> 
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Amount</th>
+                                                                <th>Type</th>
+                                                                <th>Remarks</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>                                  
+                                                                <% for (let i = 0; i < walletDetails.length; i++) { %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%= walletDetails[i]?.timestamp.toLocaleDateString() %>
+                                                                        <%= walletDetails[i]?.timestamp.toLocaleTimeString() %>
+                                                                    </td>
+                                                                    <td>₹ <%= walletDetails[i]?.amount %></td>
+                                                                    <td>
+                                                                        <span style="font-size: 14px;">
+                                                                            <% if (walletDetails[i]?.transaction === "C") { %> CREDIT
+                                                                            <% } else if (walletDetails[i]?.transaction === "D") { %> DEBIT <% } %>                                                                            
+                                                                        </span>
+                                                                    </td>                                                                    
+                                                                    <td><%= walletDetails[i]?.remarks %></td>
+                                                                </tr>
+                                                                <% } %>
+                                                        </tbody>
+                                                    </table>
+                                                        <% } %>
+                                                    <% } %>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
@@ -664,9 +708,8 @@
             </div>
         </div>
     </div>
-    <!-- End of Modal for Edit button -->
-
-    <!-- Modal for Edit button -->
+    <!-- End of Modal for Order View -->
+    <!-- Modal for Address Edit -->
     <div class="modal fade" id="addAddress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -986,7 +1029,33 @@
             </div>
         </div>
     </div>
-    <!-- End of Modal for Edit button -->
+    <!-- End of Modal for Address Edit -->
+    <!-- Modal for Add to Wallet -->
+    <div class="modal fade" id="addToWalletModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add balance to wallet</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <p id="errMsg" class="m-auto text-center text-danger my-1"><% if (locals.errMsg) { %><%= errMsg %><% } %></p>                        
+                <form name="addToWalletForm" id="addToWalletForm" method="post" action="/user/add-to-wallet">
+                    <div class="modal-body">
+                        <div class="form-group w-100">
+                            <label for="categoryName">Enter Amount</label>
+                            <input class="form-control" id="inputAmount" name="amount" placeholder="Min.₹1  Max.₹99999" value="5000"/>
+                            <div class="error text-danger ms-2"></div>
+                        </div> 
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    <button id="modal-save-btn" type="submit" onclick="addToWallet()" class="btn btn-primary w-50">Proceed to Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Modal for Add to Wallet -->
     <footer class="main">
         <section class="newsletter p-30 text-white wow fadeIn animated">
             <div class="container">
@@ -1098,6 +1167,8 @@
             </div>
         </div>
     </footer>
+    <!-- Custom Alert -->
+    <%- include('./partials/home/custom-alert.ejs') %>
     <!-- Preloader Start -->
     <div id="preloader-active">
         <div class="preloader d-flex align-items-center justify-content-center">
@@ -1134,163 +1205,160 @@
     <script src="assets/js/plugins/jquery.vticker-min.js"></script>
     <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <!-- Template  JS -->
-    <script src="./assets/js/main.js?v=3.4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="./assets/js/main.js?v=3.4"></script>  
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="/js/custom-alert.js"></script>
+    <script src="/js/validate-userAddress.js"></script>
+    
     <!-- Page level custom scripts -->
     <script>
-        const form = document.getElementById('addAddress');
-        const customerName = document.getElementById('customerName');
-        const addressLine1 = document.getElementById('addressLine1');
-        const city = document.getElementById('city');
-        const state = document.getElementById('state');
-        const country = document.getElementById('country');
-        const pincode = document.getElementById('pincode');
-        const phone = document.getElementById('phone');
-        const email = document.getElementById('email');
-        
-        const setError = (element, message) => {
-            const inputControl = element.parentElement;
-            const errorDisplay = inputControl.querySelector('.error');
+        $(document).ready(function() {
+            $('#orderTable').DataTable({
+                order: [[0, 'desc']],
+                columnDefs: [{ "targets": [2,4], "orderable": false }],
+                searching: false,
+                dom: '<"top"i>rt<"bottom"flp>'
+            });
+            $('#walletTable').DataTable({
+                order: [[0, 'desc']],
+                columnDefs: [{ "targets": [3], "orderable": false }],
+                searching: false,
+                dom: '<"top"i>rt<"bottom"flp>'
+            });
+        });
+    </script>
+    <!-- Add to Wallet -->
+    <script>
+        function validateAddToWallet(){
+            const amountToAdd = document.getElementById('inputAmount')
+            const amountToAddVal = amountToAdd.value.trim();
+            const amountToAddRegex = /^[0-9]{1,5}$/;
+            setSuccess(amountToAdd);
 
-            errorDisplay.innerText = message;
-            inputControl.classList.add('error');
-            inputControl.classList.remove('success');
-        };
-        const setSuccess = element => {
-            const inputControl = element.parentElement;
-            const errorDisplay = inputControl.querySelector('.error');
-
-            errorDisplay.innerText = '';
-            inputControl.classList.add('success');
-            inputControl.classList.remove('error');
-        };
-        const isValidEmail = email => {
-            //const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            const re =/[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}/;
-            return re.test(String(email).toLowerCase());
-        }
-        
-        function validateInputs() {
-            setSuccess(customerName);
-            setSuccess(addressLine1);
-            setSuccess(city);
-            setSuccess(state);
-            setSuccess(country);
-            setSuccess(pincode);
-            setSuccess(phone);
-            setSuccess(email);
-
-            const customerNameValue = customerName.value.trim();
-            const addressLine1Value = addressLine1.value.trim();
-            const cityValue = city.value.trim();
-            const stateValue = state.value.trim();
-            const countryValue = country.value.trim();
-            const pincodeValue = pincode.value.trim();
-            const phoneValue = phone.value.trim();
-            const emailValue = email.value.trim();
-
-            if(customerNameValue === '') {
-                setError(customerName, 'Please enter customer name');
-                customerName.focus();
+            if(amountToAddVal === '') {
+                setError(amountToAdd, 'Please enter amount');
+                amountToAdd.focus();
                 return false;
-            } else{
-                setSuccess(customerName);
-            }
-            
-            if(addressLine1Value === '') {
-                setError(addressLine1, 'Please enter address');
-                addressLine1.focus();
+            } else if(!amountToAddVal.match(amountToAddRegex)){
+                setError(amountToAdd, 'Enter valid amount');
+                amountToAdd.focus();
                 return false;
-            } else{
-                setSuccess(addressLine1);
-            }
-
-            if(cityValue === '') {
-                setError(city, 'Please enter city');
-                city.focus();
+            } else if(amountToAddVal < 1){
+                setError(amountToAdd, 'Enter amount greater than ₹1');
+                amountToAdd.focus();
                 return false;
-            } else{
-                setSuccess(city);
-            }
-            
-            if(stateValue === '') {
-                setError(state, 'Please enter state');
-                state.focus();
-                return false;
-            } else{
-                setSuccess(state);
-            }
-            
-            const pincodeRegex = /^\d{6}$/;
-            if(pincodeValue === '') {
-                setError(pincode, 'Please enter pincode');
-                pincode.focus();
-                return false;
-            } if(!pincodeValue.match(pincodeRegex)){
-                setError(pincode, 'Enter valid pincode');
-                pincode.focus();
+            } else if(amountToAddVal > 99999){
+                setError(amountToAdd, 'Enter amount less than ₹100000');
+                amountToAdd.focus();
                 return false;
             }
             else{
-                setSuccess(pincode);
-            }
-
-            const phonenoRegex = /^\d{10}$/;
-            if(phoneValue === ""){
-                setError(phone, 'Enter phone number');
-                phone.focus();
-                return false;
-            }
-            else if(!phoneValue.match(phonenoRegex)){
-                setError(phone, 'Enter valid number');
-                phone.focus();
-                return false;
-            }
-            else{
-                setSuccess(phone);
-            }
-
-            if (!isValidEmail(emailValue)) {
-                setError(email, 'Provide a valid email address');
-                email.focus();
-                return false;
-            } 
-            else{
-                setSuccess(email);
-            }
-
+                setSuccess(amountToAdd);
+            }            
             return true;
         }
-
-        function confirmEdit(form) {
-            const button = document.getElementById('modal-save-btn');
-            const btnAction = button.innerHTML;
-            console.log('Login submit button recorded');
-            if(validateInputs()){
+        function addToWallet(){
+            console.log('Add to Wallet submit button recorded');
+            if(validateAddToWallet()){
                 console.log("VALIDATION Success");
-                console.log("Action : " + btnAction);
-                if(btnAction === "Save changes"){                    
-                    if (confirm('Save the changes made to the address ?')) {
-                        document.getElementById(form).submit();
+                console.log("form fubmitting...");
+                $.ajax({
+                    url:'/user/add-to-wallet',
+                    method:'POST',
+                    data: $("#addToWalletForm").serialize(),
+                    success:(response)=>{
+                        if(response.status){
+                            razorpayPayment(response);
+                        } else{
+                            customAlert("Hey there!", "Cannot add balance to cart right now. Please try again later.")
+                        }
                     }
-                }
-                else{
-                    document.getElementById(form).submit();
-                }
+                })
             } else{
                 console.log("Validation FAILED!");
             }
         }
+        function razorpayPayment(data){
+            const user = data.user;
+            const razorpayOrder = data.razorpayOrder;
+            console.log("ANOUNT RAZORPAY : " + razorpayOrder.amount);
+            const options = {
+                "key": "rzp_test_8UfeOJggaoD0lS",
+                "amount": razorpayOrder.amount, 
+                "currency": "INR",
+                "name": "JMJ Music House",
+                "description": "Test Transaction",
+                "image": "/assets/imgs/theme/logo.svg",
+                "order_id": razorpayOrder.id, 
+                "handler": function (response){
+                    verifyWalletPayment(response, razorpayOrder.amount  );
+                },
+                "prefill": {
+                    "name": user?.name,
+                    "email": user?.email,
+                    "contact": user?.phone
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#990718"
+                }
+            };
+            console.log(options);
+            console.log(JSON.stringify(options));
+            const rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response){
+                customAlert("Oops..!", JSON.stringify(error));
+            });
+            rzp1.open();
+        }
+        function verifyWalletPayment(payment, amount){
+            $.ajax({
+                url:'/user/verify-wallet-payment',
+                method: 'post',
+                data:{
+                    payment,
+                    amount
+                },
+                success:(response)=>{
+                    console.log(response);
+                    console.log(JSON.stringify(response));
 
+                    $('#addToWalletModal').modal('hide');
+                    if(response.status){
+                        const data = response.data;        
+                        let transactionHtml = '<span style="font-size: 14px;">';
+                        if(data?.transaction === "C") { 
+                            transactionHtml += 'CREDIT'
+                        } else if (data?.transaction === "D") { 
+                            transactionHtml += 'DEBIT'
+                        }
+                        transactionHtml += '</span>';
+                        //update table
+                        $('#walletTable tbody').prepend(
+                            "<tr><td>" + new Date(data?.timestamp).toLocaleDateString() + 
+                            + new Date(data?.timestamp).toLocaleTimeString() + "</td><td>₹ " + data?.amount + 
+                            "</td><td>" + transactionHtml + "</td><td>" + data?.remarks + "</td></tr>");
+                        //update wallet balance
+                        let walletBalance = $('#walletBalance').text();
+                        walletBalance = parseInt(walletBalance) + Number(data?.amount) ?? 0;
+                        console.log("walletBalance : " + walletBalance);
+                        $('#walletBalance').text(walletBalance);
+                        
+                        customAlert("Success","Payment SUCCESS! Added money to wallet.")
+                    } else{
+                        customAlert("Oops..!","Payment failed!" + response.errMsg)
+                    }
+                }
+            });
+        }
     </script>
-    <script>
-        // Call the dataTables jQuery plugin
-        // $(document).ready(function() {
-        //     $('#dataTable').DataTable();
-        // });
-    
-        function confirmDelete(formID, name) {
+    <!-- Adding & Editing Address -->
+    <script>    
+        function confirmDeleteAddress(formID, name) {
             if (confirm(`Are you sure to delete the ${name}?`)) {
                 document.getElementById(formID).submit();
             }
@@ -1369,11 +1437,8 @@
                 $('#addAddressForm').attr('action', '/user/edit-address');
                 $('#modal-save-btn').text('Save changes');
             }
+            $('#customerName').trigger('focus');
         });
-
-        $('#addAddress').on('shown.bs.modal', function () {
-            $('#customerName').trigger('focus')
-        })
     </script>
 </body>
 

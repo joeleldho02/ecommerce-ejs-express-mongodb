@@ -157,14 +157,18 @@ function validateInputs() {
     }
 
     if(salePriceValue === '') {
-      setError(salePrice, 'Enter regular price');
+      setError(salePrice, 'Enter sale price');
       salePrice.focus();
       return false;
     } else if (!isValidNumber(salePriceValue)) {
       setError(salePrice, 'Provide a valid price');
       salePrice.focus();
       return false;
-    } 
+    } else if(salePriceValue > regularPriceValue){
+      setError(salePrice, 'Price must be less than regular price');
+      salePrice.focus();
+      return false;
+    }
     else{
       setSuccess(salePrice);
     }
@@ -204,7 +208,7 @@ form.addEventListener('submit', function(e) {
 })
 
 function submitForm() {
-    submitSelectedFiles();
+    //submitSelectedFiles();
     const tagsString = tagsArray.join(', ');
     document.getElementById('productTags').value = tagsString;
     //console.log('Tags as comma-separated string:', tagsString);

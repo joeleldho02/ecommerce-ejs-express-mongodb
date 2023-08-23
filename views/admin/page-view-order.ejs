@@ -17,6 +17,7 @@
     <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/datatable.css">
+    <link rel="stylesheet" href="/css/custom-alert.css">
 
 </head>
 
@@ -114,14 +115,24 @@
                             <small class="text-muted">Order ID: #<%= order[0]?._id %></small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <!-- <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                <option>Change status</option>
-                                <option>Awaiting payment</option>
-                                <option>Confirmed</option>
-                                <option>Shipped</option>
-                                <option>Delivered</option>
-                            </select>
-                            <a class="btn btn-primary" href="#">Save</a> -->
+                            <!-- <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">                                
+                                <option value="0">Change status</option>
+                                <option value="APPROVED">Approve</option>
+                                <option value="DECLINED">Decline</option>
+                                <option value="DELIVERED">Delivered</option>
+                                <option value="PENDING">Pending</option>
+                            </select> -->
+                            <form id="orderEditForm" action="/admin/update-order" method="POST" class=" mb-lg-0 mb-15 mw-200 d-inline-block me-2">
+                                <select id="statusDropDown" name="orderStatus" class="form-select">
+                                    <option value="0">Change status</option>
+                                    <option value="APPROVED">Approve</option>
+                                    <option value="DECLINED">Decline</option>
+                                    <option value="DELIVERED">Delivered</option>
+                                    <option value="PENDING">Pending</option>
+                                </select>
+                                <input type="hidden" name="orderID" value="<%= order[0]?._id %>" />
+                            </form> 
+                            <a class="btn btn-primary" href="#" onclick="editOrder('orderEditForm', 'statusDropDown')">Save</a>
                             <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
                         </div>
                     </div>
@@ -140,7 +151,7 @@
                                         <%= order[0]?.customerInfo[0]?.email %> <br>
                                         <%= order[0]?.customerInfo[0]?.phone %>
                                     </p>
-                                    <a href="#">View profile</a>
+                                    <!-- <a href="#">View profile</a> -->
                                 </div>
                             </article>
                         </div> <!-- col// -->
@@ -157,11 +168,13 @@
                                         Order status: 
                                         <% if(typeof order[0]?.orderStatus === 'string') { %>
                                             <span style="font-size: 15px;"
-                                            <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
-                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
-                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
-                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
-                                            ><%= order[0]?.orderStatus %></span>   
+                                            <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "approved") { %> class="badge badge-pill bg-success"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill bg-danger"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "delivered") { %> class="badge badge-pill bg-success"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "shipped") { %> class="badge badge-pill bg-info"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "cancelled") { %> class="badge badge-pill bg-warning" <% } %> 
+                                            ><%= order[0]?.orderStatus %></span>    
                                         <% } %>
                                     </p>
                                     <!-- <a href="#">Download info</a> -->
@@ -202,16 +215,16 @@
                                         <% for (let i = 0; i < order.length; i++) { %>
                                         <tr>
                                             <td>
-                                                <a class="itemside" href="/<%= order[i]?.productInfo[0].category%>/<%= order[i]?.productInfo[0]._id %>" target="_blank">
+                                                <a class="itemside" href="/<%= order[i]?.products?.category%>/<%= order[i]?.products?.productId %>" target="_blank">
                                                     <div class="left">
-                                                        <img src="/img/products/<%= order[i]?.productInfo[0].images[0] %>" class="img-xs" alt="Item">
+                                                        <img src="/img/products/<%= order[i]?.productInfo[0]?.images[0] %>" class="img-xs" alt="Item">
                                                     </div>
-                                                    <div class="info"><%= order[i]?.productInfo[0].productName %></div>
+                                                    <div class="info"><%= order[i]?.products?.productName %></div>
                                                 </a>
                                             </td>
-                                            <td> ₹<%= order[i]?.productInfo[0]?.salePrice %> </td>
+                                            <td> ₹<%= order[i]?.products?.salePrice %> </td>
                                             <td> <%= order[i].products?.quantity %> </td>
-                                            <td class="text-end"> ₹<%= order[i].products?.quantity * order[i]?.productInfo[0]?.salePrice %> </td>
+                                            <td class="text-end"> ₹<%= order[i].products?.quantity * order[i]?.products?.salePrice %> </td>
                                         </tr>
                                         <% }  %>
                                         <tr>
@@ -226,6 +239,10 @@
                                                         <dd>₹<%= order[0]?.shippingCost || '0' %></dd>
                                                     </dl>
                                                     <dl class="dlist">
+                                                        <dt>Discount:</dt>
+                                                        <dd>- ₹ <%= order[0]?.discount || '0' %></dd>
+                                                    </dl>
+                                                    <dl class="dlist">
                                                         <dt>Grand total:</dt>
                                                         <dd> <b class="h5">₹<%= order[0]?.totalAmount %></b> </dd>
                                                     </dl>
@@ -236,8 +253,8 @@
                                                                 <span 
                                                                 <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
                                                                 <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
-                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
-                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "not paid") { %> class="badge badge-pill badge-soft-danger"
+                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill badge-soft-warning" <% } %> 
                                                                 ><%= order[0]?.paymentStatus %></span>   
                                                             <% } %>
                                                         </dd>
@@ -248,7 +265,7 @@
                                     </tbody>
                                 </table>
                             </div> <!-- table-responsive// -->
-                            <a class="btn btn-primary" href="#">View Order Tracking</a>
+                            <!-- <a class="btn btn-primary" href="#">View Order Tracking</a> -->
                         </div> <!-- col// -->
                         <div class="col-lg-1"></div>
                         <div class="col-lg-4">
@@ -260,6 +277,16 @@
                                     Phone: +1 (800) 555-154-52 -->
                                     <%= order[0]?.paymentMethod %><br>
                                 </p>
+                                <% if(locals.order[0]?.paymentDetails?.razorpay_payment_id) { %>
+                                    <p>Refecrence ID: <%= order[0]?.paymentDetails?.razorpay_payment_id %></p>
+                                <% } %>
+                                <% if(locals.order[0]?.paymentDetails?.walletBalance) { %>
+                                    <p> Wallet balance: <%= order[0]?.paymentDetails?.walletBalance %></p>
+                                <% } %>
+                                <% if(locals.order[0]?.coupon) { %>
+                                    <p> Coupon Used: <%= order[0]?.coupon?.couponText %></p>
+                                    <p> Coupon Amount: <%= order[0]?.coupon?.amount %></p>
+                                <% } %>
                             </div>
                             <div class="h-25 pt-4">
                                 <div class="mb-3">
@@ -275,6 +302,8 @@
             <% }  %>
         </section> <!-- content-main end// -->
         <%- include('./partials/admin/admin-footer.ejs') %>
+        <!-- Custom Confirm Dialog -->
+        <%- include('./partials/home/custom-confirm-dialog.ejs') %> 
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
@@ -287,13 +316,28 @@
     <!-- Page level plugins -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+    <script src="/js/custom-confirm.js"></script>
     <!-- Page level custom scripts -->    
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
             $('#dataTable').DataTable();
         });    
+    </script>
+    <script>
+        function editOrder(formId, dropDownId){
+            console.log("EDIT CLICKED!!");
+            const dropDown = document.getElementById(dropDownId);
+            if(dropDown.value !== "0"){
+                customConfirm('Hey there!', `Update the order status to '${dropDown.value}'?`, submitEditOrder, formId);
+            }else{
+                alert("Please select an update option for updating order status!")
+            }      
+            function submitEditOrder(form){
+                document.getElementById(form).submit();
+                dropDown.style.display = 'none';
+            }     
+        }
     </script>
 </body>
 

@@ -1102,14 +1102,14 @@
                     } else {
                         if(response.msg)
                             //alert(response.msg);
-                            openPopup('Oops..!', response.msg);
+                            customAlert('Oops..!', response.msg);
                         else
-                            openPopup('Oops..!', "Unable to change item quantity");
+                        customAlert('Oops..!', "Unable to change item quantity");
                             //alert("Unable to change item quantity");
                     }
                 },
                 error: function(){
-                    openPopup('Oops..!', "Unable to change item quantity");
+                    customAlert('Oops..!', "Unable to change item quantity");
                 }
             })
         } 

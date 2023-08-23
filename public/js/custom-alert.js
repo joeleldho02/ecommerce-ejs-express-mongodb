@@ -1,4 +1,4 @@
-function openPopup(title, msg) {
+function customAlert(title, msg) {
   const overlay = document.getElementById("overlay");
   const popup = document.getElementById("popup");
   const titleLable = document.getElementById("alertTitle");

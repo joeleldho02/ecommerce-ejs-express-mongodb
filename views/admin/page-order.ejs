@@ -17,6 +17,7 @@
     <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/datatable.css">
+    <link rel="stylesheet" href="/css/custom-alert.css">
 
 </head>
 
@@ -70,7 +71,7 @@
                                         <td><a class="fw-bold">#<%= orders[i].orderId %></a> </td>
                                         <td><%= orders[i]?.shippingAddress?.customerName %></td>
                                         <td><%= orders[i]?.createdAt.toLocaleDateString() %><br><%= orders[i]?.createdAt.toLocaleTimeString() %></td>
-                                        <td>₹<%= orders[i]?.totalAmount %></td>
+                                        <td>₹<%= orders[i]?.totalAmount %><br>  <%= orders[i]?.totalItems %> items</td>
                                         <td>
                                             <% if(typeof orders[i]?.paymentStatus === 'string') { %>
                                                 <span 
@@ -87,6 +88,7 @@
                                                 <span id="statusLabel-<%= orders[i]._id %>"
                                                 <% if (orders[i]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
                                                 <% } else if (orders[i]?.orderStatus.toLowerCase() == "approved") { %> class="badge badge-pill badge-soft-success"
+                                                <% } else if (orders[i]?.orderStatus.toLowerCase() == "delivered") { %> class="badge badge-pill badge-soft-success"
                                                 <% } else if (orders[i]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill badge-soft-danger"
                                                 <% } else if (orders[i]?.orderStatus.toLowerCase() == "cancelled") { %> class="badge badge-pill badge-soft-warning" <% } %> 
                                                 ><%= orders[i]?.orderStatus %></span> 
@@ -97,6 +99,7 @@
                                                     <option value="0">Choose</option>
                                                     <option value="APPROVED">Approve</option>
                                                     <option value="DECLINED">Decline</option>
+                                                    <option value="DELIVERED">Delivered</option>
                                                     <option value="PENDING">Pending</option>
                                                 </select>
                                                 <input type="hidden" name="orderID" value="<%= orders[i]?._id %>" />
@@ -110,7 +113,6 @@
                                             <a id="cancel-<%= orders[i]._id%>" class="btn m-auto ms-2 p-0" style="display: none; font-weight: 600; font-size: 12px;" 
                                                 onclick="cancelEditOrder('<%= orders[i]._id %>', 'editBtn-<%= orders[i]._id %>', 'dropDown-<%= orders[i]._id %>', 'statusLabel-<%= orders[i]._id %>', 'cancel-<%= orders[i]._id%>')">
                                             X</a>
-                                            <!-- <a href="/admin/cancel-order/<%= orders[i]._id %>" class="btn-small d-block">Edit</a> -->
                                         </td>
                                     </tr>
                                         <% } %>
@@ -123,6 +125,8 @@
         </section> <!-- content-main end// -->
         <!-- End of Modal for Edit button -->
         <%- include('./partials/admin/admin-footer.ejs') %>
+        <!-- Custom Confirm Dialog -->
+        <%- include('./partials/home/custom-confirm-dialog.ejs') %> 
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
@@ -135,7 +139,7 @@
     <!-- Page level plugins -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+    <script src="/js/custom-confirm.js"></script>
     <!-- Page level custom scripts -->
     <script>
         // Call the dataTables jQuery plugin
@@ -160,18 +164,20 @@
                 button.innerText = 'Update';
             } else{
                 if(dropDown.value !== "0"){
-                    if (confirm(`Update the order status to '${dropDown.value}'?`)) {
-                        document.getElementById('editForm-' + orderId).submit();                        
-                        dropDown.style.display = 'none';    
-                        cancelBtn.style.display = 'none';    
-                        label.style.display = 'inline'; 
-                        button.innerText = 'Edit';                        
-                    }
+                    customConfirm('Hey there!', `Update the order status to '${dropDown.value}'?`, submitEditOrder, orderId);
                 }else{
-                    alert("Please select an option for order status!")
+                    alert("Please select an update option for updating order status!")
                 }                
-            }        
+            }   
+            function submitEditOrder(orderId){
+                document.getElementById('editForm-' + orderId).submit();
+                dropDown.style.display = 'none';    
+                cancelBtn.style.display = 'none';    
+                label.style.display = 'inline'; 
+                button.innerText = 'Edit';  
+            }     
         }
+        
         function cancelEditOrder(orderId, buttonId, dropDownId, labelId, cancelBtnId){
             console.log("CANCEL CLICKED!!");
             const button = document.getElementById(buttonId);

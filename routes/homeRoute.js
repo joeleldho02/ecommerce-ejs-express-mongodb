@@ -10,7 +10,7 @@ const authController = require('../server/middleware/authenticate-user');
 
 router.get('/', categoryController.getListedCategories, cartController.getCartItemsCount, serviceRender.homePage);
 router.get('/cart', categoryController.getListedCategories, cartController.getAllCartItems, cartController.getCartItemsCount, serviceRender.getUserCartPage);
-router.get('/checkout', authController.authenticateUser, categoryController.getListedCategories, cartController.getAllCartItems, cartController.getCartItemsCount, userController.getAllAddresses, serviceRender.getUserCheckoutPage);
+router.get('/checkout', authController.authenticateUser, categoryController.getListedCategories, cartController.getAllCartItems, cartController.getCartItemsCount, userController.getAllAddresses, userController.getWalletBalance, serviceRender.getUserCheckoutPage);
 router.get('/place-order', authController.authenticateUser, categoryController.getListedCategories, cartController.getCartItemsCount, orderController.getOrderSummaryDetails, serviceRender.getOrderPlacedPage);
 
 router.get('/add-to-cart/:id', cartController.addToCart);

@@ -55,8 +55,12 @@ const userSchema = new mongoose.Schema({
     },
     wallet:[{
         amount: Number,
-        timestamp: Date,
-        type: String
+        timestamp: {
+            type: Date,
+            default: () => Date.now()
+        },
+        transaction: String,
+        remarks: String
     }]
 });
 const Userdb = mongoose.model('user', userSchema);

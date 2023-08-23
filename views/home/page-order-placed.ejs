@@ -571,10 +571,12 @@
                                         Order status: 
                                         <% if(typeof order[0]?.orderStatus === 'string') { %>
                                             <span style="font-size: 14px;"
-                                            <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
-                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
-                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
-                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                            <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "approved") { %> class="badge badge-pill bg-success"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill bg-danger"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "shipped") { %> class="badge badge-pill bg-info"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "delivered") { %> class="badge badge-pill bg-dark"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "cancelled") { %> class="badge badge-pill bg-warning" <% } %> 
                                             ><%= order[0]?.orderStatus %></span>   
                                         <% } %>
                                         </p>
@@ -602,6 +604,20 @@
                                     <p class="mb-1" style="font-size: 14px;">
                                         <%= order[0]?.paymentMethod %>
                                     </p>
+                                    <% if(locals.order[0].paymentDetails?.razorpay_payment_id) { %>
+                                        <p class="mb-1" style="font-size: 14px;">
+                                            Refecrence ID: <%= order[0]?.paymentDetails?.razorpay_payment_id %>                                            
+                                        </p>
+                                    <% } %>
+                                    <% if(locals.order[0].paymentDetails?.walletBalance) { %>
+                                        <p class="mb-1" style="font-size: 14px;">
+                                            Wallet balance: <%= order[0]?.paymentDetails?.walletBalance %>                                            
+                                        </p>
+                                    <% } %>
+                                    <% if(locals.order[0]?.coupon) { %>
+                                        <p class="mb-1" style="font-size: 14px;"> Coupon Used: <%= order[0]?.coupon?.couponText %></p>
+                                        <p class="mb-1" style="font-size: 14px;"> Coupon Amount: <%= order[0]?.coupon?.amount %></p>
+                                    <% } %>
                                 </div>
                             </article>
                         </div> <!-- col// -->
@@ -621,9 +637,9 @@
                                         <% for (let i = 0; i < order.length; i++) { %>
                                         <tr>
                                             <td>
-                                                <a class="itemside" href="/<%= order[i].productInfo[0].category%>/<%= order[i].productInfo[0]._id %>" target="_blank">
+                                                <a class="itemside" href="/<%= order[i]?.productInfo[0].category%>/<%= order[i]?.productInfo[0]?._id %>" target="_blank">
                                                     <div class="left">
-                                                        <img src="/img/products/<%= order[i].productInfo[0].images[0] %>" width="" height="40" class="img-xs" alt="Item">
+                                                        <img src="/img/products/<%= order[i]?.productInfo[0]?.images[0] %>" width="" height="40" class="img-xs" alt="Item">
                                                     </div>
                                                     <div class="info"><%= order[i].productInfo[0].productName %></div>
                                                 </a>
@@ -643,6 +659,10 @@
                                                     <dl class="dlist d-flex">
                                                         <dt>Shipping cost:</dt>
                                                         <dd>₹<%= order[0]?.shippingCost || '0' %></dd>
+                                                    </dl>                                                    
+                                                    <dl class="dlist">
+                                                        <dt>Discount:</dt>
+                                                        <dd>- ₹ <%= order[0]?.discount || '0' %></dd>
                                                     </dl>
                                                     <dl class="dlist d-flex">
                                                         <dt>Grand total:</dt>
@@ -655,8 +675,8 @@
                                                                 <span 
                                                                 <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
                                                                 <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
-                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
-                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "not paid") { %> class="badge badge-pill badge-soft-danger"
+                                                                <% } else if (order[0]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill badge-soft-warning" <% } %> 
                                                                 ><%= order[0]?.paymentStatus %></span>   
                                                             <% } %>
                                                         </dd>

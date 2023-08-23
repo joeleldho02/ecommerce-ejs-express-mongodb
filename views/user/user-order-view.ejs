@@ -446,7 +446,7 @@
                 <div class="content-header mx-5">
                     <div>
                         <h2 class="content-title card-title">Order details</h2>
-                        <p>Details for Order ID: #<%= order?._id %></p>
+                        <p>Details for Order ID: #<% if (locals.order) { %><%= order[0]?._id %><% } %></p>
                     </div>
                 </div>
                 <% if (locals.order) { %> 
@@ -460,7 +460,13 @@
                                 <small class="text-muted">Order ID: #<%= order[0]?._id %></small>
                             </div>
                             <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                                <!-- <a class="btn btn-primary" href="#">Cancel Order</a>  -->
+                                <% if(order[0]?.orderStatus !== "DELIVERED" && order[0]?.orderStatus !== "CANCELLED" && order[0]?.orderStatus !== "RETURNED") { %>
+                                    <a class="btn btn-primary" href="/user/cancel-order/<%= order[0]?._id %>">Cancel Order</a>
+                                    <!-- Return Period 14 Days :- new Date(orders[i]?.createdAt).setDate(new Date().getDate()+1) > Date.now() -->
+                                    <!-- Return Period 5 mins :- new Date(orders[i]?.createdAt.getTime() + 5*60000) -->
+                                <% } else if(new Date(order[0]?.createdAt.getTime() + 5*60000) > Date.now() && order[0]?.orderStatus !== "CANCELLED" && order[0]?.orderStatus !== "RETURNED") { %>
+                                    <a class="btn btn-primary" href="/user/return-order/<%= order[0]?._id %>">Return Order</a>
+                                <% } %> 
                                 <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
                             </div>
                         </div>
@@ -496,14 +502,16 @@
                                             Order status: 
                                             <% if(typeof order[0]?.orderStatus === 'string') { %>
                                                 <span style="font-size: 15px;"
-                                                <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
-                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
-                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
-                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                                <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "approved") { %> class="badge badge-pill bg-success"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill bg-danger"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "shipped") { %> class="badge badge-pill bg-info"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "delivered") { %> class="badge badge-pill bg-success"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "returned") { %> class="badge badge-pill bg-warning"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "cancelled") { %> class="badge badge-pill bg-warning" <% } %> 
                                                 ><%= order[0]?.orderStatus %></span>   
                                             <% } %>
                                         </p>
-                                        <!-- <a href="#">Download info</a> -->
                                     </div>
                                 </article>
                             </div> <!-- col// -->
@@ -541,16 +549,16 @@
                                             <% for (let i = 0; i < order.length; i++) { %>
                                             <tr>
                                                 <td>
-                                                    <a class="itemside" href="/<%= order[i].productInfo[0].category%>/<%= order[i].productInfo[0]._id %>" target="_blank">
+                                                    <a class="itemside" href="/<%= order[i].productInfo[0]?.category%>/<%= order[i]?.products?.prductId %>" target="_blank">
                                                         <div class="left">
-                                                            <img src="/img/products/<%= order[i].productInfo[0].images[0] %>" width="" height="40" class="img-xs" alt="Item">
+                                                            <img src="/img/products/<%= order[i]?.productInfo[0]?.images[0] %>" width="" height="40" class="img-xs" alt="Item">
                                                         </div>
-                                                        <div class="info"><%= order[i].productInfo[0].productName %></div>
+                                                        <div class="info"><%= order[i].productInfo[0]?.productName %></div>
                                                     </a>
                                                 </td>
-                                                <td> ₹<%= order[i]?.productInfo[0]?.salePrice %> </td>
+                                                <td> ₹<%= order[i]?.products?.salePrice %> </td>
                                                 <td> <%= order[i].products?.quantity %> </td>
-                                                <td class="text-end"> ₹<%= order[i].products?.quantity * order[i]?.productInfo[0]?.salePrice %> </td>
+                                                <td class="text-end"> ₹<%= order[i].products?.quantity * order[i]?.products?.salePrice %> </td>
                                             </tr>
                                             <% }  %>
                                             <tr>
@@ -558,25 +566,30 @@
                                                     <article class="float-end">
                                                         <dl class="dlist">
                                                             <dt>Subtotal:</dt>
-                                                            <dd>₹<%= order[0]?.totalAmount %></dd>
+                                                            <dd>₹ <%= order[0]?.totalAmount %></dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt>Shipping cost:</dt>
-                                                            <dd>₹<%= order[0]?.shippingCost || '0' %></dd>
+                                                            <dd>₹ <%= order[0]?.shippingCost || '0' %></dd>
+                                                        </dl>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Discount:</dt>
+                                                            <dd>- ₹ <%= order[0]?.discount || '0' %></dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt>Grand total:</dt>
-                                                            <dd> <b class="h5">₹<%= order[0]?.totalAmount %></b> </dd>
+                                                            <dd> <b class="h5">₹ <%= order[0]?.finalAmount %></b> </dd>
                                                         </dl>
                                                         <dl class="dlist">
                                                             <dt class="text-muted">Payment status:</dt>
                                                             <dd>
                                                                 <% if(typeof order[0]?.paymentStatus === 'string') { %>
                                                                     <span 
-                                                                    <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
-                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
-                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
-                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                                                    <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill bg-success"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "not paid") { %> class="badge badge-pill bg-danger"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill bg-warning" <% } %> 
                                                                     ><%= order[0]?.paymentStatus %></span>   
                                                                 <% } %>
                                                             </dd>
@@ -587,7 +600,7 @@
                                         </tbody>
                                     </table>
                                 </div> <!-- table-responsive// -->
-                                <a class="btn btn-primary" href="#">View Order Tracking</a>
+                                <!-- <a class="btn btn-primary" href="#">View Order Tracking</a> -->
                             </div> <!-- col// -->
                             <div class="col-lg-1"></div>
                             <div class="col-lg-4">
@@ -599,6 +612,16 @@
                                         Phone: +1 (800) 555-154-52 -->
                                         <%= order[0]?.paymentMethod %><br>
                                     </p>
+                                    <% if(locals.order[0]?.paymentDetails?.razorpay_payment_id) { %>
+                                        <p>Refecrence ID: <%= order[0]?.paymentDetails?.razorpay_payment_id %></p>
+                                    <% } %>
+                                    <% if(locals.order[0]?.paymentDetails?.walletBalance) { %>
+                                        <p> Wallet balance: <%= order[0]?.paymentDetails?.walletBalance %></p>
+                                    <% } %>
+                                    <% if(locals.order[0]?.coupon) { %>
+                                        <p> Coupon Used: <%= order[0]?.coupon?.couponText %></p>
+                                        <p> Coupon Amount: <%= order[0]?.coupon?.amount %></p>
+                                    <% } %>
                                 </div>
                                 <div class="h-25 pt-4">
                                     <div class="mb-3">

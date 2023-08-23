@@ -3,6 +3,8 @@ const Orderdb = require('../model/orderModel');
 const Productdb = require('../model/productModel');
 const mongoose = require('mongoose');
 const paymentHelper = require('../helper/razorpay'); 
+const userController = require('./userController');
+const Userdb = require('../model/userModel');
 
 exports.placeOrder = async (req, res, next) => {
     try{
@@ -10,46 +12,94 @@ exports.placeOrder = async (req, res, next) => {
         if(req.body.addressId && req.body.paymentMethod){
             const addressId = req.body.addressId;
             const userId = req.session.user._id;
-            const products = res.locals.userCart.products;
+            const cartProducts = res.locals.userCart.products;
+            console.log("CART PRODUCTS LIST : " + cartProducts);
+            console.log(JSON.stringify(cartProducts));
+
             const address = res.locals.addresses.filter(item => {
                 return item._id.equals(addressId);
             });
             const orderId = String((new Date()).getTime()).slice(-6);
 
-            // const products = await Cartdb.aggregate([
-            //     {$match: {customerId: new mongoose.Types.ObjectId(userId)}},
-            //     {$unwind: '$products'},
-            //     {$lookup: {
-            //         from: 'products',
-            //         localField: 'products.productId',
-            //         foreignField: '_id',
-            //         as: 'productInfo'}
-            //     }   
-            // ]);
+            const products = await Cartdb.aggregate([
+                {$match: {customerId: new mongoose.Types.ObjectId(userId)}},
+                {$unwind: '$products'},
+                {$lookup: {
+                    from: 'products',
+                    localField: 'products.productId',
+                    foreignField: '_id',
+                    as: 'productInfo'}
+                },
+                {$project: {
+                    productInfo : 1, 
+                    quantity:'$products.quantity', 
+                    _id:0, 
+                    salePrice:'$productInfo.salePrice',
+                    productName:'$productInfo.productName',
+                    category:'$productInfo.category',
+                    productImage:'$productInfo.images[0]'}
+                }
+            ]);
+
+            if(products.length === 0){
+                console.log(" No items in cart!!");
+            } else{
+                products.forEach(product => {
+                    const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product?.category[0]) );
+                    console.log(JSON.stringify(prodCategoryName));
+                    product.category[0] = prodCategoryName[0]?.categoryName;
+                });  
+            }
+
             console.log("CART products ::::::");
             console.log(JSON.stringify(products));
-            const totalItems = products.reduce((tot, product)=>{
+            const totalItems = cartProducts.reduce((tot, product)=>{
                 return product.quantity + tot;
             },0)
-            // products.forEach((product)=>{
 
-            // })
-            // const product = await Productdb.findOne({_id: req.body.prodId}).lean();
-            // if(product !== null){
-            //     if(item.quantity > product.stock){
-            //         return res.json({status: true, msg:"Unable to add product quantity! Quantity exceeds available stock."});
-            //     }
-            // }
+            const updateOperations = []
+			let isAvailable = true;
+            let i = 0;
+			for(const item of products) {
+				if (item.quantity > item.productInfo[0].stock) {
+					isAvailable = false;
+                    console.log("1");
+					break;
+				}
+                console.log("2");
+				updateOperations.push({
+					updateOne: {
+						filter: { _id: item.productInfo[0]._id.toString() },
+						update: { $inc: { stock: -item.quantity } },
+					},
+				});
+                cartProducts[i].productName = item.productName[0];
+                cartProducts[i].category = item.category[0];
+                cartProducts[i].salePrice = item.salePrice[0];
+                cartProducts[i].productImage = item.productImage[0];
+                i++;
+			}
+
+            if (!isAvailable) return res.status(400).json({ status: false, errMsg: 'Some items are out of stock' })
+
+            console.log("CART PRODUCTS LIST : " + cartProducts);
+            console.log(JSON.stringify(cartProducts));
+
+            const result = await Productdb.bulkWrite(updateOperations);
+			if (result.modifiedCount !== products.length) {
+				return res.status(500).json({ status: false, errMsg: 'Something went wrong, Pls try again later' })
+			}
     
             console.log("Total Items in order : " + totalItems);
             const newOrder = new Orderdb({
                 orderId: orderId,
                 customerId: userId,
                 paymentMethod: req.body.paymentMethod,
-                products: products,
+                products: cartProducts,
                 shippingAddress: address[0],
                 totalAmount : req.body.totalAmount,
                 totalItems : totalItems,
+                finalAmount: req.body.totalAmount
             })
             console.log("New ORDER : " + newOrder);
 
@@ -71,53 +121,49 @@ exports.placeOrder = async (req, res, next) => {
             //     console.log(err);
             // });
             //////////////////////////////
-            // exports.updateDisplayOrder = async keyValPairArr => {
-            //     try {
-            //         let data = await ContestModel.collection.update(
-            //             { _id: { $in: keyValPairArr.map(o => o.id) } },
-            //             [{
-            //                 $set: {
-            //                     displayOrder: {
-            //                         $let: {
-            //                             vars: { obj: { $arrayElemAt: [{ $filter: { input: keyValPairArr, as: "kvpa", cond: { $eq: ["$$kvpa.id", "$_id"] } } }, 0] } },
-            //                             in:"$$obj.displayOrder"                                    
-            //                         }
-            //                     }
-            //                 }
-            //             }],
-            //             { runValidators: true, multi: true }
-            //             )            
-            //         return data;
-            //     } catch (error) {
-            //         throw error;
-            //     }
-            // }
-            //////////////////////////////
             
             newOrder.save()
                 .then(async (savedOrder) => {
-                    await Cartdb.findOneAndDelete({customerId: req.session.user._id})
-                    .then(async ()=>{
-                        console.log("Cleared user cart after order is placed!");
-                        console.log(savedOrder._id);
-                        console.log(savedOrder);
-                        if(savedOrder.paymentMethod === 'COD'){
-                            console.log("COD: "+savedOrder.paymentMethod);
-                            res.json({payment:true});                            
-                        } else if(savedOrder.paymentMethod === 'RAZORPAY'){
-                            console.log("RAZORPAY: "+savedOrder.paymentMethod);
-                            const generatedOrder = await paymentHelper.generateRazorpay(savedOrder._id, savedOrder.totalAmount)
-                            console.log("GENERATED ORDER : "+generatedOrder);
-                            res.json(generatedOrder);                            
+                    console.log(savedOrder._id);
+                    console.log(savedOrder);
+                    if(Number(savedOrder.finalAmount) < 1)  
+                        return res.json({status: false, errMsg:'Minimum amount should be ₹1'});
+                    if(savedOrder.paymentMethod === 'COD'){
+                        console.log("COD: "+savedOrder.paymentMethod);
+                        await Cartdb.findOneAndDelete({customerId: req.session.user._id})
+                            .then(async ()=>{
+                                res.json({payment:true});  
+                                console.log("Cleared user cart after order is placed!");
+                            })
+                            .catch(err => {
+                                res.status(500).render('error', {
+                                    message: "Unable to clear user cart after order is placed!",
+                                    errStatus : 500
+                                });
+                                console.log(err);
+                            });                                             
+                    } else if(savedOrder.paymentMethod === 'RAZORPAY'){
+                        const generatedOrder = await paymentHelper.generateOrderRazorpay(savedOrder._id, savedOrder.totalAmount);
+                        res.json({payment:false, method:"razorpay", razorpayOrder: generatedOrder, order: savedOrder});                       
+                    } else if(savedOrder.paymentMethod === 'WALLET'){
+                        console.log("WALLET: "+savedOrder.paymentMethod);
+                        const walletBalance = await userController.getUserWalletBalance(req.session.user._id);
+                        if(walletBalance < savedOrder.finalAmount){
+                            console.log("Wallet is short of money!");
+                            res.json({payment:false, method:"wallet", errMsg:"Insufficent balance in wallet to process the order!"});
+                        } else{
+                            console.log("WALLET: " + savedOrder.paymentMethod);
+                            await userController.addWalletTransaction(req.session.user._id, savedOrder.finalAmount*100, "D", "Debited for order")
+                            const paymentDetails = {
+                                walletBalance : await userController.getUserWalletBalance(req.session.user._id),
+                            }
+                            exports.changePaymentStatus(savedOrder._id, paymentDetails, "PAID")
+                                .then(async ()=>{
+                                    res.json({status:true, method:"wallet"});
+                                    await Cartdb.findOneAndDelete({customerId: req.session.user._id});
+                                });
                         }
-                    })
-                    .catch(err => {
-                        res.status(500).render('error', {
-                            message: "Unable to clear user cart after order is placed!",
-                            errStatus : 500
-                        });
-                        console.log(err);
-                    });
+                    }              
                 })
                 .catch(err => {
                     res.status(500).render('error', {
@@ -140,11 +186,12 @@ exports.placeOrder = async (req, res, next) => {
         });
         console.log(err);
     }
-}
-exports.changePaymentStatus = (orderId) => {
+};
+exports.changePaymentStatus = (orderId, payment, status) => {
     const editOrder = {
         _id: orderId,
-        paymentStatus: "PAID"
+        paymentStatus: status,
+        paymentDetails: payment
     }
     return new Promise((resolve, reject) => {
         Orderdb.findByIdAndUpdate(orderId, editOrder)
@@ -157,19 +204,24 @@ exports.changePaymentStatus = (orderId) => {
     })
 };
 exports.verifyRazorpayPayment = (req, res)=>{
-    console.log(req.body);
-    paymentHelper.verifyPayment(req.body).then(()=>{
-        console.log("ORDER: ID :" + req.body.order.receipt);
-        console.log("Payment SUCCESSFUL");
-        orderController.changePaymentStatus(req.body.order.receipt).then(()=>{
-            console.log("STATUS PAID");
-            res.json({status:true});
+    try{
+        paymentHelper.verifyOrderPayment(req.body)
+        .then(async ()=>{
+            console.log("Payment SUCCESSFUL");
+            exports.changePaymentStatus(req.body.order._id, req.body.payment, "PAID")
+            .then(()=>{
+                res.json({status:true});
+            });
+            await Cartdb.findOneAndDelete({customerId: req.session.user._id});
+        }).catch((err)=>{
+            console.log(err);
+            res.json({status: false, errMsg:'Payment failed!'});
         });
-    }).catch((err)=>{
+    } catch(err){
         console.log(err);
         res.json({status: false, errMsg:'Payment failed!'});
-    });
-}
+    }
+};
 
 exports.getAllUsersOrders = async (req, res, next) => {
     try{
@@ -234,11 +286,11 @@ exports.getSingleOrderDetails = async (req, res, next) => {
         ]);
         console.log("CART ::::::");
         console.log(JSON.stringify(order));
-        delete order.customerInfo.password;
         if(order.length === 0){
             console.log(" No items in cart!!");
         } else{
             order.forEach(product => {
+                delete product.customerInfo[0].password;
                 const prodCategoryName = res.locals.categories.filter(cat => cat._id.equals(product.productInfo.category));
                 product.productInfo.category = prodCategoryName[0]?.categoryName;
             });  
@@ -361,9 +413,177 @@ exports.getOrderDetails = async (req, res, next) => {
 
 exports.cancelOrder = async (req, res, next) => {
     try{
+        const orderId = req.params.id;
+        if(!orderId){
+            return res.status(500).render('error', {
+                message: "Error while updating order status!",
+                errStatus : 500
+            });
+        }
+        await Orderdb.findById(orderId)
+            .then( async (order)=>{
+                if(order !== null){
+                    //re-stock ordered products
+                    const updateOperations = [];
+                    let i = 0;
+                    for(const item of order.products) {
+				        updateOperations.push({
+				    	    updateOne: {
+				    		    filter: { _id: item.productId.toString() },
+				    		    update: { $inc: { stock: item.quantity } },
+				    	    },
+				        });
+                        i++;
+			        }
+                    const result = await Productdb.bulkWrite(updateOperations);
+                    if (result.modifiedCount !== order.products.length) {
+                        return res.status(500).render('error', {
+                            message: "Unable to return the order",
+                            errStatus : 500
+                        });
+                    }
+                    //refund payment
+                    const editOrder = {
+                        _id: orderId,
+                        orderStatus: "CANCELLED"
+                    };
+                    if(order.paymentStatus === "PAID"){
+                        const amount = order.finalAmount*100;
+                        const remarks = "Refund of order"
+                        await userController.addWalletTransaction(req.session.user._id, amount, "C", remarks)
+                            .then((data)=>{
+                                console.log(`Refund of amount "₹${data.amount}" is successful!`);
+                                // res.json({status:true, data: data});
+                                editOrder.paymentStatus = "REFUNDED";
+                            })
+                            .catch((err)=>{
+                                console.log(`Refund of amount failed!`);
+                                console.log(err);
+                                // res.json({status: false, errMsg:'Payment failed!'});
+                            });
+                    } else{
+                        editOrder.paymentStatus = "NOT PAID";
+                    }                    
+                    await Orderdb.findByIdAndUpdate(orderId, editOrder)
+                            .then(data => {
+                                if (!data) {
+                                    res.status(500).render('error', {
+                                        message: "Unable to cancel the order",
+                                        errStatus : 500
+                                    });
+                                }
+                                else {
+                                    //res.send(data);   
+                                    console.log("Order cancelled successfully!");
+                                    res.redirect('back');
+                                }
+                            })
+                            .catch(err => {
+                                res.status(500).render('error', {
+                                    message: "Error cancelling the order",
+                                    errStatus : 500
+                                });
+                                console.log(err.message);
+                            });                  
+                }
+            }).catch(err =>{
+                    console.log(err);
+            });
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Error while updating order status!",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+};
 
-    }catch(err){
+exports.returnOrder = async (req, res, next) => {
+    try{
+        const orderId = req.params.id;
+        if(!orderId){
+            return res.status(500).render('error', {
+                message: "Error while updating order status!",
+                errStatus : 500
+            });
+        }
+        await Orderdb.findById(orderId)
+            .then( async (order)=>{
+                if(order !== null){
 
+                    //re-stock ordered products
+                    const updateOperations = [];
+                    let i = 0;
+                    for(const item of order.products) {
+				        updateOperations.push({
+				    	    updateOne: {
+				    		    filter: { _id: item.productId.toString() },
+				    		    update: { $inc: { stock: item.quantity } },
+				    	    },
+				        });
+                        i++;
+			        }
+                    const result = await Productdb.bulkWrite(updateOperations);
+                    if (result.modifiedCount !== order.products.length) {
+                        return res.status(500).render('error', {
+                            message: "Unable to return the order",
+                            errStatus : 500
+                        });
+                    } else{ console.log("Re-stocked all the ordered products!");}
+
+                    //refund payment                    
+                    const editOrder = {
+                        _id: orderId,
+                        orderStatus: "RETURNED"
+                    };
+                    if(order.paymentStatus === "PAID"){
+                        const amount = order.finalAmount*100;
+                        const remarks = "Refund of order"
+                        await userController.addWalletTransaction(req.session.user._id, amount, "C", remarks)
+                            .then((data)=>{
+                                console.log(`Refund of amount "₹${data.amount}" is successful!`);
+                                // res.json({status:true, data: data});
+                                editOrder.paymentStatus = "REFUNDED";
+                            })
+                            .catch((err)=>{
+                                console.log(`Refund of amount failed!`);
+                                console.log(err);
+                                // res.json({status: false, errMsg:'Payment failed!'});
+                            });
+                    } else{
+                        editOrder.paymentStatus = "NOT PAID";
+                    }                    
+                    await Orderdb.findByIdAndUpdate(orderId, editOrder)
+                            .then(data => {
+                                if (!data) {
+                                    res.status(500).render('error', {
+                                        message: "Unable to cancel the order",
+                                        errStatus : 500
+                                    });
+                                }
+                                else {
+                                    //res.send(data);   
+                                    console.log("Order cancelled successfully!");
+                                    res.redirect('back');
+                                }
+                            })
+                            .catch(err => {
+                                res.status(500).render('error', {
+                                    message: "Error cancelling the order",
+                                    errStatus : 500
+                                });
+                                console.log(err.message);
+                            });                  
+                }
+            }).catch(err =>{
+                    console.log(err);
+            });
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Error while updating order status!",
+            errStatus : 500
+        });
+        console.log(err);
     }
 };
 

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config({path:'.env'});
 const client = require('twilio')(process.env.TWILIO_ACCOUNTSID, process.env.TWILIO_AUTHTOKEN);
+const paymentHelper = require('../helper/razorpay'); 
 
 async function setSession(req, res, userData){
     try{         
@@ -469,7 +470,6 @@ exports.editAddress = async (req, res) => {
                     if(user.address[i]._id.equals(new mongoose.Types.ObjectId(req.body.id)) ){
                         user.address.splice(i, 1);
                         user.address.push(editAddress);
-                        //address = editAddress;
                         break;
                     }
                 }          
@@ -550,3 +550,134 @@ exports.deleteAddress = async (req, res, next) => {
         console.log(err);
     }
 };
+
+//Wallet
+
+exports.getUserWalletDetails = async (req, res, next) => {
+    try{
+        const id = req.session.user._id;
+        await Userdb.findById(id)
+            .then((user) => {
+                console.log(user);
+                if (user !== null && user.wallet !== undefined){
+                    res.locals.walletDetails = user.wallet;
+                    console.log("User Wallet: " + JSON.stringify(res.locals.walletDetails));
+                }
+                else{                    
+                    console.log("Unable to find user to get user wallet details from database");
+                }
+                next();
+            })
+            .catch(err => {
+                res.status(500).render('error', {
+                    message: "Unable to retrieve data from database",
+                    errStatus : 500
+                });
+                console.log("Unable to get user wallet details from database");
+            })
+    } catch{
+        next();
+    }
+};
+
+exports.getUserWalletBalance = (userId) => {
+    try{
+        return new Promise((resolve, reject) => {
+            Userdb.findOne({_id: new mongoose.Types.ObjectId(userId)}, {_id:0, wallet:1})
+            .then((userWallet) => {
+                if(userWallet.wallet !== undefined){
+                    if(userWallet.wallet.length !== 0){
+                        let balance = 0;
+                        userWallet.wallet.forEach((wallet)=>{
+                            if(wallet.transaction === "C"){
+                                balance += wallet.amount;
+                            } else {
+                                balance -= wallet.amount;
+                            }
+                        })
+                        resolve(balance);
+                    } else{
+                        resolve(0);
+                    }
+                } else{
+                    resolve(0);
+                }
+            }).catch((err) => {reject("Error finding wallet balance in Database. " + err)});            
+        })
+    } catch(err){
+        console.log("Error finding wallet balance in Database. " + err);
+    }
+};
+
+exports.getWalletBalance = async (req, res, next) => {
+    try{
+        const walletBalance =  await exports.getUserWalletBalance(req.session.user._id) ?? 0;
+        res.locals.walletBalance = walletBalance;
+        next();       
+    } catch(err){
+        console.log("Error finding wallet balance in Database. " + err);
+    }
+};
+
+exports.addWalletTransaction = async (userId, amount, transactionType, remarks) => {
+    try{
+        const newTransaction = {
+            amount: Number(amount)/100,
+            transaction: transactionType,
+            remarks: remarks,
+            timestamp: new Date()
+        };
+        return new Promise(async(resolve, reject) => {
+            await Userdb.findByIdAndUpdate(userId, { $push: { wallet: newTransaction } })
+                .then((user) => {console.log(JSON.stringify(newTransaction));resolve(newTransaction);})
+                .catch((err)=>{console.log("rejected!!!!");reject(err);});
+            })
+    } catch(err){
+        console.log("Error updating user wallet in Database. " + err);
+    }
+};
+
+exports.addToWalletGetRazorpay = async (req, res) => {
+    console.log(req.body);
+    const amount = Number(req.body.amount);
+    console.log(amount);
+    if(amount < 1)
+        return res.json({status: false, errMsg:'Minimum amount should be ₹1'});
+    const generatedWallet = await paymentHelper.generateWalletRazorpay(amount);
+    console.log(generatedWallet);
+    console.log(generatedWallet.amount);
+    res.json({
+        status: true, 
+        razorpayOrder: generatedWallet, 
+        user:{
+            name: req.session.user.firstName, 
+            email: req.session.user.email, 
+            phone: req.session.user.phone}});
+};
+
+exports.verifyWalletRazorpayPayment = (req, res)=>{
+    try{
+        console.log("VERIFY PAYMENT: " + req.body);
+        paymentHelper.verifyWalletPayment(req.body)
+        .then(async ()=>{
+            console.log("Payment SUCCESSFUL");
+            const remarks = "Credited by you";
+            console.log(remarks);
+            const amount = req.body.amount;
+            exports.addWalletTransaction(req.session.user._id, amount, "C", remarks)
+            .then((data)=>{
+                res.json({status:true, data: data});
+            })
+            .catch((err)=>{
+                console.log(err);
+                res.json({status: false, errMsg:'Payment failed!'});
+            });
+        }).catch((err)=>{
+            console.log(err);
+            res.json({status: false, errMsg:'Payment failed!'});
+        });
+    } catch(err){
+        console.log(err);
+        res.json({status: false, errMsg:'Payment failed!'});
+    }
+}

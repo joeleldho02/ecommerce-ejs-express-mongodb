@@ -137,7 +137,7 @@
                     <form name="modalForm" id="modalForm" method="post" action="/admin/edit-category">
                         <div class="modal-body">
                             <div class="form-group">
-                                <input type="hidden" class="form-control edit-id" name="id"  <% if(locals.inputData) {%>  value = "<%= inputData.id %>"  <% } %> >
+                                <input type="hidden" class="form-control edit-id" name="id" <% if(locals.inputData) {%>  value = "<%= inputData.id %>"  <% } %> >
                             </div>
                             <div class="form-group w-100">
                                 <label for="categoryName">Category Name</label>
@@ -328,13 +328,12 @@
 
         $('#myModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget); // Button that triggered the modal
-
             let btnAction = button.data('btnaction');
             let title = button.data('modaltitle');
             let recipient = button.data('categoryname') || "";             
             let modal = $(this);
             modal.find('.modal-title').text(title + " " + recipient);
-
+            
             if( btnAction === "add" ) {  
                 $('#modalForm').attr('action', '/admin/add-category');
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
@@ -344,11 +343,8 @@
                 $('#modalForm').attr('action', '/admin/edit-category');
                 $('#modal-save-btn').text('Save changes');
             }
+            $('#categoryName').trigger('focus');
         });
-
-        $('#myModal').on('shown.bs.modal', function () {
-            $('#categoryName').trigger('focus')
-        })
     </script>
 </body>
 

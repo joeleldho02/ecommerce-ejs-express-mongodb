@@ -1,3 +1,4 @@
+const userController = require('../controller/userController');
 
 //------- HOME PAGE --------//
 exports.homePage = (req, res) => {
@@ -49,7 +50,8 @@ exports.getUserCheckoutPage = (req, res) => {
             cartItems : res.locals.cartItems,
             subTotal : res.locals.subTotal,
             itemsCount : res.locals.itemsCount,
-            addresses: res.locals.addresses
+            addresses: res.locals.addresses,
+            walletBalance: res.locals.walletBalance
         });
     }    
 };
@@ -143,7 +145,7 @@ exports.getAdminCategoryPage = (req, res) => {
 };
 
 //------- USER SIDE --------//
-exports.userDashboardPage = (req, res) => {
+exports.userDashboardPage =async (req, res) => {
     if(req.session.userLoggedIn === true)
         res.render('user-dashboard',{
             navTitle: 'Welcome ' + req.session.user.firstName,
@@ -153,7 +155,9 @@ exports.userDashboardPage = (req, res) => {
             subTotal : res.locals.subTotal,
             itemsCount : res.locals.itemsCount,
             addresses : res.locals.addresses,
-            orders: res.locals.orders
+            orders: res.locals.orders,
+            walletDetails: res.locals.walletDetails,
+            walletBalance: res.locals.walletBalance,
         });
     else if(req.session.adminLoggedIn === true)
         res.redirect('/admin');

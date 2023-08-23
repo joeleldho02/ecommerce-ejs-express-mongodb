@@ -5,16 +5,22 @@ const orderSchema = new mongoose.Schema({
     orderId: String,
     customerId: mongoose.Schema.Types.ObjectId,
     products: [{
-        productId: mongoose.Schema.Types.ObjectId,
+        productId: {
+            type : mongoose.Schema.Types.ObjectId
+        },
         productName: String,
         category: String,
         quantity: Number,
-        salePrice: Number
+        salePrice: Number,
+        productImage: String
     }],
     paymentMethod : String,
     paymentStatus: {
         type : String,
         default: "PENDING"
+    },
+    paymentDetails:{
+        type: Object
     },
     shippingMethod: {
         type : String,
@@ -26,7 +32,18 @@ const orderSchema = new mongoose.Schema({
     },
     totalItems : Number,
     totalAmount : Number,
-    discount: Number,
+    finalAmount: {
+		type: Number,
+		default: 0,
+	},
+    coupon:{
+        couponText: String,
+        amount: Number
+    },
+    discount: {
+		type: Number,
+		default: 0,
+	},
     shippingAddress : {},
     orderStatus: {
         type : String,
@@ -41,6 +58,7 @@ const orderSchema = new mongoose.Schema({
         default: () => Date.now()
     }
 });
+
 const Orderdb = mongoose.model('order', orderSchema);
 
 module.exports = Orderdb;
