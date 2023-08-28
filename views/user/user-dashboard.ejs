@@ -12,7 +12,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -49,9 +49,9 @@
                                 <li>
                                     <a class="language-dropdown-active" href="#"> <i class="fi-rs-world"></i> English <i class="fi-rs-angle-small-down"></i></a>
                                     <ul class="language-dropdown">
-                                        <li><a href="#"><img src="assets/imgs/theme/flag-fr.png" alt="">Français</a></li>
-                                        <li><a href="#"><img src="assets/imgs/theme/flag-dt.png" alt="">Deutsch</a></li>
-                                        <li><a href="#"><img src="assets/imgs/theme/flag-ru.png" alt="">Pусский</a></li>
+                                        <li><a href="#"><img src="/assets/imgs/theme/flag-fr.png" alt="">Français</a></li>
+                                        <li><a href="#"><img src="/assets/imgs/theme/flag-dt.png" alt="">Deutsch</a></li>
+                                        <li><a href="#"><img src="/assets/imgs/theme/flag-ru.png" alt="">Pусский</a></li>
                                     </ul>
                                 </li>
                                 <li><i class="fi-rs-user"></i><a href="/">Logout</a></li>
@@ -65,7 +65,7 @@
             <div class="container">
                 <div class="header-wrap header-space-between position-relative">
                     <div class="logo logo-width-1">
-                        <a href="/"><img src="assets/imgs/theme/logo.svg" alt="logo"></a>
+                        <a href="/"><img src="/assets/imgs/theme/logo.svg" alt="logo"></a>
                     </div>
                     <div class="main-menu main-menu-grow main-menu-padding-1 main-menu-lh-1 main-menu-mrg-1 hm3-menu-padding d-none d-lg-block hover-boder">
                         <nav>
@@ -135,7 +135,7 @@
                                         </li>
                                         <li class="sub-mega-menu sub-mega-menu-width-34">
                                             <div class="menu-banner-wrap">
-                                                <a href="shop-product-right.html"><img src="assets/imgs/banner/menu-banner.jpg" alt="Evara"></a>
+                                                <a href="shop-product-right.html"><img src="/assets/imgs/banner/menu-banner.jpg" alt="Evara"></a>
                                                 <div class="menu-banner-content">
                                                     <h4>Hot deals</h4>
                                                     <h3>Don't miss<br> Trending</h3>
@@ -207,13 +207,13 @@
                         <div class="header-action-2">
                             <div class="header-action-icon-2">
                                 <a href="/wishlist">
-                                    <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
+                                    <img class="svgInject" alt="Evara" src="/assets/imgs/theme/icons/icon-heart.svg">
                                     <span class="pro-count blue">4</span>
                                 </a>
                             </div>
                             <div class="header-action-icon-2">
                                 <a class="mini-cart-icon" href="/cart">
-                                    <img alt="Logo" src="assets/imgs/theme/icons/icon-cart.svg">
+                                    <img alt="Logo" src="/assets/imgs/theme/icons/icon-cart.svg">
                                     <span class="pro-count blue"><% if(locals.itemsCount) { %> <%= itemsCount %> <% } else { %> 0<% }%></span>
                                 </a>
                                 <% if(locals.cartItems) { %>
@@ -265,7 +265,7 @@
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
                 <div class="mobile-header-logo">
-                    <a href="/"><img src="assets/imgs/theme/logo.svg" alt="logo"></a>
+                    <a href="/"><img src="/assets/imgs/theme/logo.svg" alt="logo"></a>
                 </div>
                 <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
                     <button class="close-style search-close">
@@ -412,11 +412,11 @@
                 </div>
                 <div class="mobile-social-icon">
                     <h5 class="mb-15 text-grey-4">Follow Us</h5>
-                    <a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
-                    <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
-                    <a href="#"><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
-                    <a href="#"><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
-                    <a href="#"><img src="assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+                    <a href="#"><img src="/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                    <a href="#"><img src="/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                    <a href="#"><img src="/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                    <a href="#"><img src="/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                    <a href="#"><img src="/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
                 </div>
             </div>
         </div>
@@ -437,7 +437,7 @@
                     <div class="col-lg-10 m-auto">
                         <div class="row">
                             <div class="col-md-3">
-                                <div class="dashboard-menu">
+                                <div class="dashboard-menu" data-opentab="<%if(locals.openTab) { %><%= openTab %><% } else { %>dashboard<% } %>">
                                     <ul class="nav flex-column" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
@@ -520,61 +520,70 @@
                                         </div>
                                     </div>  
                                     <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
-                                        <div class="row mb-5">
-                                            <div class="float-end">
-                                                <a href="/user/add-new-address" class="btn btn-primary add_address_button p-2" data-bs-toggle="modal" data-bs-target="#addAddress"
-                                                    data-modaltitle="Add new address" data-btnaction="add">
-                                                    <i class="material-icons md-plus"></i> Add new address
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <% if (locals.addresses) { %>                                    
-                                                <% for (let i = 0; i < addresses.length; i++) { %>
-                                            <div class="col-lg-6">
-                                                <div class="card mb-3 mb-lg-0">
-                                                    <div class="card-header">
-                                                        <h5 class="mb-0">Address <%= i+1 %> 
-                                                            <% if(addresses[i]?.isDefault) { %> <span class=" float-end text-success">Default</span> <% } %>
-                                                        </h5>                                                        
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="row d-flex">
+                                                    <div class="col-6">
+                                                        <h5 class="mb-0">Manage Addresses</h5>
                                                     </div>
-                                                    <div class="card-body">
-                                                        <p><strong><%= addresses[i]?.customerName %></strong></p>
-                                                        <address><%= addresses[i]?.addressLine1 %><br><%= addresses[i]?.addressLine2 %>,<br><%= addresses[i]?.city %>, <%= addresses[i]?.state %><br><%= addresses[i]?.pincode %></address>
-                                                        <p>Email: <%= addresses[i]?.email %></p>
-                                                        <address>Phone: <%= addresses[i]?.phone %></address>                                                        
-                                                        <a class="btn-small edit_address_button" id="edit-address-button"
-                                                            data-bs-toggle="modal" data-bs-target="#addAddress" 
-                                                            data-btnaction="edit"
-                                                            data-modaltitle="Edit address"
-                                                            data-id="<%= addresses[i]?._id %>"
-                                                            data-customername="<%= addresses[i]?.customerName %>"
-                                                            data-addressline1="<%= addresses[i]?.addressLine1 %>"
-                                                            data-addressline2="<%= addresses[i]?.addressLine2 %>"
-                                                            data-city="<%= addresses[i]?.city %>"
-                                                            data-state="<%= addresses[i]?.state %>"
-                                                            data-country="<%= addresses[i]?.country %>"
-                                                            data-pincode="<%= addresses[i]?.pincode %>"
-                                                            data-email="<%= addresses[i]?.email %>"
-                                                            data-phone="<%= addresses[i]?.phone %>"
-                                                            data-notes="<%= addresses[i]?.notes %>"
-                                                            data-isdefault="<%= addresses[i]?.isDefault %>"
-                                                            > 
-                                                            <span title="Edit Address <%= i+1 %>">
-                                                                Edit
-                                                            </span>
-                                                        </a>
-                                                        <form id="hidden-form-<%= i %>" action="/user/delete-address" method="POST" style="display: none;">
-                                                            <input type="hidden" name="addressId" value="<%= addresses[i]?._id %>" />
-                                                        </form>
-                                                        <a  onclick="confirmDeleteAddress('hidden-form-<%= i %>', 'Address <%= i+1 %>')" class="btn-small ms-5">
-                                                            <span title="Delete Address <%= i+1 %>">Delete</span>
+                                                    <div class="col-6">
+                                                        <a href="/user/add-new-address" class="btn btn-primary add_address_button p-2 float-end" data-bs-toggle="modal" data-bs-target="#addAddress"
+                                                            data-modaltitle="Add new address" data-btnaction="add">
+                                                            <i class="material-icons md-plus"></i> Add new address
                                                         </a>
                                                     </div>
                                                 </div>
                                             </div>
-                                                <% } %>
-                                            <% }  %>                                            
+                                            <div class="card-body">                                                
+                                                <div class="row">
+                                                    <% if (locals.addresses) { %>                                    
+                                                        <% for (let i = 0; i < addresses.length; i++) { %>
+                                                    <div class="col-lg-6">
+                                                        <div class="card mb-3 mb-lg-0">
+                                                            <div class="card-header">
+                                                                <h5 class="mb-0">Address <%= i+1 %> 
+                                                                    <% if(addresses[i]?.isDefault) { %> <span class=" float-end text-success">Default</span> <% } %>
+                                                                </h5>                                                        
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p><strong><%= addresses[i]?.customerName %></strong></p>
+                                                                <address><%= addresses[i]?.addressLine1 %><br><%= addresses[i]?.addressLine2 %>,<br><%= addresses[i]?.city %>, <%= addresses[i]?.state %><br><%= addresses[i]?.pincode %></address>
+                                                                <p>Email: <%= addresses[i]?.email %></p>
+                                                                <address>Phone: <%= addresses[i]?.phone %></address>                                                        
+                                                                <a class="btn-small edit_address_button" id="edit-address-button"
+                                                                    data-bs-toggle="modal" data-bs-target="#addAddress" 
+                                                                    data-btnaction="edit"
+                                                                    data-modaltitle="Edit address"
+                                                                    data-id="<%= addresses[i]?._id %>"
+                                                                    data-customername="<%= addresses[i]?.customerName %>"
+                                                                    data-addressline1="<%= addresses[i]?.addressLine1 %>"
+                                                                    data-addressline2="<%= addresses[i]?.addressLine2 %>"
+                                                                    data-city="<%= addresses[i]?.city %>"
+                                                                    data-state="<%= addresses[i]?.state %>"
+                                                                    data-country="<%= addresses[i]?.country %>"
+                                                                    data-pincode="<%= addresses[i]?.pincode %>"
+                                                                    data-email="<%= addresses[i]?.email %>"
+                                                                    data-phone="<%= addresses[i]?.phone %>"
+                                                                    data-notes="<%= addresses[i]?.notes %>"
+                                                                    data-isdefault="<%= addresses[i]?.isDefault %>"
+                                                                    > 
+                                                                    <span title="Edit Address <%= i+1 %>">
+                                                                        Edit
+                                                                    </span>
+                                                                </a>
+                                                                <form id="hidden-form-<%= i %>" action="/user/delete-address" method="POST" style="display: none;">
+                                                                    <input type="hidden" name="addressId" value="<%= addresses[i]?._id %>" />
+                                                                </form>
+                                                                <a  onclick="confirmDeleteAddress('hidden-form-<%= i %>', 'Address <%= i+1 %>')" class="btn-small ms-5">
+                                                                    <span title="Delete Address <%= i+1 %>">Delete</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                        <% } %>
+                                                    <% }  %>                                            
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
@@ -599,7 +608,7 @@
                                                             <% } %>
                                                         <% } %>
                                                         <div class="col">
-                                                            <a class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#addToWalletModal">
+                                                            <a id="add-to-wallet-btn" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#addToWalletModal">
                                                                 <i class="material-icons md-plus"></i> Add money to wallet
                                                             </a>
                                                         </div>
@@ -1043,7 +1052,7 @@
                     <div class="modal-body">
                         <div class="form-group w-100">
                             <label for="categoryName">Enter Amount</label>
-                            <input class="form-control" id="inputAmount" name="amount" placeholder="Min.₹1  Max.₹99999" value="5000"/>
+                            <input class="form-control" id="inputAmount" name="amount" placeholder="Min.₹1  Max.₹99999" value=""/>
                             <div class="error text-danger ms-2"></div>
                         </div> 
                     </div>
@@ -1063,7 +1072,7 @@
                     <div class="col-lg-7 mb-md-3 mb-lg-0">
                         <div class="row align-items-center">
                             <div class="col flex-horizontal-center">
-                                <img class="icon-email" src="assets/imgs/theme/icons/icon-email.svg" alt="">
+                                <img class="icon-email" src="/assets/imgs/theme/icons/icon-email.svg" alt="">
                                 <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
                             </div>
                             <div class="col my-4 my-md-0 des">
@@ -1088,7 +1097,7 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="widget-about font-md mb-md-5 mb-lg-0">
                             <div class="logo logo-width-1 wow fadeIn animated">
-                                <a href="/"><img src="assets/imgs/theme/logo.svg" alt="logo"></a>
+                                <a href="/"><img src="/assets/imgs/theme/logo.svg" alt="logo"></a>
                             </div>
                             <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
                             <p class="wow fadeIn animated">
@@ -1102,11 +1111,11 @@
                             </p>
                             <h5 class="mb-10 mt-30 fw-600 text-grey-4 wow fadeIn animated">Follow Us</h5>
                             <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0">
-                                <a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
-                                <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
-                                <a href="#"><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
-                                <a href="#"><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
-                                <a href="#"><img src="assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
                             </div>
                         </div>
                     </div>
@@ -1138,13 +1147,13 @@
                             <div class="col-md-8 col-lg-12">
                                 <p class="wow fadeIn animated">From App Store or Google Play</p>
                                 <div class="download-app wow fadeIn animated">
-                                    <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="assets/imgs/theme/app-store.jpg" alt=""></a>
-                                    <a href="#" class="hover-up"><img src="assets/imgs/theme/google-play.jpg" alt=""></a>
+                                    <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="/assets/imgs/theme/app-store.jpg" alt=""></a>
+                                    <a href="#" class="hover-up"><img src="/assets/imgs/theme/google-play.jpg" alt=""></a>
                                 </div>
                             </div>
                             <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
                                 <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
-                                <img class="wow fadeIn animated" src="assets/imgs/theme/payment-method.png" alt="">
+                                <img class="wow fadeIn animated" src="/assets/imgs/theme/payment-method.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -1185,29 +1194,29 @@
         </div>
     </div>
     <!-- Vendor JS-->
-    <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
-    <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/plugins/slick.js"></script>
-    <script src="assets/js/plugins/jquery.syotimer.min.js"></script>
-    <script src="assets/js/plugins/wow.js"></script>
-    <script src="assets/js/plugins/jquery-ui.js"></script>
-    <script src="assets/js/plugins/perfect-scrollbar.js"></script>
-    <script src="assets/js/plugins/magnific-popup.js"></script>
-    <script src="assets/js/plugins/select2.min.js"></script>
-    <script src="assets/js/plugins/waypoints.js"></script>
-    <script src="assets/js/plugins/counterup.js"></script>
-    <script src="assets/js/plugins/jquery.countdown.min.js"></script>
-    <script src="assets/js/plugins/images-loaded.js"></script>
-    <script src="assets/js/plugins/isotope.js"></script>
-    <script src="assets/js/plugins/scrollup.js"></script>
-    <script src="assets/js/plugins/jquery.vticker-min.js"></script>
-    <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
+    <script src="/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/plugins/slick.js"></script>
+    <script src="/assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="/assets/js/plugins/wow.js"></script>
+    <script src="/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/assets/js/plugins/select2.min.js"></script>
+    <script src="/assets/js/plugins/waypoints.js"></script>
+    <script src="/assets/js/plugins/counterup.js"></script>
+    <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="/assets/js/plugins/images-loaded.js"></script>
+    <script src="/assets/js/plugins/isotope.js"></script>
+    <script src="/assets/js/plugins/scrollup.js"></script>
+    <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="/assets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="./assets/js/main.js?v=3.4"></script>  
+    <script src="/assets/js/main.js?v=3.4"></script>  
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="/js/custom-alert.js"></script>
     <script src="/js/validate-userAddress.js"></script>
@@ -1227,6 +1236,13 @@
                 searching: false,
                 dom: '<"top"i>rt<"bottom"flp>'
             });
+            //$('.nav-tabs a[href="#address"]').tab('show')
+            $('.nav a[href="#<%if(locals.openTab) { %><%= openTab %><% } else { %>dashboard<% } %>"]').tab('show');
+            const openTab = $('.dashboard-menu').data('opentab');
+            console.log(openTab);
+            if(openTab === "wallet"){
+                document.getElementById('add-to-wallet-btn').click(); 
+            }
         });
     </script>
     <!-- Add to Wallet -->
@@ -1290,7 +1306,7 @@
                 "currency": "INR",
                 "name": "JMJ Music House",
                 "description": "Test Transaction",
-                "image": "/assets/imgs/theme/logo.svg",
+                "image": "//assets/imgs/theme/logo.svg",
                 "order_id": razorpayOrder.id, 
                 "handler": function (response){
                     verifyWalletPayment(response, razorpayOrder.amount  );
@@ -1339,7 +1355,7 @@
                         transactionHtml += '</span>';
                         //update table
                         $('#walletTable tbody').prepend(
-                            "<tr><td>" + new Date(data?.timestamp).toLocaleDateString() + 
+                            "<tr><td>" + new Date(data?.timestamp).toLocaleDateString() + " "
                             + new Date(data?.timestamp).toLocaleTimeString() + "</td><td>₹ " + data?.amount + 
                             "</td><td>" + transactionHtml + "</td><td>" + data?.remarks + "</td></tr>");
                         //update wallet balance
@@ -1347,8 +1363,14 @@
                         walletBalance = parseInt(walletBalance) + Number(data?.amount) ?? 0;
                         console.log("walletBalance : " + walletBalance);
                         $('#walletBalance').text(walletBalance);
-                        
-                        customAlert("Success","Payment SUCCESS! Added money to wallet.")
+
+                        const openTab = $('.dashboard-menu').data('opentab');
+                        console.log(openTab);
+                        if(openTab === "wallet"){
+                            window.location.href = '/checkout';
+                        } else{
+                            customAlert("Success","Payment SUCCESS! Added money to wallet.");
+                        }                        
                     } else{
                         customAlert("Oops..!","Payment failed!" + response.errMsg)
                     }

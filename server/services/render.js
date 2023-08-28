@@ -143,6 +143,19 @@ exports.getAdminCategoryPage = (req, res) => {
         delete req.session.inputData;
     }
 };
+exports.getAdminCouponPage = (req, res) => {
+    console.log("--------------------------------- > HERE2");
+    res.render('page-coupons', {
+        pageTitle: "Coupon Management",
+        coupons: res.locals.coupons,
+        // errMsg: req.session.errMsg,
+        // inputData: req.session.inputData
+    });
+    if(req.session.errMsg) {
+        delete req.session.errMsg;
+        delete req.session.inputData;
+    }
+};
 
 //------- USER SIDE --------//
 exports.userDashboardPage =async (req, res) => {
@@ -158,6 +171,7 @@ exports.userDashboardPage =async (req, res) => {
             orders: res.locals.orders,
             walletDetails: res.locals.walletDetails,
             walletBalance: res.locals.walletBalance,
+            openTab: req.query.tab,
         });
     else if(req.session.adminLoggedIn === true)
         res.redirect('/admin');

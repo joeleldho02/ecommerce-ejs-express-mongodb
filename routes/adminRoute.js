@@ -5,12 +5,11 @@ const adminController = require('../server/controller/adminController');
 const userController = require('../server/controller/userController');
 const productController = require('../server/controller/productController');
 const categoryController = require('../server/controller/categoryController');
+const couponController = require('../server/controller/couponController');
 const orderController = require('../server/controller/orderController');
 const authController = require('../server/middleware/authenticate-admin');
 const uploadController = require('../server/middleware/upload-image');
 const serviceRender = require('../server/services/render');
-
-
 
 
 //------- LOGIN / LOGOUT --------//
@@ -21,22 +20,14 @@ router.get('/logout', authController.authenticateAdmin, serviceRender.adminLogou
 router.post('/login', adminController.adminLogin);
 
 
-
 //------- PRODUCTS --------//
 router.get('/products', authController.authenticateAdmin, categoryController.getListedCategories, productController.getAllProducts, serviceRender.getAdminProductPage);
 router.get('/add-product', authController.authenticateAdmin, categoryController.getListedCategories, serviceRender.getAddProductPage);
 router.get('/edit-product/:id', authController.authenticateAdmin, categoryController.getListedCategories, productController.getEditProductItemDetails, serviceRender.getEditProductPage);
 
 router.post('/add-product', authController.authenticateAdmin, uploadController.uploadProductImage.array('productImage', 5), productController.addNewProduct);// , uploadController.resizeImages
-
-// (req, res)=>{
-//     console.log(req.body); 
-//     res.send(req.body);
-// })
 router.post('/edit-product', authController.authenticateAdmin, uploadController.uploadProductImage.array('productImage', 5), productController.updateProductItem);
 router.post('/delete-product', authController.authenticateAdmin, productController.deleteProductItem);
-
-
 
 
 //------- CUSTOMERS --------//
@@ -44,8 +35,6 @@ router.get('/customers', authController.authenticateAdmin, userController.getAll
 
 router.post('/edit-user', authController.authenticateAdmin, userController.updateSinlgleUser); 
 router.post('/delete-user', authController.authenticateAdmin, userController.deleteUser);
-
-
 
 
 //------- CATEGORY --------//
@@ -56,11 +45,16 @@ router.post('/edit-category', authController.authenticateAdmin, categoryControll
 router.post('/delete-category', authController.authenticateAdmin, categoryController.deleteCategory);
 
 
-
-
 //------- ORDERS --------//
 router.get('/orders/:id', authController.authenticateAdmin, categoryController.getListedCategories, orderController.getSingleOrderDetails, serviceRender.getAdminViewOrderPage)
 router.get('/orders', authController.authenticateAdmin, orderController.getAllUsersOrders, serviceRender.getAdminOrdersPage);
 router.post('/update-order', orderController.updateOrderStatus);
+
+//------- COUPONS --------//
+router.get('/coupons', authController.authenticateAdmin, couponController.getAllCouponDetails, serviceRender.getAdminCouponPage);
+
+router.post('/add-coupon', authController.authenticateAdmin, couponController.addCoupon);
+router.post('/edit-coupon', authController.authenticateAdmin, couponController.updateCoupon);
+router.post('/delete-coupon', authController.authenticateAdmin, couponController.deleteCoupon);
 
 module.exports = router;  

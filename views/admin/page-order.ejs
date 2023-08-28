@@ -78,7 +78,7 @@
                                                 <% if (orders[i]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
                                                 <% } else if (orders[i]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
                                                 <% } else if (orders[i]?.paymentStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
-                                                <% } else if (orders[i]?.paymentStatus.toLowerCase() == "refund") { %> class="badge badge-pill badge-soft-warning <% } %> 
+                                                <% } else if (orders[i]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill badge-soft-warning" <% } %> 
                                                 ><%= orders[i]?.paymentStatus %></span>   
                                             <% } %>                                          
                                         </td>
@@ -89,7 +89,8 @@
                                                 <% if (orders[i]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
                                                 <% } else if (orders[i]?.orderStatus.toLowerCase() == "approved") { %> class="badge badge-pill badge-soft-success"
                                                 <% } else if (orders[i]?.orderStatus.toLowerCase() == "delivered") { %> class="badge badge-pill badge-soft-success"
-                                                <% } else if (orders[i]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill badge-soft-danger"
+                                                <% } else if (orders[i]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill badge-soft-danger"                                                
+                                                <% } else if (orders[i]?.orderStatus.toLowerCase() == "returned") { %> class="badge badge-pill badge-soft-warning"
                                                 <% } else if (orders[i]?.orderStatus.toLowerCase() == "cancelled") { %> class="badge badge-pill badge-soft-warning" <% } %> 
                                                 ><%= orders[i]?.orderStatus %></span> 
                                             <% } %>                                       
@@ -107,9 +108,11 @@
                                         </td>
                                         <td class="d-flex">
                                             <a href="/admin/orders/<%= orders[i]._id %>" class="btn-small d-block btn btn-xs px-2">View</a>
+                                            <% if(orders[i]?.orderStatus.toLowerCase() !== "returned" && orders[i]?.orderStatus.toLowerCase() !== "cancelled" && orders[i]?.orderStatus.toLowerCase() !== "delivered") { %>
                                             <a id="editBtn-<%= orders[i]._id %>" onclick="editOrder('<%= orders[i]._id %>', 'editBtn-<%= orders[i]._id %>', 'dropDown-<%= orders[i]._id %>', 'statusLabel-<%= orders[i]._id %>', 'cancel-<%= orders[i]._id%>')" 
                                                 class="btn-small d-block btn btn-xs ms-1 px-2">Edit
                                             </a>
+                                            <% } %>
                                             <a id="cancel-<%= orders[i]._id%>" class="btn m-auto ms-2 p-0" style="display: none; font-weight: 600; font-size: 12px;" 
                                                 onclick="cancelEditOrder('<%= orders[i]._id %>', 'editBtn-<%= orders[i]._id %>', 'dropDown-<%= orders[i]._id %>', 'statusLabel-<%= orders[i]._id %>', 'cancel-<%= orders[i]._id%>')">
                                             X</a>

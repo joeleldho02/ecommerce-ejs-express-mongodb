@@ -28,7 +28,7 @@ router.post('/edit-address', authController.authenticateUser, userController.edi
 router.post('/add-to-wallet', authController.authenticateUser, userController.addToWalletGetRazorpay);
 router.post('/verify-wallet-payment', authController.authenticateUser, userController.verifyWalletRazorpayPayment);
 
-router.get('/cancel-order/:id', orderController.cancelOrder);
-router.get('/return-order/:id', orderController.returnOrder);
+router.get('/cancel-order/:id', authController.authenticateUser, orderController.cancelOrder);
+router.get('/return-order/:id', authController.authenticateUser, orderController.returnOrder);
 
 module.exports = router;  

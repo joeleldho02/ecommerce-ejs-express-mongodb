@@ -385,7 +385,7 @@ exports.addNewAddress = async (req, res) => {
                 else {
                     const msg = "New address added successfully!";
                     console.log(msg);
-                    res.redirect('/user#address');
+                    res.redirect('back');
                 }
             })
             .catch(err => {
@@ -619,24 +619,6 @@ exports.getWalletBalance = async (req, res, next) => {
     }
 };
 
-exports.addWalletTransaction = async (userId, amount, transactionType, remarks) => {
-    try{
-        const newTransaction = {
-            amount: Number(amount)/100,
-            transaction: transactionType,
-            remarks: remarks,
-            timestamp: new Date()
-        };
-        return new Promise(async(resolve, reject) => {
-            await Userdb.findByIdAndUpdate(userId, { $push: { wallet: newTransaction } })
-                .then((user) => {console.log(JSON.stringify(newTransaction));resolve(newTransaction);})
-                .catch((err)=>{console.log("rejected!!!!");reject(err);});
-            })
-    } catch(err){
-        console.log("Error updating user wallet in Database. " + err);
-    }
-};
-
 exports.addToWalletGetRazorpay = async (req, res) => {
     console.log(req.body);
     const amount = Number(req.body.amount);
@@ -664,7 +646,7 @@ exports.verifyWalletRazorpayPayment = (req, res)=>{
             const remarks = "Credited by you";
             console.log(remarks);
             const amount = req.body.amount;
-            exports.addWalletTransaction(req.session.user._id, amount, "C", remarks)
+            exports.addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
             .then((data)=>{
                 res.json({status:true, data: data});
             })
@@ -681,3 +663,21 @@ exports.verifyWalletRazorpayPayment = (req, res)=>{
         res.json({status: false, errMsg:'Payment failed!'});
     }
 }
+
+exports.addWalletTransactionToDb = async (userId, amount, transactionType, remarks) => {
+    try{
+        const newTransaction = {
+            amount: Number(amount)/100,
+            transaction: transactionType,
+            remarks: remarks,
+            timestamp: new Date()
+        };
+        return new Promise(async(resolve, reject) => {
+            await Userdb.findByIdAndUpdate(userId, { $push: { wallet: newTransaction } })
+                .then((user) => {console.log(JSON.stringify(newTransaction));resolve(newTransaction);})
+                .catch((err)=>{console.log("rejected!!!!");reject(err);});
+            })
+    } catch(err){
+        console.log("Error updating user wallet in Database. " + err);
+    }
+};

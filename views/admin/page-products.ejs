@@ -103,7 +103,7 @@
                                                     </span>
                                                 </a>
                                                 <form id="hidden-form-<%= i %>" action="/admin/delete-product" method="POST" style="display: none;">
-                                                  <input type="hidden" name="userID" value="<%= products[i]._id %>" />
+                                                  <input type="hidden" name="productID" value="<%= products[i]._id %>" />
                                                 </form>
                                                 <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= products[i].productName %>')">
                                                     <span class=" material-icons md-delete_forever" title="Delete <%= products[i].productName %>">

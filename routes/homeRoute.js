@@ -5,6 +5,7 @@ const categoryController = require('../server/controller/categoryController');
 const cartController = require('../server/controller/cartController');
 const orderController = require('../server/controller/orderController');
 const userController = require('../server/controller/userController');
+const couponController = require('../server/controller/couponController');
 const serviceRender = require('../server/services/render');
 const authController = require('../server/middleware/authenticate-user');
 
@@ -17,6 +18,7 @@ router.get('/add-to-cart/:id', cartController.addToCart);
 router.get('/remove-cart-item/:id', authController.authenticateUser, cartController.removeCartItem);
 router.post('/change-cart-item-quantity', cartController.changeCartItemQty);
 
+router.post('/apply-coupon', couponController.applyCoupon)
 router.post('/place-order', authController.authenticateUser, categoryController.getListedCategories, cartController.getUserCart, userController.getAllAddresses, orderController.placeOrder);
 router.post('/verify-payment', orderController.verifyRazorpayPayment)
 router.get('/:category', categoryController.getListedCategories, productController.getProductsOfSingleCategory, cartController.getCartItemsCount, serviceRender.categoryProductsPage);

@@ -122,6 +122,7 @@
                                 <option value="DELIVERED">Delivered</option>
                                 <option value="PENDING">Pending</option>
                             </select> -->
+                            <% if(order[0]?.orderStatus.toLowerCase() !== "returned" && order[0]?.orderStatus.toLowerCase() !== "cancelled" && order[0]?.orderStatus.toLowerCase() !== "delivered") { %>
                             <form id="orderEditForm" action="/admin/update-order" method="POST" class=" mb-lg-0 mb-15 mw-200 d-inline-block me-2">
                                 <select id="statusDropDown" name="orderStatus" class="form-select">
                                     <option value="0">Change status</option>
@@ -133,6 +134,7 @@
                                 <input type="hidden" name="orderID" value="<%= order[0]?._id %>" />
                             </form> 
                             <a class="btn btn-primary" href="#" onclick="editOrder('orderEditForm', 'statusDropDown')">Save</a>
+                            <% } %>
                             <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
                         </div>
                     </div>
@@ -173,6 +175,7 @@
                                             <% } else if (order[0]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill bg-danger"
                                             <% } else if (order[0]?.orderStatus.toLowerCase() == "delivered") { %> class="badge badge-pill bg-success"
                                             <% } else if (order[0]?.orderStatus.toLowerCase() == "shipped") { %> class="badge badge-pill bg-info"
+                                            <% } else if (order[0]?.orderStatus.toLowerCase() == "returned") { %> class="badge badge-pill bg-warning"
                                             <% } else if (order[0]?.orderStatus.toLowerCase() == "cancelled") { %> class="badge badge-pill bg-warning" <% } %> 
                                             ><%= order[0]?.orderStatus %></span>    
                                         <% } %>

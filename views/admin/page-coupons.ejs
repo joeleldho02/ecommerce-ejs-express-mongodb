@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Category Management</title>
+    <title>Coupon Management</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,10 +28,10 @@
             <div class="content-header">
                 <div></div>
                 <div>
-                    <a class="btn btn-primary" id="btn-add-category" data-bs-toggle="modal" data-bs-target="#myModal"
-                        data-modaltitle="<% if (locals.action) { %>Edit category details<% } else { %>Add new category<% } %>" 
+                    <a class="btn btn-primary" id="btn-add-coupon" data-bs-toggle="modal" data-bs-target="#myModal"
+                        data-modaltitle="<% if (locals.action) { %>Edit coupon details<% } else { %>Add new coupon<% } %>" 
                         data-btnaction="<% if (locals.action) { %><%= action %><% } else { %>add<% } %>">
-                        <i class="material-icons md-plus"></i> Add Category
+                        <i class="material-icons md-plus"></i> Add Coupon
                     </a>
                 </div>
             </div>
@@ -40,75 +40,65 @@
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex">
-                        <h6 class="my-auto font-weight-bold text-primary">Category Management</h6>
-                        <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
-                            <select class="form-select">
-                                <option selected>All category</option>
-                                <option>Electronics</option>
-                                <option>Clothes</option>
-                                <option>Automobile</option>
-                            </select>
-                        </div> -->
+                        <h6 class="my-auto font-weight-bold text-primary">Coupon Management</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Category</th>
+                                        <th>Code</th>
                                         <th>Description</th>
-                                        <th>Slug</th>
+                                        <th>%Discount</th>
+                                        <th>Min Amount</th>
+                                        <th>Max Discount</th>
                                         <th>List</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <!-- <tfoot>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>Description</th>
-                                        <th>List</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </tfoot> -->
                                 <tbody>
-                                <% if (locals.categories) { %>                                    
-                                    <% for (let i = 0; i < categories.length; i++) { %>
+                                <% if (locals.coupons) { %>                                    
+                                    <% for (let i = 0; i < coupons.length; i++) { %>
                                         <tr>
                                           <td>
                                             <div class="info">
-                                                <h6 class="mb-0"><%= categories[i]?.categoryName %></h6>
+                                                <h6 class="mb-0"><%= coupons[i]?.couponCode %></h6>
                                             </div>
                                           </td>
-                                          <td><%= categories[i]?.description %></td>
-                                          <td><%= categories[i]?.slug %></td>
+                                          <td><%= coupons[i]?.description %></td>
+                                          <td><%= coupons[i]?.discount %></td>
+                                          <td>₹ <%= coupons[i]?.minAmount %></td>
+                                          <td>₹ <%= coupons[i]?.maxDiscount %></td> 
                                           <td>                                               
-                                            <% if(categories[i]?.isListed){ %>
+                                            <% if(coupons[i]?.isListed){ %>
                                                 <span class="badge rounded-pill alert-success">Visible</span>
                                             <% } else{ %>  
                                                 <span class="badge rounded-pill alert-danger">Unlisted</span>
                                             <% } %>  
-                                          </td>
+                                          </td>                                         
                                           <td>
                                             <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
                                                 <a class="ms-2 edit_button" id="edit-button" name="edit-btn"
                                                         data-bs-toggle="modal" data-bs-target="#myModal" 
                                                         data-btnaction="edit"
-                                                        data-modaltitle="Edit category"
-                                                        data-id="<%= categories[i]?._id %>"
-                                                        data-categoryname="<%= categories[i]?.categoryName %>"
-                                                        data-description="<%= categories[i]?.description %>"
-                                                        data-slug="<%= categories[i]?.slug %>"
-                                                        data-listed="<%= categories[i]?.isListed %>"
+                                                        data-modaltitle="Edit coupon"
+                                                        data-id="<%= coupons[i]?._id %>"
+                                                        data-couponcode="<%= coupons[i]?.couponCode %>"
+                                                        data-description="<%= coupons[i]?.description %>"
+                                                        data-discount="<%= coupons[i]?.discount %>"
+                                                        data-minamount="<%= coupons[i]?.minAmount %>"
+                                                        data-maxdiscount="<%= coupons[i]?.maxDiscount %>" 
+                                                        data-listed="<%= coupons[i]?.isListed %>" 
                                                         >
-                                                        <span class="material-icons md-edit iconbtn" title="Edit <%= categories[i]?.categoryName %>">
-                                                            <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
-                                                        </span>
-                                                    </a>
-                                                <form id="hidden-form-<%= i %>" action="/admin/delete-category" method="POST" style="display: none;">
-                                                  <input type="hidden" name="categoryID" value="<%= categories[i]?._id %>" />
+                                                    <span class="material-icons md-edit iconbtn" title="Edit <%= coupons[i]?.code %>">
+                                                        <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                    </span>
+                                                </a>
+                                                <form id="hidden-form-<%= i %>" action="/admin/delete-coupon" method="POST" style="display: none;">
+                                                  <input type="hidden" name="couponID" value="<%= coupons[i]?._id %>" />
                                                 </form>
-                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= categories[i]?.categoryName %>')">
-                                                    <span class=" material-icons md-delete_forever" title="Delete <%= categories[i]?.categoryName %>">
+                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= coupons[i]?.couponName %>')">
+                                                    <span class=" material-icons md-delete_forever" title="Delete <%= coupons[i]?.couponName %>">
                                                         <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
                                                     </span>
                                                 </a>
@@ -130,28 +120,38 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel">Edit category details</h4>
+                        <h4 class="modal-title" id="myModalLabel">Edit coupon details</h4>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <p id="errMsg" class="m-auto text-center text-danger my-1"><% if (locals.errMsg) { %><%= errMsg %><% } %></p>                        
-                    <form name="modalForm" id="modalForm" method="post" action="/admin/edit-category">
+                    <form name="modalForm" id="modalForm" method="post" action="/admin/edit-coupon">
                         <div class="modal-body">
                             <div class="form-group">
-                                <input type="hidden" class="form-control edit-id" name="id" <% if(locals.inputData) {%>  value = "<%= inputData.id %>"  <% } %> >
+                                <input type="hidden" class="form-control edit-id" name="id" <% if(locals.inputData) {%>  value = "<%= inputData?.id %>"  <% } %> >
                             </div>
                             <div class="form-group w-100">
-                                <label for="categoryName">Category Name</label>
-                                <input class="form-control edit-categoryname" id="categoryName" name="categoryName" placeholder="Enter category name" <% if(locals.inputData) {%>  value = "<%= inputData.categoryName %>"  <% } %> >
+                                <label for="couponCode">Coupon code</label>
+                                <input class="form-control edit-couponcode" id="couponCode" name="couponCode" placeholder="Enter coupon code" <% if(locals.inputData) {%>  value = "<%= inputData?.couponCode %>"  <% } %> >
                                 <div class="error text-danger ms-2"></div>
                             </div>
                             <div class="form-group mt-3">
                                 <label for="description">Description</label>
-                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter description" <% if(locals.inputData) {%>  value = "<%= inputData.description %>"  <% } %> >
+                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter description" <% if(locals.inputData) {%>  value = "<%= inputData?.description %>"  <% } %> >
                                 <div class="error text-danger ms-2"></div>
                             </div>  
                             <div class="form-group mt-3">
-                                <label for="slug">Slug</label>
-                                <input class="form-control edit-slug" id="slug" name="slug" placeholder="Enter /slug" <% if(locals.inputData) {%>  value = "<%= inputData.slug %>"  <% } %> >
+                                <label for="discount">Discount</label>
+                                <input class="form-control edit-discount" id="discount" name="discount" placeholder="Enter discount amount" <% if(locals.inputData) {%>  value = "<%= inputData?.discount %>"  <% } %> >
+                                <div class="error text-danger ms-2"></div>
+                            </div> 
+                            <div class="form-group mt-3">
+                                <label for="minAmount">Min. Amount in ₹</label>
+                                <input class="form-control edit-minamount" id="minAmount" name="minAmount" placeholder="Enter mininum amount" <% if(locals.inputData) {%>  value = "<%= inputData?.minAmount %>"  <% } %> >
+                                <div class="error text-danger ms-2"></div>
+                            </div>  
+                            <div class="form-group mt-3">
+                                <label for="maxDiscount">Max. Discount in ₹</label>
+                                <input class="form-control edit-maxdiscount" id="maxDiscount" name="maxDiscount" placeholder="Enter maximum discount" <% if(locals.inputData) {%>  value = "<%= inputData?.maxDiscount %>"  <% } %> >
                                 <div class="error text-danger ms-2"></div>
                             </div>  
                             <div class="form-group mt-3">
@@ -193,9 +193,11 @@
     <!-- Page level custom scripts -->
     <script>
         const form = document.getElementById('loginForm');
-        const categoryName = document.getElementById('categoryName');
+        const couponCode = document.getElementById('couponCode');
         const description = document.getElementById('description'); 
-        const slug = document.getElementById('slug'); 
+        const discount = document.getElementById('discount'); 
+        const minAmount = document.getElementById('minAmount'); 
+        const maxDiscount = document.getElementById('maxDiscount'); 
         
         const setError = (element, message) => {
             const inputControl = element.parentElement;
@@ -213,18 +215,32 @@
             inputControl.classList.add('success');
             inputControl.classList.remove('error');
         };
+        const isValidNumber = (number) => {
+            const re =/[0-9]{1,3}/;
+            return re.test(String(number).toLowerCase());
+        };
+        const isValidCode = (text) => {
+            const re =/[A-Z0-9]{6,10}/;
+            return re.test(String(text));
+        };
 
         function validateInputs() {
-            const categoryNameValue = categoryName.value.trim();
+            const couponCodeValue = couponCode.value.trim();
             const descriptionValue = description.value.trim();
-            const slugValue = slug.value.trim();
+            const discountValue = discount.value.trim();
+            const minAmountValue = minAmount.value.trim();
+            const maxDiscountValue = maxDiscount.value.trim();
 
-            if(categoryNameValue === '') {
-                setError(categoryName, 'Please enter category name');
-                categoryName.focus();
+            if(couponCodeValue === '') {
+                setError(couponCode, 'Please enter coupon code');
+                couponCode.focus();
                 return false;
-            } else{
-                setSuccess(categoryName);
+            } else if (!isValidCode(couponCodeValue)) {
+                setError(couponCode, 'Provide a valid coupon code');
+                couponCode.focus();
+                return false;
+            }  else{
+                setSuccess(couponCode);
             }
             
             if(descriptionValue === '') {
@@ -235,24 +251,48 @@
                 setSuccess(description);
             }
 
-            if(slugValue === '') {
-                setError(slug, 'Please enter slug');
-                slug.focus();
+            if(discountValue === '') {
+                setError(discount, 'Enter discount %');
+                discount.focus();
                 return false;
-            } else if(slugValue[0] !== '/') {
-                setError(slug, 'Please enter valid slug');
-                slug.focus();
+            } else if (!isValidNumber(discountValue)) {
+                setError(discount, 'Provide a valid discount');
+                discount.focus();
                 return false;
             } else{
-                setSuccess(slug);
+                setSuccess(discount);
             }
-            
+
+            if(minAmountValue === '') {
+                setError(minAmount, 'Enter minimum order amount');
+                minAmount.focus();
+                return false;
+            } else if (!isValidNumber(minAmountValue)) {
+                setError(minAmount, 'Provide a valid amount');
+                minAmount.focus();
+                return false;
+            } else{
+                setSuccess(minAmount);
+            }
+
+            if(maxDiscountValue === '') {
+                setError(maxDiscount, 'Enter smaximum discount amount');
+                maxDiscount.focus();
+                return false;
+            } else if (!isValidNumber(maxDiscountValue)) {
+                setError(maxDiscount, 'Provide a valid amount');
+                maxDiscount.focus();
+                return false;
+            } else{
+                setSuccess(maxDiscount);
+            }
+
             return true;
         }
 
         function submitEditForm(formID){
             document.getElementById(formID).submit();
-            console.log("category edit form SUBMITTED!!");
+            console.log("coupon edit form SUBMITTED!!");
         }
 
         function confirmEdit(form) {
@@ -264,10 +304,7 @@
                 console.log("VALIDATION Success");
                 console.log("Action : " + btnAction);
                 if(btnAction === "Save changes"){                    
-                    customConfirm('Hey there!', 'Save the changes made to the category ?', submitEditForm, form);
-                    // if (confirm('Save the changes made to the category ?')) {
-                    //     document.getElementById(form).submit();
-                    // }
+                    customConfirm('Hey there!', 'Save the changes made to the coupon ?', submitEditForm, form);
                 }
                 else{
                     document.getElementById(form).submit();
@@ -283,12 +320,7 @@
     <script type="text/javascript">        
         $(window).on('load', function() {
             if(document.getElementById('errMsg').innerHTML.length > 1){
-                //$('#myModal').modal('show');   
-                // if(false){                    
-                //     document.getElementByID('btn-add-category').setAttribute('data-btnaction', 'edit')        
-                //     document.getElementByID('btn-add-category').setAttribute('data-modaltitle', 'Edit')        
-                // }
-                document.getElementById('btn-add-category').click();  
+                document.getElementById('btn-add-coupon').click();  
             }
         });
     </script>
@@ -297,30 +329,34 @@
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
             $('#dataTable').DataTable({
-                order: [[0, 'asc']],
-                columnDefs: [{ "targets": [4], "orderable": false }]
+                order: [[2, 'desc']],
+                columnDefs: [{ "targets": [1], "orderable": false }]
             });
         });    
 
         function confirmDelete(formID, name) {
-            customConfirm('Hey there!', `Are you sure to delete the category '${name}'?`, submitDeleteForm, formID);
+            customConfirm('Hey there!', `Are you sure to delete the coupon '${name}'?`, submitDeleteForm, formID);
         }
         function submitDeleteForm(formID){
             document.getElementById(formID).submit();
-            console.log("category delete form SUBMITTED!!");
+            console.log("coupon delete form SUBMITTED!!");
         }
         
         $(document).on( "click", '.edit_button',function(e) {
             const id = $(this).data('id');
-            const categoryName = $(this).data('categoryname');
+            const couponcode = $(this).data('couponcode');
             const description = $(this).data('description');
-            const slug = $(this).data('slug');
+            const discount = $(this).data('discount');
+            const minamount = $(this).data('minamount');
+            const maxdiscount = $(this).data('maxdiscount');
             const isListed = $(this).data('listed');
             console.log(isListed);
             $(".edit-id").val(id);
-            $(".edit-categoryname").val(categoryName);
+            $(".edit-couponcode").val(couponcode);
             $(".edit-description").val(description);
-            $(".edit-slug").val(slug);
+            $(".edit-discount").val(discount);
+            $(".edit-minamount").val(minamount);
+            $(".edit-maxdiscount").val(maxdiscount);
             $(".edit-islisted").val(isListed);
             if(isListed === true)
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
@@ -330,20 +366,20 @@
             let button = $(event.relatedTarget); // Button that triggered the modal
             let btnAction = button.data('btnaction');
             let title = button.data('modaltitle');
-            let recipient = button.data('categoryname') || "";             
+            let recipient = button.data('couponcode') || "";             
             let modal = $(this);
             modal.find('.modal-title').text(title + " " + recipient);
             
             if( btnAction === "add" ) {  
-                $('#modalForm').attr('action', '/admin/add-category');
+                $('#modalForm').attr('action', '/admin/add-coupon');
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
-                $('#modal-save-btn').text('Add category');
+                $('#modal-save-btn').text('Add coupon');
             }
             else if( btnAction === "edit" ) {
-                $('#modalForm').attr('action', '/admin/edit-category');
+                $('#modalForm').attr('action', '/admin/edit-coupon');
                 $('#modal-save-btn').text('Save changes');
             }
-            $('#categoryName').trigger('focus');
+            $('#couponCode').trigger('focus');
         });
     </script>
 </body>

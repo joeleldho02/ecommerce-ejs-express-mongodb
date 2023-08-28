@@ -82,15 +82,11 @@ exports.placeOrder = async (req, res, next) => {
 
             if (!isAvailable) return res.status(400).json({ status: false, errMsg: 'Some items are out of stock' })
 
-            console.log("CART PRODUCTS LIST : " + cartProducts);
-            console.log(JSON.stringify(cartProducts));
-
             const result = await Productdb.bulkWrite(updateOperations);
 			if (result.modifiedCount !== products.length) {
 				return res.status(500).json({ status: false, errMsg: 'Something went wrong, Pls try again later' })
 			}
     
-            console.log("Total Items in order : " + totalItems);
             const newOrder = new Orderdb({
                 orderId: orderId,
                 customerId: userId,
@@ -101,7 +97,6 @@ exports.placeOrder = async (req, res, next) => {
                 totalItems : totalItems,
                 finalAmount: req.body.totalAmount
             })
-            console.log("New ORDER : " + newOrder);
 
             /////////////////
             // const placeOrder = newOrder.save();
@@ -153,7 +148,7 @@ exports.placeOrder = async (req, res, next) => {
                             res.json({payment:false, method:"wallet", errMsg:"Insufficent balance in wallet to process the order!"});
                         } else{
                             console.log("WALLET: " + savedOrder.paymentMethod);
-                            await userController.addWalletTransaction(req.session.user._id, savedOrder.finalAmount*100, "D", "Debited for order")
+                            await userController.addWalletTransactionToDb(req.session.user._id, savedOrder.finalAmount*100, "D", "Debited for order")
                             const paymentDetails = {
                                 walletBalance : await userController.getUserWalletBalance(req.session.user._id),
                             }
@@ -326,8 +321,6 @@ exports.getOrderSummaryDetails = async (req, res, next) => {
                      as: 'productInfo'}
             }
         ]);
-        console.log("SUMARY ::::::");
-        console.log(JSON.stringify(order));
 
         if(order.length === 0){
             console.log(" No items in cart!!");

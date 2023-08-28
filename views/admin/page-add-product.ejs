@@ -262,7 +262,7 @@
                                 <div class="w-100 bg-light rounded-3 p-2 d-flex d-none">
                                     <label for="productImage" class="custom-input-label py-2 px-3 ms-2 rounded-3 " style="font-size: 13px; background-color: #cfcfcf; color: #000000;"><span>Select Files</span></label>
                                 </div>                                
-                                <input class="form-control" form="newProductForm" type="file" multiple id="productImage" name="productImage"
+                                <input class="form-control" form="newProductForm" type="file" multiple id="productImage" name="productImage" accept="image/*"
                                 <% if (locals.product) { %>
                                     value="<%= product.images.join(', ') %>"
                                 <% } %> >

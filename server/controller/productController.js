@@ -58,7 +58,7 @@ exports.addNewProduct = async (req, res) => {
 //find and retrieve all product(s) to display in table
 exports.getAllProducts = (req, res, next) => {
     try{
-        Productdb.find({},{review: 0, rating: 0})
+        Productdb.find({isDeleted: false},{review: 0, rating: 0})
         .collation({locale: "en"})
         .sort({ category: 1, productName: 1 }).lean()
         .then(data => {
@@ -242,28 +242,54 @@ exports.deleteProductItem = (req, res) => {
                 errStatus : 500
             });
         }
-        const id = req.body.userID;
-        Productdb.findByIdAndDelete(id)
-            .then(data => {
-                if (!data) {
-                    res.status(500).render('error', {
-                        message: "Unable to delete product. Product not found!",
-                        errStatus : 500
+        const id = req.body.productID;
+        const product = {
+            isDeleted:true,
+            updatedAt: Date.now(),
+            _id: id
+        };
+        Productdb.findByIdAndUpdate(id, product)
+                    .then(data => {
+                        if (!data) {
+                            res.status(500).render('error', {
+                                message: "Unable to delete product",
+                                errStatus : 500
+                            });
+                            console.log("Unable to delete product");
+                        }
+                        else {
+                            console.log("Delete succes: " + data);
+                            res.redirect('/admin/products');
+                        }
+                    })
+                    .catch(err => {
+                        res.status(500).render('error', {
+                            message: "Error deleteing product in Database",
+                            errStatus : 500
+                        });
+                        console.log(err);
                     });
-                    console.log("Unable to delete product. Product not found!");
-                }
-                else {
-                    console.log("Delete succes: " + data);
-                    res.redirect('/admin/products');
-                }
-            })
-            .catch(err => {
-                res.status(500).render('error', {
-                    message: "Unable to delete product. Error deleting product from Database",
-                    errStatus : 500
-                });            
-                console.log(err);
-            });
+        // Productdb.findByIdAndDelete(id)
+        //     .then(data => {
+        //         if (!data) {
+        //             res.status(500).render('error', {
+        //                 message: "Unable to delete product. Product not found!",
+        //                 errStatus : 500
+        //             });
+        //             console.log("Unable to delete product. Product not found!");
+        //         }
+        //         else {
+        //             console.log("Delete succes: " + data);
+        //             res.redirect('/admin/products');
+        //         }
+        //     })
+        //     .catch(err => {
+        //         res.status(500).render('error', {
+        //             message: "Unable to delete product. Error deleting product from Database",
+        //             errStatus : 500
+        //         });            
+        //         console.log(err);
+        //     });
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to delete product. Error deleting product from Database",
@@ -276,7 +302,7 @@ exports.deleteProductItem = (req, res) => {
 exports.getProductItemById = async (req, res, next) => {
     try{        
         //if(mongoose.Types.ObjectId.isValid(req.params.id)){}
-        await Productdb.findOne({_id : req.params.id}).lean()
+        await Productdb.findOne({_id : req.params.id, isDeleted: false}).lean()
         .then(data => {
             if(data){
                 if(data !== null){
@@ -321,7 +347,7 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
             const prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
             console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
             console.log(JSON.stringify(prodCategoryId));
-            await Productdb.find({ category: prodCategoryId}).limit(8).lean()
+            await Productdb.find({ category: prodCategoryId, isDeleted: false}).limit(8).lean()
             .then(data => {                
                 console.log(JSON.stringify(data));
                 if(data.length !== 0){
