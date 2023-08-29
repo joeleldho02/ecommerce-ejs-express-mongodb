@@ -75,7 +75,17 @@ exports.adminLoginPage = (req, res) => {
 };
 exports.adminDashboardPage = (req, res) => {
     if(req.session.adminLoggedIn === true)
-        res.render('admin-dashboard',{pageTitle: "Dashboard"});
+        res.render('admin-dashboard',{
+            pageTitle: "Dashboard",
+            orderCount: res.locals.orderCount,
+            productCount: res.locals.productCount,
+            categoryCount: res.locals.categoryCount,
+            totalRevenue: res.locals.totalRevenue,
+            totalMonthlyRevenue: res.locals.totalMonthlyRevenue,
+            orderCountPercent: res.locals.orderCountPercent,
+            newUsers: res.locals.newUsers,
+            categoryPerformance: res.locals.categoryPerformance,
+        });
     else if(req.session.userLoggedIn === true)
         res.redirect('/user');
     else    
@@ -131,30 +141,27 @@ exports.getAdminUsersPage = (req, res) => {
     });
 };
 exports.getAdminCategoryPage = (req, res) => {
-    console.log("--------------------------------- > HERE2");
     res.render('page-category', {
         pageTitle: "Category Management",
-        categories: res.locals.categories,
-        // errMsg: req.session.errMsg,
-        // inputData: req.session.inputData
+        categories: res.locals.categories
     });
-    if(req.session.errMsg) {
-        delete req.session.errMsg;
-        delete req.session.inputData;
-    }
 };
 exports.getAdminCouponPage = (req, res) => {
-    console.log("--------------------------------- > HERE2");
     res.render('page-coupons', {
         pageTitle: "Coupon Management",
-        coupons: res.locals.coupons,
-        // errMsg: req.session.errMsg,
-        // inputData: req.session.inputData
+        coupons: res.locals.coupons
     });
-    if(req.session.errMsg) {
-        delete req.session.errMsg;
-        delete req.session.inputData;
-    }
+};
+exports.getAdminBannerPage = (req, res) => {
+    res.render('page-banners', {
+        pageTitle: "Banner Management",
+        banners: res.locals.banners
+    });
+};
+exports.getAdminSalesPage = (req, res) => {
+    res.render('page-sales', {
+        pageTitle: "Sales Report"
+    });
 };
 
 //------- USER SIDE --------//
@@ -208,6 +215,15 @@ exports.userLogout = (req, res) => {
 };
 exports.getUserOrderDetailsPage = (req, res) => {
     res.render('user-order-view', {
+        categories: res.locals.categories,
+        cartItems : res.locals.cartItems,
+        itemsCount : res.locals.itemsCount,
+        order: res.locals.order,
+        totalAmount : res.locals.subTotal
+    })
+}
+exports.getUserOrderInvoicePage = (req, res) => {
+    res.render('user-order-invoice', {
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         itemsCount : res.locals.itemsCount,

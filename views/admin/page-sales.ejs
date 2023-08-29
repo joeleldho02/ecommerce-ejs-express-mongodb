@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Sales Report</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/datatable.css">
+    <link rel="stylesheet" href="/css/custom-alert.css">
+
+</head>
+
+<body>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'sales'}) %>
+    <main class="main-wrap">
+        <%- include('./partials/admin/admin-header.ejs') %>
+        <section class="content-main">
+            <!-- Begin Page Content -->
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex">
+                        <h6 class="my-auto font-weight-bold text-primary">Sales</h6>
+                        <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
+                            <select class="form-select">
+                                <option selected>All category</option>
+                                <option>Electronics</option>
+                                <option>Clothes</option>
+                                <option>Automobile</option>
+                            </select>
+                        </div> -->
+                    </div>
+                    <div class="card-body mb-50">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th class="align-middle" scope="col">Order ID</th>
+                                        <th class="align-middle" scope="col">Billing Name</th>
+                                        <th class="align-middle" scope="col">Date</th>
+                                        <th class="align-middle" scope="col">Total</th>
+                                        <th class="align-middle" scope="col">Payment Status</th>
+                                        <th class="align-middle" scope="col">Payment Method</th>
+                                        <th class="align-middle" scope="col">Order Status</th>
+                                        <th class="align-middle" scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>                                    
+                                </tbody>
+                             </table>
+                        </div>
+                    </div>                    
+                </div> 
+        </section> <!-- content-main end// -->
+        <!-- End of Modal for Edit button -->
+        <%- include('./partials/admin/admin-footer.ejs') %>
+        <!-- Custom Confirm Dialog -->
+        <%- include('./partials/home/custom-confirm-dialog.ejs') %> 
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets2/js/vendors/select2.min.js"></script>
+    <script src="/assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets2/js/main.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Page level plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/custom-confirm.js"></script>
+    <!-- Page level custom scripts -->
+    <script>
+        // Call the dataTables jQuery plugin
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                order: [[2, 'desc']],
+                columnDefs: [{ "targets": [0,7], "orderable": false }]
+            });
+        });
+    </script> 
+</body>
+
+</html>

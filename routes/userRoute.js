@@ -16,6 +16,8 @@ router.get('/verify-otp', serviceRender.userVerifyOtpPage);
 router.get('/login', serviceRender.userLoginPage);
 router.get('/logout', serviceRender.userLogout);
 router.get('/view-order/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderDetailsPage)
+router.get('/order-invoice/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderInvoicePage)
+router.get('/download-invoice/:id', orderController.generatePdf);
 
 router.post('/signup', userController.registerUser);
 router.post('/verify-otp', userController.loginOTPVerify);

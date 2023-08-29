@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Coupon Management</title>
+    <title>banner Management</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="">
+    <meta name="link" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:title" content="">
     <meta property="og:type" content="">
@@ -21,7 +21,7 @@
 </head>
 
 <body>
-    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'coupons'}) %>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'banners'}) %>
     <main class="main-wrap">
         <%- include('./partials/admin/admin-header.ejs') %>
         <section class="content-main">
@@ -31,13 +31,13 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex row">                        
                         <div class="col-6">
-                            <h6 class="my-auto font-weight-bold text-primary">Coupon Management</h6>
+                            <h6 class="my-auto font-weight-bold text-primary">Banner Management</h6>
                         </div>
                         <div class="col-6 text-end">
-                            <a class="btn btn-primary" id="btn-add-coupon" data-bs-toggle="modal" data-bs-target="#myModal"
-                                data-modaltitle="<% if (locals.action) { %>Edit coupon details<% } else { %>Add new coupon<% } %>" 
+                            <a class="btn btn-primary" id="btn-add-banner" data-bs-toggle="modal" data-bs-target="#myModal"
+                                data-modaltitle="<% if (locals.action) { %>Edit banner details<% } else { %>Add new banner<% } %>" 
                                 data-btnaction="<% if (locals.action) { %><%= action %><% } else { %>add<% } %>">
-                                <i class="material-icons md-plus"></i> Add Coupon
+                                <i class="material-icons md-plus"></i> Add Banner
                             </a>
                         </div>
                     </div>
@@ -46,33 +46,29 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
-                                        <th>Description</th>
-                                        <th>%Discount</th>
-                                        <th>Min Amount</th>
-                                        <th>Max Discount</th>
-                                        <th>List</th>
+                                        <th>Image</th>
+                                        <th>Title</th>
+                                        <th>Link</th>
+                                        <th>Active</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <% if (locals.coupons) { %>                                    
-                                    <% for (let i = 0; i < coupons.length; i++) { %>
+                                <% if (locals.banners) { %>                                    
+                                    <% for (let i = 0; i < banners.length; i++) { %>
                                         <tr>
                                           <td>
-                                            <div class="info">
-                                                <h6 class="mb-0"><%= coupons[i]?.couponCode %></h6>
+                                            <div class="left d-none d-lg-block">
+                                                <img src="/img/banners/<%= banners[i].image %>" class="img-sm img-thumbnail" alt="Image">
                                             </div>
                                           </td>
-                                          <td><%= coupons[i]?.description %></td>
-                                          <td><%= coupons[i]?.discount %></td>
-                                          <td>₹ <%= coupons[i]?.minAmount %></td>
-                                          <td>₹ <%= coupons[i]?.maxDiscount %></td> 
+                                          <td><%= banners[i]?.title %></td>
+                                          <td><%= banners[i]?.link %></td>
                                           <td>                                               
-                                            <% if(coupons[i]?.isListed){ %>
+                                            <% if(banners[i]?.isActive){ %>
                                                 <span class="badge rounded-pill alert-success">Visible</span>
                                             <% } else{ %>  
-                                                <span class="badge rounded-pill alert-danger">Unlisted</span>
+                                                <span class="badge rounded-pill alert-danger">Hidden</span>
                                             <% } %>  
                                           </td>                                         
                                           <td>
@@ -80,24 +76,22 @@
                                                 <a class="ms-2 edit_button" id="edit-button" name="edit-btn"
                                                         data-bs-toggle="modal" data-bs-target="#myModal" 
                                                         data-btnaction="edit"
-                                                        data-modaltitle="Edit coupon"
-                                                        data-id="<%= coupons[i]?._id %>"
-                                                        data-couponcode="<%= coupons[i]?.couponCode %>"
-                                                        data-description="<%= coupons[i]?.description %>"
-                                                        data-discount="<%= coupons[i]?.discount %>"
-                                                        data-minamount="<%= coupons[i]?.minAmount %>"
-                                                        data-maxdiscount="<%= coupons[i]?.maxDiscount %>" 
-                                                        data-listed="<%= coupons[i]?.isListed %>" 
+                                                        data-modaltitle="Edit banner"
+                                                        data-id="<%= banners[i]?._id %>"
+                                                        data-title="<%= banners[i]?.title %>"
+                                                        data-image="<%= banners[i]?.image %>"
+                                                        data-link="<%= banners[i]?.link %>"
+                                                        data-isactive="<%= banners[i]?.isActive %>"
                                                         >
-                                                    <span class="material-icons md-edit iconbtn" title="Edit <%= coupons[i]?.code %>">
+                                                    <span class="material-icons md-edit iconbtn" title="Edit <%= banners[i]?.code %>">
                                                         <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
                                                     </span>
                                                 </a>
-                                                <form id="hidden-form-<%= i %>" action="/admin/delete-coupon" method="POST" style="display: none;">
-                                                  <input type="hidden" name="couponID" value="<%= coupons[i]?._id %>" />
+                                                <form id="hidden-form-<%= i %>" action="/admin/delete-banner" method="POST" style="display: none;">
+                                                  <input type="hidden" name="bannerID" value="<%= banners[i]?._id %>" />
                                                 </form>
-                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= coupons[i]?.couponName %>')">
-                                                    <span class=" material-icons md-delete_forever" title="Delete <%= coupons[i]?.couponName %>">
+                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= banners[i]?.title %>')">
+                                                    <span class=" material-icons md-delete_forever" title="Delete <%= banners[i]?.title %>">
                                                         <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
                                                     </span>
                                                 </a>
@@ -119,54 +113,59 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel">Edit coupon details</h4>
+                        <h4 class="modal-title" id="myModalLabel">Edit banner details</h4>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <p id="errMsg" class="m-auto text-center text-danger my-1"><% if (locals.errMsg) { %><%= errMsg %><% } %></p>                        
-                    <form name="modalForm" id="modalForm" method="post" action="/admin/edit-coupon">
+                    <form name="bannerForm" id="bannerForm" method="post" action="/admin/edit-banner" enctype="multipart/form-data">
                         <div class="modal-body">
                             <div class="form-group">
                                 <input type="hidden" class="form-control edit-id" name="id" <% if(locals.inputData) {%>  value = "<%= inputData?.id %>"  <% } %> >
                             </div>
                             <div class="form-group w-100">
-                                <label for="couponCode">Coupon code</label>
-                                <input class="form-control edit-couponcode" id="couponCode" name="couponCode" placeholder="Enter coupon code" <% if(locals.inputData) {%>  value = "<%= inputData?.couponCode %>"  <% } %> >
+                                <label for="title">Title</label>
+                                <input class="form-control edit-title" id="bannerTitle" name="title" placeholder="Enter banner code" <% if(locals.inputData) {%>  value = "<%= inputData?.title %>"  <% } %> >
                                 <div class="error text-danger ms-2"></div>
                             </div>
                             <div class="form-group mt-3">
-                                <label for="description">Description</label>
-                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter description" <% if(locals.inputData) {%>  value = "<%= inputData?.description %>"  <% } %> >
-                                <div class="error text-danger ms-2"></div>
-                            </div>  
-                            <div class="form-group mt-3">
-                                <label for="discount">Discount</label>
-                                <input class="form-control edit-discount" id="discount" name="discount" placeholder="Enter discount amount" <% if(locals.inputData) {%>  value = "<%= inputData?.discount %>"  <% } %> >
-                                <div class="error text-danger ms-2"></div>
-                            </div> 
-                            <div class="form-group mt-3">
-                                <label for="minAmount">Min. Amount in ₹</label>
-                                <input class="form-control edit-minamount" id="minAmount" name="minAmount" placeholder="Enter mininum amount" <% if(locals.inputData) {%>  value = "<%= inputData?.minAmount %>"  <% } %> >
-                                <div class="error text-danger ms-2"></div>
-                            </div>  
-                            <div class="form-group mt-3">
-                                <label for="maxDiscount">Max. Discount in ₹</label>
-                                <input class="form-control edit-maxdiscount" id="maxDiscount" name="maxDiscount" placeholder="Enter maximum discount" <% if(locals.inputData) {%>  value = "<%= inputData?.maxDiscount %>"  <% } %> >
+                                <label for="link">Link</label>
+                                <input class="form-control edit-link" id="link" name="link" placeholder="Enter link (url)" <% if(locals.inputData) {%>  value = "<%= inputData?.link %>"  <% } %> >
                                 <div class="error text-danger ms-2"></div>
                             </div>  
                             <div class="form-group mt-3">
                                 <label for="flexSwitchCheckChecked">List</label>
                                 <div class="form-control form-switch">
-                                    <input class="form-check-input ms-3  py-2 px-4" type="checkbox" role="switch" name="isListed" id="flexSwitchCheckChecked">
+                                    <input class="form-check-input ms-3  py-2 px-4" type="checkbox" role="switch" name="isActive" id="flexSwitchCheckChecked">
                                 </div>
                             </div>
                             <div class="form-group mt-3">
-                                <input type="hidden" class="form-control edit-islisted" id="listed" name="listed" placeholder="Is listed" required>
+                                <input type="hidden" class="form-control edit-isactive" id="active" name="active" placeholder="Is listed" required>
+                            </div>
+                            <div class="card-header">
+                                <h6>Banner Image</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="input-upload">
+                                    <div class="w-100 bg-light rounded-3 p-2 d-flex d-none">
+                                        <label for="image" class="custom-input-label py-2 px-3 ms-2 rounded-3 " style="font-size: 13px; background-color: #cfcfcf; color: #000000;"><span>Select Files</span></label>
+                                    </div>                               
+                                    <input class="form-control" type="file" id="image" name="image" accept="image/*"
+                                    <% if (locals.inputData) { %>
+                                        value="<%= inputData?.image %>"
+                                    <% } %> >
+                                    <div class="error text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="preview-images text-center">
+                                    <img id="previewImage" src="" class="img edit-image" alt="">
+                                </div>
                             </div>
                         </div>
                     </form>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
-                        <button id="modal-save-btn" type="submit" onclick="confirmEdit('modalForm')" class="btn btn-primary w-50">Save changes</button>
+                        <button id="modal-save-btn" type="submit" onclick="confirmEdit('bannerForm')" class="btn btn-primary w-50">Save changes</button>
                     </div>
                 </div>
             </div>
@@ -191,12 +190,9 @@
     <script src="/js/custom-confirm.js"></script>
     <!-- Page level custom scripts -->
     <script>
-        const form = document.getElementById('loginForm');
-        const couponCode = document.getElementById('couponCode');
-        const description = document.getElementById('description'); 
-        const discount = document.getElementById('discount'); 
-        const minAmount = document.getElementById('minAmount'); 
-        const maxDiscount = document.getElementById('maxDiscount'); 
+        const form = document.getElementById('bannerForm');
+        const title = document.getElementById('bannerTitle');
+        const link = document.getElementById('link'); 
         
         const setError = (element, message) => {
             const inputControl = element.parentElement;
@@ -214,76 +210,25 @@
             inputControl.classList.add('success');
             inputControl.classList.remove('error');
         };
-        const isValidNumber = (number) => {
-            const re =/[0-9]{1,3}/;
-            return re.test(String(number).toLowerCase());
-        };
-        const isValidCode = (text) => {
-            const re =/[A-Z0-9]{6,10}/;
-            return re.test(String(text));
-        };
-
+        
         function validateInputs() {
-            const couponCodeValue = couponCode.value.trim();
-            const descriptionValue = description.value.trim();
-            const discountValue = discount.value.trim();
-            const minAmountValue = minAmount.value.trim();
-            const maxDiscountValue = maxDiscount.value.trim();
+            const titleValue = title.value.trim();
+            const linkValue = link.value.trim();
 
-            if(couponCodeValue === '') {
-                setError(couponCode, 'Please enter coupon code');
-                couponCode.focus();
+            if(titleValue === '') {
+                setError(title, 'Please enter banner title');
+                title.focus();
                 return false;
-            } else if (!isValidCode(couponCodeValue)) {
-                setError(couponCode, 'Provide a valid coupon code');
-                couponCode.focus();
-                return false;
-            }  else{
-                setSuccess(couponCode);
+            } else{
+                setSuccess(title);
             }
             
-            if(descriptionValue === '') {
-                setError(description, 'Please enter description');
-                description.focus();
+            if(linkValue === '') {
+                setError(link, 'Please enter link (url)');
+                link.focus();
                 return false;
             } else{
-                setSuccess(description);
-            }
-
-            if(discountValue === '') {
-                setError(discount, 'Enter discount %');
-                discount.focus();
-                return false;
-            } else if (!isValidNumber(discountValue)) {
-                setError(discount, 'Provide a valid discount');
-                discount.focus();
-                return false;
-            } else{
-                setSuccess(discount);
-            }
-
-            if(minAmountValue === '') {
-                setError(minAmount, 'Enter minimum order amount');
-                minAmount.focus();
-                return false;
-            } else if (!isValidNumber(minAmountValue)) {
-                setError(minAmount, 'Provide a valid amount');
-                minAmount.focus();
-                return false;
-            } else{
-                setSuccess(minAmount);
-            }
-
-            if(maxDiscountValue === '') {
-                setError(maxDiscount, 'Enter smaximum discount amount');
-                maxDiscount.focus();
-                return false;
-            } else if (!isValidNumber(maxDiscountValue)) {
-                setError(maxDiscount, 'Provide a valid amount');
-                maxDiscount.focus();
-                return false;
-            } else{
-                setSuccess(maxDiscount);
+                setSuccess(link);
             }
 
             return true;
@@ -291,7 +236,7 @@
 
         function submitEditForm(formID){
             document.getElementById(formID).submit();
-            console.log("coupon edit form SUBMITTED!!");
+            console.log("banner edit form SUBMITTED!!");
         }
 
         function confirmEdit(form) {
@@ -303,7 +248,7 @@
                 console.log("VALIDATION Success");
                 console.log("Action : " + btnAction);
                 if(btnAction === "Save changes"){                    
-                    customConfirm('Hey there!', 'Save the changes made to the coupon ?', submitEditForm, form);
+                    customConfirm('Hey there!', 'Save the changes made to the banner ?', submitEditForm, form);
                 }
                 else{
                     document.getElementById(form).submit();
@@ -314,72 +259,90 @@
         }
 
     </script>
-    
-    <!-- open modal if there is error message -->
-    <script type="text/javascript">        
-        $(window).on('load', function() {
-            if(document.getElementById('errMsg').innerHTML.length > 1){
-                document.getElementById('btn-add-coupon').click();  
-            }
-        });
-    </script>
-
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
             $('#dataTable').DataTable({
-                order: [[2, 'desc']],
-                columnDefs: [{ "targets": [1], "orderable": false }]
+                order: [[1, 'desc']],
+                columnDefs: [{ "targets": [0,4], "orderable": false }]
             });
         });    
 
+        let selectedFiles = [];
+
+        $("#image").on("change", function() {
+            selectedFiles = Array.from(this.files);
+            imagesPreview(".preview-images");   
+        });
+  
+        let imagesPreview = function(placeToInsertImagePreview) {
+            $(placeToInsertImagePreview).empty();    
+            if (selectedFiles) {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    let reader = new FileReader();
+                    reader.onload = function(event) {
+                        let imagePreview = document.createElement('div');
+                        imagePreview.classList.add('img');
+  
+                        let img = document.createElement('img');
+                        img.src = event.target.result;
+  
+                        imagePreview.appendChild(img);
+  
+                        $(placeToInsertImagePreview).append(imagePreview);
+                    };
+                    reader.readAsDataURL(selectedFiles[i]);
+                }
+            }
+        };
+
         function confirmDelete(formID, name) {
-            customConfirm('Hey there!', `Are you sure to delete the coupon '${name}'?`, submitDeleteForm, formID);
+            customConfirm('Hey there!', `Are you sure to delete the banner '${name}'?`, submitDeleteForm, formID);
         }
         function submitDeleteForm(formID){
             document.getElementById(formID).submit();
-            console.log("coupon delete form SUBMITTED!!");
+            console.log("banner delete form SUBMITTED!!");
         }
         
         $(document).on( "click", '.edit_button',function(e) {
             const id = $(this).data('id');
-            const couponcode = $(this).data('couponcode');
-            const description = $(this).data('description');
-            const discount = $(this).data('discount');
-            const minamount = $(this).data('minamount');
-            const maxdiscount = $(this).data('maxdiscount');
-            const isListed = $(this).data('listed');
-            console.log(isListed);
+            const title = $(this).data('title');
+            const link = $(this).data('link');
+            const isactive = $(this).data('isactive');
+            const image = $(this).data('image');
+
+            console.log(isactive);
             $(".edit-id").val(id);
-            $(".edit-couponcode").val(couponcode);
-            $(".edit-description").val(description);
-            $(".edit-discount").val(discount);
-            $(".edit-minamount").val(minamount);
-            $(".edit-maxdiscount").val(maxdiscount);
-            $(".edit-islisted").val(isListed);
-            if(isListed === true)
+            $(".edit-title").val(title);
+            $(".edit-link").val(link);
+            $(".edit-isactive").val(isactive);
+            if(isactive === true)
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+
+            document.getElementById("previewImage").setAttribute("src", "/img/banners/" + image);
         });
 
         $('#myModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget); // Button that triggered the modal
             let btnAction = button.data('btnaction');
+            console.log(btnAction);
             let title = button.data('modaltitle');
-            let recipient = button.data('couponcode') || "";             
+            let recipient = button.data('title') || "";             
             let modal = $(this);
             modal.find('.modal-title').text(title + " " + recipient);
             
             if( btnAction === "add" ) {  
-                $('#modalForm').attr('action', '/admin/add-coupon');
+                $('#bannerForm').attr('action', '/admin/add-banner');
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
-                $('#modal-save-btn').text('Add coupon');                
-                document.getElementById("modalForm").reset();
+                $('#modal-save-btn').text('Add banner');
+                document.getElementById("bannerForm").reset();
+                document.getElementById("previewImage").setAttribute("src", "");
             }
             else if( btnAction === "edit" ) {
-                $('#modalForm').attr('action', '/admin/edit-coupon');
+                $('#bannerForm').attr('action', '/admin/edit-banner');
                 $('#modal-save-btn').text('Save changes');
             }
-            $('#couponCode').trigger('focus');
+            $('#bannerTitle').trigger('focus');
         });
     </script>
 </body>

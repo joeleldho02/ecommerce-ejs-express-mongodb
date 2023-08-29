@@ -605,3 +605,209 @@ exports.updateOrderStatus = async (req, res, next) => {
         console.log(err);
     }
 };
+
+exports.getOrderCount = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count------------>");
+            const count = await Orderdb.countDocuments({});
+            if(count){
+                console.log("Count ::::::::::::::::::"+ count);
+                res.locals.orderCount = count;
+                console.log(res.locals.orderCount);
+            }
+            next();
+        } else{
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
+    }
+};
+
+exports.getTotalRevenue = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count------------>");
+            const data = await Orderdb.aggregate([
+                {
+                    $match:{orderStatus:{$nin:['CANCELLED', 'RETURNED']}, paymentStatus:{$nin:['PENDING', 'REFUNDED']}}
+                },
+                {
+                    $group:{_id:null, totalRevenue: { $sum: "$finalAmount" }}
+                },
+                {
+                    $project:{_id:0}
+                }
+            ]);
+            console.log(data);
+            const totalRevenue = data[0].totalRevenue;
+            if(totalRevenue){
+                console.log("totalRevenue ::::::::::::::::::"+ totalRevenue);
+                res.locals.totalRevenue = totalRevenue;
+                console.log(res.locals.totalRevenue);
+            }
+            next();
+        } else{
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
+    }
+};
+
+exports.getMonthlyTotalRevenue = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count------------>");
+            const month = new Date().getMonth() + 1;
+            console.log(month);
+            const data = await Orderdb.aggregate([
+                {
+                    $match:{
+                        orderStatus:{$nin:['CANCELLED', 'RETURNED']}, 
+                        paymentStatus:{$nin:['PENDING', 'REFUNDED']},
+                        "$expr": { 
+                            "$eq": [ { "$month": "$createdAt" }, month] 
+                        } 
+                    }
+                },
+                {
+                    $group:{_id:null, totalMonthlyRevenue: { $sum: "$finalAmount" }}
+                },
+                {
+                    $project:{_id:0}
+                }
+                
+            ]);
+            console.log(data);
+            const totalMonthlyRevenue = data[0].totalMonthlyRevenue;
+            if(totalMonthlyRevenue){
+                console.log("totalMonthlyRevenue ::::::::::::::::::"+ totalMonthlyRevenue);
+                res.locals.totalMonthlyRevenue = totalMonthlyRevenue;
+                console.log(res.locals.totalMonthlyRevenue);
+            }
+            next();
+        } else{
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
+    }
+};
+
+exports.getOrderCountPercent = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count Percent------------>");           
+            const data = await Orderdb.aggregate([
+                {
+                    $group:{_id:{ status:'$orderStatus'}, count: {$sum :1}}
+                },
+                {
+                    $project:{_id:0, count:1, status:'$_id.status'}
+                },
+                {
+                    $sort: { status : 1}
+                }
+            ]);
+            console.log(data);
+            if(data){
+                console.log("Count ::::::::::::::::::"+ data);
+                res.locals.orderCountPercent = data;
+                console.log(res.locals.orderCountPercent);
+            }
+            next();
+        } else{
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
+    }
+};
+
+exports.getCategoryPerformance = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count Percent------------>");           
+            const data = await Orderdb.aggregate([
+                {
+                    $match: {
+                        orderStatus: { $nin: ['CANCELLED', 'RETURNED'] },
+                        "$expr": {
+                            "$eq": [{ "$month": "$createdAt" }, 8]
+                        }
+                    }
+                },
+                {
+                    $unwind:'$products'  
+                },
+                {
+                    $group: { _id: { category: '$products.category' }, count: { $sum: 1 } }
+                },
+                {
+                    $project: { _id: 0, category: '$_id.category', count: 1 }
+                },
+                {
+                    $sort: { category: 1 }
+                }
+            ]);
+            
+            console.log(data);
+            if(data){
+                console.log("Count ::::::::::::::::::"+ data);
+                res.locals.categoryPerformance = data;
+                console.log(res.locals.categoryPerformance);
+            }
+            next();
+        } else{
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
+    }
+};
+
+exports.generatePdf = async (req, res, next) => {
+    const puppeteer = require('puppeteer');
+    const fs = require('fs');
+
+    async function generatePDF(url, outputFile){
+        try{
+            //launch browser
+            const browser = await puppeteer.launch({headless: false});
+            const page = await browser.newPage();
+
+            // //navigate to page
+            // await page.goto(url, { waitUntil: 'networkidle0' });
+            const html = fs.readFileSync('sample.html', 'utf-8');
+            await page.setContent(html, { waitUntil: 'domcontentloaded' });
+
+            //To reflect CSS used for screens instead of print
+            await page.emulateMediaType('screen');
+
+            //generate pdf
+            await page.pdf({
+                path: outputFile, 
+                format: 'A4',
+                margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+                printBackground: true
+            });
+
+            //close browser
+            await browser.close();
+            res.send("PDF Saved!");
+        } catch(err){
+            console.log(err);
+        }
+    }
+
+    const url = "http://localhost:8080/user/order-invoice/64ec2da84314998bc93bd41d";
+    const outputFile = Date.now() + "out1.pdf";
+    generatePDF(url, outputFile);
+};

@@ -5,15 +5,19 @@ const adminController = require('../server/controller/adminController');
 const userController = require('../server/controller/userController');
 const productController = require('../server/controller/productController');
 const categoryController = require('../server/controller/categoryController');
-const couponController = require('../server/controller/couponController');
 const orderController = require('../server/controller/orderController');
+const couponController = require('../server/controller/couponController');
+const bannerController = require('../server/controller/bannerController');
 const authController = require('../server/middleware/authenticate-admin');
 const uploadController = require('../server/middleware/upload-image');
 const serviceRender = require('../server/services/render');
 
 
 //------- LOGIN / LOGOUT --------//
-router.get('/', serviceRender.adminDashboardPage);
+router.get('/', orderController.getOrderCount, productController.getProductCount,
+            categoryController.getCategoryCount, orderController.getTotalRevenue, 
+            orderController.getMonthlyTotalRevenue, orderController.getOrderCountPercent,
+            userController.getNewUsers, orderController.getCategoryPerformance, serviceRender.adminDashboardPage);
 router.get('/login', serviceRender.adminLoginPage);
 router.get('/logout', authController.authenticateAdmin, serviceRender.adminLogout);
 
@@ -56,5 +60,15 @@ router.get('/coupons', authController.authenticateAdmin, couponController.getAll
 router.post('/add-coupon', authController.authenticateAdmin, couponController.addCoupon);
 router.post('/edit-coupon', authController.authenticateAdmin, couponController.updateCoupon);
 router.post('/delete-coupon', authController.authenticateAdmin, couponController.deleteCoupon);
+
+//------- BANNERS --------//
+router.get('/banners', authController.authenticateAdmin, bannerController.getAllBannerDetails, serviceRender.getAdminBannerPage);
+
+router.post('/add-banner', authController.authenticateAdmin, uploadController.uploadBannerImage.single('image'), bannerController.addBanner);
+router.post('/edit-banner', authController.authenticateAdmin, uploadController.uploadBannerImage.single('image'), bannerController.updateBanner);
+router.post('/delete-banner', authController.authenticateAdmin, bannerController.deleteBanner);
+
+//------- BANNERS --------//
+router.get('/sales', authController.authenticateAdmin, serviceRender.getAdminSalesPage);
 
 module.exports = router;  

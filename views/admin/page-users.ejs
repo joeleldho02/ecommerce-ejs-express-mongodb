@@ -21,13 +21,10 @@
 </head>
 
 <body>
-    <%- include('./partials/admin/admin-side-nav.ejs') %>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'customers'}) %>
     <main class="main-wrap">
         <%- include('./partials/admin/admin-header.ejs') %>
         <section class="content-main">
-            <div class="content-header">
-                <p>Manage all customers here.</p>
-            </div>
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <!-- DataTales Example -->

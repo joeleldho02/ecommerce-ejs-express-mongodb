@@ -10,45 +10,45 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item active">
+                <li class="menu-item <% if(currTab === 'dashboard') { %>active<% } %>">
                     <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item <% if(currTab === 'products') { %>active<% } %>">
                     <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item <% if(currTab === 'orders') { %>active<% } %>">
                     <a class="menu-link" href="/admin/orders"> <i class="icon material-icons md-shopping_cart"></i>
                         <span class="text">Orders</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item <% if(currTab === 'category') { %>active<% } %>">
                     <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-stars"></i>
                         <span class="text">Category</span> </a>
                 </li>
-                <li class="menu-item">
+                <!-- <li class="menu-item">
                     <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
                         <span class="text">Brands</span> </a>
-                </li>
-                <li class="menu-item">
+                </li> -->
+                <li class="menu-item <% if(currTab === 'customers') { %>active<% } %>">
                     <a class="menu-link" href="/admin/customers"> <i class="icon material-icons md-monetization_on"></i>
                         <span class="text">Customers</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item <% if(currTab === 'coupons') { %>active<% } %>">
                     <a class="menu-link" href="/admin/coupons"> <i class="icon material-icons md-comment"></i>
                         <span class="text">Coupons</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item <% if(currTab === 'banners') { %>active<% } %>">
                     <a class="menu-link" href="/admin/banners"> <i class="icon material-icons md-comment"></i>
                         <span class="text">Banners</span>
                     </a>
                 </li>                
-                <li class="menu-item">
+                <li class="menu-item <% if(currTab === 'sales') { %>active<% } %>">
                     <a class="menu-link" href="/admin/sales"> <i class="icon material-icons md-pie_chart"></i>
                         <span class="text">Sales Report</span>
                     </a>

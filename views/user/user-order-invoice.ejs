@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>View Order</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <!-- <link rel="stylesheet" href="/assets/css/main.css?v=3.4"> -->
+</head>
+
+<body>
+    <main class="main">
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Order Invoice</h2>
+                    <p>Details for Order ID: #<% if (locals.order) { %><%= order[0]?._id %><% } %></p>
+                </div>
+            </div>
+            <% if (locals.order) { %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <header class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                                    <span>
+                                        <i class="material-icons md-calendar_today"></i> <b><%= order[0]?.createdAt.toLocaleString() %></b>
+                                    </span> <br>
+                                    <small class="text-muted">Order ID: #<%= order[0]?._id %></small>
+                                </div>
+                                <div class="col-lg-6 col-md-6 ms-auto text-md-end">                                   
+                                    <a class="btn btn-primary" href="/user/download-invoice<% if (locals.order) { %>/<%= order[0]?._id %><% } %>"> <i class="icon material-icons md-cloud_download mr-5"></i>Save PDF</a>
+                                </div>
+                            </div>
+                        </header> <!-- card-header end// -->
+                        <div class="card-body">
+                            <div class="receipt-content">
+                                <div class="container bootstrap snippets bootdey">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="invoice-wrapper mb-15">
+                                                <div class="intro">
+                                                    Hi <strong><%= order[0]?.customerInfo[0]?.firstName %> <%= order[0]?.customerInfo[0]?.lastName %></strong>,
+                                                    <br>
+                                                    This is the invoice for order <strong>#<%= order[0]?._id %></strong> of <b>₹ <%= order[0]?.finalAmount %></b>
+                                                </div>
+                    
+                                                <div class="payment-info">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <span >Payment status:</span>
+                                                            <strong>
+                                                                <% if(typeof order[0]?.paymentStatus === 'string') { %>
+                                                                    <span style="color: #000000; font-weight: 700; font-size: 13px;"
+                                                                    <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill bg-success"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "not paid") { %> class="badge badge-pill bg-danger"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill bg-warning" <% } %> 
+                                                                    ><%= order[0]?.paymentStatus %></span>   
+                                                                <% } %>
+                                                            </strong>
+                                                            <% if(locals.order[0]?.paymentDetails?.razorpay_payment_id) { %>
+                                                                <span>Refecrence ID</span>
+                                                                <strong><%= order[0]?.paymentDetails?.razorpay_payment_id %></strong>
+                                                            <% } %>
+                                                        </div>
+                                                        <% if(locals.order[0]?.paymentDetails?.walletBalance || locals.order[0]?.paymentDetails?.razorpay_payment_id) { %>
+                                                            <div class="col-sm-6 text-end">
+                                                                <span>Payment Date</span>
+                                                                <strong><%= order[0]?.createdAt.toLocaleString() %></strong>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                    
+                                                <div class="payment-details">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <span>Customer</span>
+                                                            <strong>
+                                                                <%= order[0]?.customerInfo[0]?.firstName %> <%= order[0]?.customerInfo[0]?.lastName %>
+                                                            </strong>
+                                                            <p>
+                                                                <%= order[0]?.shippingAddress?.addressLine1 %> <br>
+                                                                <% if(locals.order[0]?.shippingAddress?.addressLine2) { %><%= order[0]?.shippingAddress?.addressLine2 %> <br><% } %>
+                                                                <%= order[0]?.shippingAddress?.city %>, <%= order[0]?.shippingAddress?.state %>, <%= order[0]?.shippingAddress?.country %> <br>
+                                                                <%= order[0]?.shippingAddress?.pincode %> <br>
+                                                                <a href="#">
+                                                                    <%= order[0]?.shippingAddress?.email %>
+                                                                </a>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-sm-6 text-end">
+                                                            <span>Payment To</span>
+                                                            <strong>
+                                                                JMJ Music House
+                                                            </strong>
+                                                            <p>
+                                                                White Field <br>
+                                                                Bangalore <br>
+                                                                650013 <br>
+                                                                India <br>
+                                                                <a href="#">
+                                                                    orders@jmjmusichouse.com
+                                                                </a>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                    
+                                                <div class="line-items">
+                                                    <div class="headers clearfix">
+                                                        <div class="row">
+                                                            <div class="col-md-4">Description</div>
+                                                            <div class="col-md-2">Quantity</div>
+                                                            <div class="col-md-2 text-end">Price</div>
+                                                            <div class="col-md-4 text-end">Amount</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="items">
+                                                        <% for (let i = 0; i < order.length; i++) { %>
+                                                        <div class="row item">
+                                                            <div class="col-md-4 desc">
+                                                                <%= order[i].productInfo[0]?.productName %>
+                                                            </div>
+                                                            <div class="col-md-2 qty">
+                                                                <%= order[i].products?.quantity %>
+                                                            </div>
+                                                            <div class="col-md-2 qty text-end">
+                                                                <%= order[i].products?.salePrice %>
+                                                            </div>
+                                                            <div class="col-md-4 amount text-end">
+                                                                ₹<%= order[i].products?.quantity * order[i]?.products?.salePrice %>
+                                                            </div>
+                                                        </div>
+                                                        <% }  %>
+                                                    </div>
+                                                    <div class="total text-end">
+                                                        <p class="extra-notes">
+                                                            <strong>Extra Notes</strong>
+                                                            <%= order[0]?.shippingAddress?.notes %>
+                                                        </p>
+                                                        <div class="field">
+                                                            Subtotal <span>₹ <%= order[0]?.totalAmount %></span>
+                                                        </div>
+                                                        <div class="field">
+                                                            Shipping <span>₹ <%= order[0]?.shippingCost || '0' %></span>
+                                                        </div>
+                                                        <div class="field">
+                                                            Discount <span>- ₹ <%= order[0]?.discount || '0' %></span>
+                                                        </div>
+                                                        <div class="field grand-total">
+                                                            Total <span>₹ <%= order[0]?.finalAmount %></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="footer mb-30">
+                                                    Copyright © 2023. JMJ Music House
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- card-body end// -->
+                    </div> <!-- card end// -->
+                </div>
+            </div>
+            <% } %> 
+        </section> <!-- content-main end// -->
+    </main>
+    <!-- Vendor JS-->
+    <!-- <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/plugins/slick.js"></script>
+    <script src="/assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="/assets/js/plugins/wow.js"></script>
+    <script src="/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/assets/js/plugins/select2.min.js"></script>
+    <script src="/assets/js/plugins/waypoints.js"></script>
+    <script src="/assets/js/plugins/counterup.js"></script>
+    <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="/assets/js/plugins/images-loaded.js"></script>
+    <script src="/assets/js/plugins/isotope.js"></script>
+     <script src="/assets/js/plugins/scrollup.js"></script> -->
+    <!-- <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="/assets/js/plugins/jquery.theia.sticky.js"></script> --> 
+    <!-- Template  JS -->
+    <!-- <script src="/assets/js/main.js?v=3.4"></script>   -->
+</body>
+
+</html>

@@ -551,8 +551,7 @@ exports.deleteAddress = async (req, res, next) => {
     }
 };
 
-//Wallet
-
+//User Wallet
 exports.getUserWalletDetails = async (req, res, next) => {
     try{
         const id = req.session.user._id;
@@ -679,5 +678,33 @@ exports.addWalletTransactionToDb = async (userId, amount, transactionType, remar
             })
     } catch(err){
         console.log("Error updating user wallet in Database. " + err);
+    }
+};
+
+//------------- REPORTS -------------//
+
+//find and retrieve new user(s) to display in dashboard
+exports.getNewUsers = (req, res, next) => {
+    try{
+        Userdb.find({},{ firstName: 1, lastName: 1, email: 1, address: 1}).collation({locale: "en"})
+        .sort({ createdAt: -1 }).limit(3).lean()
+        .then(data => {
+            if(data.length !== 0){
+                console.log("newUsers received: " + data);
+                res.locals.newUsers = data;
+            }
+            else{
+                console.log("List is empty");
+                res.locals.newUsers = [];
+            }
+            next();            
+        })
+        .catch(err => {
+            console.log(err);
+            next(); 
+        });
+    } catch(err){
+        console.log(err);
+        next(); 
     }
 };

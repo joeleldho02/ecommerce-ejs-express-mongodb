@@ -22,7 +22,7 @@ exports.addCoupon = async (req, res, next) => {
                 .then(async data => {
                     if (data !== null) {
                         console.log("Coupon code already exsits!");  
-                        // res.redirect('/admin/category');
+                        // res.redirect('/admin/coupons');
                         await getAllCategories()
                         .then(data => {
                             res.render('page-coupons', {
@@ -135,7 +135,7 @@ function getCoupon(couponCode){
     }
 }
 
-//update category by category id in db
+//update coupon by coupon id in db
 exports.updateCoupon = async (req, res, next) => {
     try{
         if (!req.body) {
@@ -148,7 +148,7 @@ exports.updateCoupon = async (req, res, next) => {
         await Coupondb.findOne({ couponCode: { $regex: regex }, isDeleted: false, _id:{$ne: req.body.id} })
                 .then( async data => {
                     if (data !== null) {
-                        console.log("Category name already exsits!");  
+                        console.log("Coupon code already exsits!");  
                         await getAllCoupons()
                         .then(data => {
                             res.render('page-coupons', {
@@ -209,7 +209,7 @@ exports.updateCoupon = async (req, res, next) => {
         console.log(err);
     }
 };
-//delete category with specified categoryID from DB
+//delete coupon with specified couponsID from DB
 exports.deleteCoupon = async (req, res) => {
     try{
         if (!req.body) {

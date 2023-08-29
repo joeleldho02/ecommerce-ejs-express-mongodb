@@ -1454,6 +1454,7 @@
             if( btnAction === "add" ) {  
                 $('#addAddressForm').attr('action', '/user/add-new-address');
                 $('#modal-save-btn').text('Add new Address');
+                document.getElementById("addAddressForm").reset();
             }
             else if( btnAction === "edit" ) {
                 $('#addAddressForm').attr('action', '/user/edit-address');

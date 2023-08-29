@@ -165,43 +165,26 @@ exports.updateProductItem = async (req, res) => {
                 .then(catergoryId => {
                     const id = req.body.productID;
                     let imageFiles = [];
-                    let product;
+                    const product = {
+                        productName: req.body.productName,
+                        shortDescription: req.body.shortDescription,
+                        description: req.body.description,
+                        category: catergoryId,
+                        brand: req.body.brand,
+                        regularPrice: req.body.regularPrice,
+                        salePrice: req.body.salePrice,
+                        taxRate: req.body.taxRate,
+                        stock: req.body.stock,
+                        tags: req.body.tags,
+                        SKU:req.body.sku,
+                        updatedAt: Date.now(),
+                        _id: id
+                    };
                     if(req.files.length > 0){
                         imageFiles = req.files.map(file => {
                             return file.filename;
                         });
-                        product = {
-                            productName: req.body.productName,
-                            shortDescription: req.body.shortDescription,
-                            description: req.body.description,
-                            category: catergoryId,
-                            brand: req.body.brand,
-                            regularPrice: req.body.regularPrice,
-                            salePrice: req.body.salePrice,
-                            taxRate: req.body.taxRate,
-                            stock: req.body.stock,
-                            tags: req.body.tags,
-                            SKU:req.body.sku,
-                            images: imageFiles,
-                            updatedAt: Date.now(),
-                            _id: id
-                        }   ;
-                    } else{
-                        product = {
-                            productName: req.body.productName,
-                            shortDescription: req.body.shortDescription,
-                            description: req.body.description,
-                            category: catergoryId,
-                            brand: req.body.brand,
-                            regularPrice: req.body.regularPrice,
-                            salePrice: req.body.salePrice,
-                            taxRate: req.body.taxRate,
-                            stock: req.body.stock,
-                            tags: req.body.tags,
-                            SKU:req.body.sku,
-                            updatedAt: Date.now(),
-                            _id: id
-                        };
+                        product.images = imageFiles;
                     }
                     console.log("EDITED PRODUCT --------> " + product);
                     Productdb.findByIdAndUpdate(id, product)
@@ -387,5 +370,25 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
             errStatus : 404
         });
         console.log(err);
+    }
+};
+
+exports.getProductCount = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count------------>");
+            const count = await Productdb.countDocuments({isDeleted: false});
+            if(count){
+                console.log("Count ::::::::::::::::::"+ count);
+                res.locals.productCount = count;
+                console.log(res.locals.productCount);
+            }
+            next();
+        } else{
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
     }
 };

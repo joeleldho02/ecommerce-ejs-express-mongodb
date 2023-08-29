@@ -22,24 +22,23 @@
 </head>
 
 <body>
-    <%- include('./partials/admin/admin-side-nav.ejs') %>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'products'}) %>
     <main class="main-wrap">
         <%- include('./partials/admin/admin-header.ejs') %>
         <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <p>Manage all your products here.</p>
-                </div>
-                <div>
-                    <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Add Product</a>
-                </div>
-            </div>
             <!-- Begin Page Content -->
             <div class="container-fluid">
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex">
-                        <h6 class="my-auto font-weight-bold text-primary">Product Management</h6>
+                    <div class="card-header py-3 row d-flex">
+                        <div class="col-6">
+                            <h6 class="my-auto font-weight-bold text-primary">Product Management</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Add Product</a>
+                        </div>
+                        <!-- <h6 class="my-auto font-weight-bold text-primary">Product Management</h6>
+                        <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Add Product</a> -->
                         <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
                             <select class="form-select">
                                 <option selected>All category</option>

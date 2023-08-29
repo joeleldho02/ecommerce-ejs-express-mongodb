@@ -22,19 +22,10 @@
 </head>
 
 <body>
-    <%- include('./partials/admin/admin-side-nav.ejs') %>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'orders'}) %>
     <main class="main-wrap">
         <%- include('./partials/admin/admin-header.ejs') %>
         <section class="content-main">
-            <div class="content-header">
-                <div></div>
-                <!-- <div>
-                    <a href="/admin/add-category" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"
-                        data-modaltitle="Add new category" data-btnaction="add">
-                        <i class="material-icons md-plus"></i> Add Category
-                    </a>
-                </div> -->
-            </div>
             <!-- Begin Page Content -->
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">

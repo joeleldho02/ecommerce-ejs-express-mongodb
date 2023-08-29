@@ -23,7 +23,7 @@
 const path = require('path');
 
 const multer  = require('multer');
-const storage = multer.diskStorage({
+const storage1 = multer.diskStorage({
     destination: function(req, file, cb){
         cb(null, path.join('D:/BROTOTYPE/PROJECTS/ecommerce-jmj-music-house/public/img/products'));
     },
@@ -32,7 +32,29 @@ const storage = multer.diskStorage({
         cb(null, name);
     }
 })
-exports.uploadProductImage = multer({ storage: storage });
+exports.uploadProductImage = multer({ storage: storage1 });
+
+const storage2 = multer.diskStorage({
+  destination: function(req, file, cb){
+      cb(null, path.join('D:/BROTOTYPE/PROJECTS/ecommerce-jmj-music-house/public/img/banners'));
+  },
+  filename: function(req, file, cb){
+      const name = Date.now() + "-" + file.originalname;
+      cb(null, name);
+  }
+})
+exports.uploadBannerImage = multer({ storage: storage2 });
+
+const storage3 = multer.diskStorage({
+  destination: function(req, file, cb){
+      cb(null, path.join('D:/BROTOTYPE/PROJECTS/ecommerce-jmj-music-house/public/img/users'));
+  },
+  filename: function(req, file, cb){
+      const name = Date.now() + "-" + file.originalname;
+      cb(null, name);
+  }
+})
+exports.uploadUserImage = multer({ storage: storage3 });
 
 
 const sharp = require("sharp");

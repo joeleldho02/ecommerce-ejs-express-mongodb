@@ -21,26 +21,25 @@
 </head>
 
 <body>
-    <%- include('./partials/admin/admin-side-nav.ejs') %>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'category'}) %>
     <main class="main-wrap">
         <%- include('./partials/admin/admin-header.ejs') %>
         <section class="content-main">
-            <div class="content-header">
-                <div></div>
-                <div>
-                    <a class="btn btn-primary" id="btn-add-category" data-bs-toggle="modal" data-bs-target="#myModal"
-                        data-modaltitle="<% if (locals.action) { %>Edit category details<% } else { %>Add new category<% } %>" 
-                        data-btnaction="<% if (locals.action) { %><%= action %><% } else { %>add<% } %>">
-                        <i class="material-icons md-plus"></i> Add Category
-                    </a>
-                </div>
-            </div>
             <!-- Begin Page Content -->
-            <div class="container-fluid w-75">
+            <div class="container-fluid">
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex">
-                        <h6 class="my-auto font-weight-bold text-primary">Category Management</h6>
+                    <div class="card-header py-3 row d-flex">
+                        <div class="col-6">
+                            <h6 class="my-auto font-weight-bold text-primary">Category Management</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a class="btn btn-primary" id="btn-add-category" data-bs-toggle="modal" data-bs-target="#myModal"
+                                data-modaltitle="<% if (locals.action) { %>Edit category details<% } else { %>Add new category<% } %>" 
+                                data-btnaction="<% if (locals.action) { %><%= action %><% } else { %>add<% } %>">
+                                <i class="material-icons md-plus"></i> Add Category
+                            </a>                    
+                        </div>
                         <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
                             <select class="form-select">
                                 <option selected>All category</option>
@@ -338,6 +337,8 @@
                 $('#modalForm').attr('action', '/admin/add-category');
                 document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
                 $('#modal-save-btn').text('Add category');
+                
+                document.getElementById("modalForm").reset();
             }
             else if( btnAction === "edit" ) {
                 $('#modalForm').attr('action', '/admin/edit-category');

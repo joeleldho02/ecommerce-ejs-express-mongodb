@@ -302,3 +302,25 @@ exports.deleteCategory = (req, res) => {
         console.log(err.message);
     }
 };
+
+
+exports.getCategoryCount = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count------------>");
+            const count = await Categorydb.countDocuments({isDeleted: false});
+            if(count){
+                console.log("Count ::::::::::::::::::"+ count);
+                res.locals.categoryCount = count;
+                console.log(res.locals.categoryCount);
+            }
+            next();
+        } else{
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
+    }
+};
+
