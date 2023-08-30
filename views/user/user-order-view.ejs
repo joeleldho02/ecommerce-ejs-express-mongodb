@@ -17,6 +17,19 @@
     <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
     <link rel="stylesheet" href="/css/form-error.css" />
+    <link rel="stylesheet" href="/css/custom-alert.css">
+    <style>
+        .notification {
+            display: none;
+            position: fixed;
+            top: 120px;
+            right: 100px;
+            background-color: #f4dede;
+            color: #121010;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -432,6 +445,9 @@
         </div>
     </div>
     <main class="main">
+        <div class="notification" id="notification">
+            <p>Your order invoice download has started...</p>
+        </div>
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
@@ -439,6 +455,7 @@
                     <span></span> Orders
                     <span></span> View Order
                 </div>
+                
             </div>
         </div>
         <section class="content-main">
@@ -467,8 +484,7 @@
                                 <% } else if(new Date(order[0]?.createdAt.getTime() + 5*60000) > Date.now() && order[0]?.orderStatus !== "CANCELLED" && order[0]?.orderStatus !== "RETURNED") { %>
                                     <a class="btn btn-primary" href="/user/return-order/<%= order[0]?._id %>">RETURN ORDER</a>
                                 <% } %> 
-                                <a class="btn btn-secondary ms-2" href="/user/order-invoice/<%= order[0]?._id %>">VIEW INVOICE</a>
-                                <!-- <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a> -->
+                                <a class="btn btn-secondary print ms-2" onclick="downloadInvoice()"> INVOICE <i class="icon material-icons md-print"></i></a>
                             </div>
                         </div>
                     </header> <!-- card-header end// -->
@@ -750,6 +766,8 @@
             </div>
         </div>
     </footer>
+    <!-- Custom Alert -->
+    <%- include('./partials/home/custom-alert.ejs') %>
     <!-- Preloader Start -->
     <div id="preloader-active">
         <div class="preloader d-flex align-items-center justify-content-center">
@@ -787,6 +805,33 @@
     <script src="/assets/js/plugins/jquery.theia.sticky.js"></script>
     <!-- Template  JS -->
     <script src="/assets/js/main.js?v=3.4"></script>
+    <script src="/js/custom-alert.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easyinvoice/dist/easyinvoice.min.js"></script>
+    <script>
+        function downloadInvoice(){
+            $.ajax({
+                url:"/user/download-invoice/<%= order[0]?._id %>",
+                method:'get',
+                success:async (data)=>{
+                    if(data){
+                        // customAlert("Hi there...!","Downloading invoice. Please check downloads");
+                        showNotification();
+                        await easyinvoice.createInvoice(data, function (result) {
+                            easyinvoice.download('Order Invoice.pdf', result.pdf);
+                        });                        
+                    } else{
+                        customAlert("Oops...!","Unable to download invoice right now. Please try again later.");
+                    }
+                }
+            });
+        }
+
+        function showNotification() {
+            const notification = document.getElementById("notification");
+            notification.style.display = "block";
+            setTimeout(()=>{ notification.style.display = "none"; }, 3000);
+        }
+    </script>
 </body>
 
 </html>

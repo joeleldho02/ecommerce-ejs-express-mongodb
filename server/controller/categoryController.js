@@ -307,10 +307,10 @@ exports.deleteCategory = (req, res) => {
 exports.getCategoryCount = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
-            console.log("Getting Order Count------------>");
+            console.log("Getting Category Count------------>");
             const count = await Categorydb.countDocuments({isDeleted: false});
             if(count){
-                console.log("Count ::::::::::::::::::"+ count);
+                console.log("Category Count ::::::::::::::::::");
                 res.locals.categoryCount = count;
                 console.log(res.locals.categoryCount);
             }

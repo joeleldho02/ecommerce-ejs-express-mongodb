@@ -661,7 +661,7 @@ exports.verifyWalletRazorpayPayment = (req, res)=>{
         console.log(err);
         res.json({status: false, errMsg:'Payment failed!'});
     }
-}
+} 
 
 exports.addWalletTransactionToDb = async (userId, amount, transactionType, remarks) => {
     try{

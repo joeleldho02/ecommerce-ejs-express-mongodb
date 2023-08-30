@@ -56,6 +56,17 @@ const storage3 = multer.diskStorage({
 })
 exports.uploadUserImage = multer({ storage: storage3 });
 
+const storage4 = multer.diskStorage({
+  destination: function(req, file, cb){
+      cb(null, path.join('D:/BROTOTYPE/PROJECTS/ecommerce-jmj-music-house/public/img/category'));
+  },
+  filename: function(req, file, cb){
+      const name = Date.now() + "-" + file.originalname;
+      cb(null, name);
+  }
+})
+exports.uploadCategoryImage = multer({ storage: storage4 });
+
 
 const sharp = require("sharp");
 exports.resizeImages = async (req, res, next) => {

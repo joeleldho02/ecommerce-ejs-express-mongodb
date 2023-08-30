@@ -468,7 +468,7 @@
                                                 <h5 class="mb-0">Hello <%- user.firstName %>! </h5>
                                             </div>
                                             <div class="card-body">
-                                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a></p>
+                                                <p>From your account dashboard. you can easily check &amp; view your <a href="#orders">recent orders</a>, manage your <a href="#address">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a></p>
                                             </div>
                                         </div>
                                     </div>
@@ -547,7 +547,12 @@
                                                             </div>
                                                             <div class="card-body">
                                                                 <p><strong><%= addresses[i]?.customerName %></strong></p>
-                                                                <address><%= addresses[i]?.addressLine1 %><br><%= addresses[i]?.addressLine2 %>,<br><%= addresses[i]?.city %>, <%= addresses[i]?.state %><br><%= addresses[i]?.pincode %></address>
+                                                                <address>
+                                                                    <%= addresses[i]?.addressLine1 %><br>
+                                                                    <% if(addresses[i]?.addressLine2) { %><%= addresses[i]?.addressLine2 %>,<br><% } %>
+                                                                    <%= addresses[i]?.city %>, <%= addresses[i]?.state %><br>
+                                                                    <%= addresses[i]?.pincode %>
+                                                                </address>
                                                                 <p>Email: <%= addresses[i]?.email %></p>
                                                                 <address>Phone: <%= addresses[i]?.phone %></address>                                                        
                                                                 <a class="btn-small edit_address_button" id="edit-address-button"

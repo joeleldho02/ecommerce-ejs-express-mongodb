@@ -68,7 +68,7 @@
                                                 <span 
                                                 <% if (orders[i]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill badge-soft-info"
                                                 <% } else if (orders[i]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill badge-soft-success"
-                                                <% } else if (orders[i]?.paymentStatus.toLowerCase() == "chargeback") { %> class="badge badge-pill badge-soft-danger"
+                                                <% } else if (orders[i]?.paymentStatus.toLowerCase() == "not paid") { %> class="badge badge-pill badge-soft-danger"
                                                 <% } else if (orders[i]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill badge-soft-warning" <% } %> 
                                                 ><%= orders[i]?.paymentStatus %></span>   
                                             <% } %>                                          

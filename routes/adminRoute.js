@@ -68,7 +68,8 @@ router.post('/add-banner', authController.authenticateAdmin, uploadController.up
 router.post('/edit-banner', authController.authenticateAdmin, uploadController.uploadBannerImage.single('image'), bannerController.updateBanner);
 router.post('/delete-banner', authController.authenticateAdmin, bannerController.deleteBanner);
 
-//------- BANNERS --------//
-router.get('/sales', authController.authenticateAdmin, serviceRender.getAdminSalesPage);
+//------- SALES --------//
+router.get('/sales', authController.authenticateAdmin, categoryController.getListedCategories, orderController.getAllUsersOrders, serviceRender.getAdminSalesPage);
+router.post('/get-report', authController.authenticateAdmin, ((req, res, next)=>{console.log(req.body); res.send(req.body)}));
 
 module.exports = router;  

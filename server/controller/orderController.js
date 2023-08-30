@@ -2,8 +2,9 @@ const Cartdb = require('../model/cartModel');
 const Orderdb = require('../model/orderModel');
 const Productdb = require('../model/productModel');
 const mongoose = require('mongoose');
-const paymentHelper = require('../helper/razorpay'); 
 const userController = require('./userController');
+const paymentHelper = require('../helper/razorpay'); 
+const invoiceHelper = require('../helper/invoicePDF'); 
 const Userdb = require('../model/userModel');
 
 exports.placeOrder = async (req, res, next) => {
@@ -443,7 +444,7 @@ exports.cancelOrder = async (req, res, next) => {
                     if(order.paymentStatus === "PAID"){
                         const amount = order.finalAmount*100;
                         const remarks = "Refund of order"
-                        await userController.addWalletTransaction(req.session.user._id, amount, "C", remarks)
+                        await userController.addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
                             .then((data)=>{
                                 console.log(`Refund of amount "₹${data.amount}" is successful!`);
                                 // res.json({status:true, data: data});
@@ -468,7 +469,7 @@ exports.cancelOrder = async (req, res, next) => {
                                 else {
                                     //res.send(data);   
                                     console.log("Order cancelled successfully!");
-                                    res.redirect('back');
+                                    res.redirect('/user?tab=orders');
                                 }
                             })
                             .catch(err => {
@@ -532,7 +533,7 @@ exports.returnOrder = async (req, res, next) => {
                     if(order.paymentStatus === "PAID"){
                         const amount = order.finalAmount*100;
                         const remarks = "Refund of order"
-                        await userController.addWalletTransaction(req.session.user._id, amount, "C", remarks)
+                        await userController.addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
                             .then((data)=>{
                                 console.log(`Refund of amount "₹${data.amount}" is successful!`);
                                 // res.json({status:true, data: data});
@@ -612,7 +613,7 @@ exports.getOrderCount = async(req, res, next) => {
             console.log("Getting Order Count------------>");
             const count = await Orderdb.countDocuments({});
             if(count){
-                console.log("Count ::::::::::::::::::"+ count);
+                console.log("Count ::::::::::::::::::");
                 res.locals.orderCount = count;
                 console.log(res.locals.orderCount);
             }
@@ -629,7 +630,7 @@ exports.getOrderCount = async(req, res, next) => {
 exports.getTotalRevenue = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
-            console.log("Getting Order Count------------>");
+            console.log("Getting Total Revenue------------>");
             const data = await Orderdb.aggregate([
                 {
                     $match:{orderStatus:{$nin:['CANCELLED', 'RETURNED']}, paymentStatus:{$nin:['PENDING', 'REFUNDED']}}
@@ -641,10 +642,9 @@ exports.getTotalRevenue = async(req, res, next) => {
                     $project:{_id:0}
                 }
             ]);
-            console.log(data);
             const totalRevenue = data[0].totalRevenue;
             if(totalRevenue){
-                console.log("totalRevenue ::::::::::::::::::"+ totalRevenue);
+                console.log("total Revenue ::::::::::::::::::");
                 res.locals.totalRevenue = totalRevenue;
                 console.log(res.locals.totalRevenue);
             }
@@ -661,9 +661,8 @@ exports.getTotalRevenue = async(req, res, next) => {
 exports.getMonthlyTotalRevenue = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
-            console.log("Getting Order Count------------>");
+            console.log("Getting Monthly Total Revenue------------>");
             const month = new Date().getMonth() + 1;
-            console.log(month);
             const data = await Orderdb.aggregate([
                 {
                     $match:{
@@ -682,10 +681,9 @@ exports.getMonthlyTotalRevenue = async(req, res, next) => {
                 }
                 
             ]);
-            console.log(data);
             const totalMonthlyRevenue = data[0].totalMonthlyRevenue;
             if(totalMonthlyRevenue){
-                console.log("totalMonthlyRevenue ::::::::::::::::::"+ totalMonthlyRevenue);
+                console.log("total Monthly Revenue ::::::::::::::::::");
                 res.locals.totalMonthlyRevenue = totalMonthlyRevenue;
                 console.log(res.locals.totalMonthlyRevenue);
             }
@@ -714,9 +712,8 @@ exports.getOrderCountPercent = async(req, res, next) => {
                     $sort: { status : 1}
                 }
             ]);
-            console.log(data);
             if(data){
-                console.log("Count ::::::::::::::::::"+ data);
+                console.log("Order Count Percent ::::::::::::::::::");
                 res.locals.orderCountPercent = data;
                 console.log(res.locals.orderCountPercent);
             }
@@ -733,7 +730,7 @@ exports.getOrderCountPercent = async(req, res, next) => {
 exports.getCategoryPerformance = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
-            console.log("Getting Order Count Percent------------>");           
+            console.log("Getting Category Performancet------------>");           
             const data = await Orderdb.aggregate([
                 {
                     $match: {
@@ -756,10 +753,8 @@ exports.getCategoryPerformance = async(req, res, next) => {
                     $sort: { category: 1 }
                 }
             ]);
-            
-            console.log(data);
             if(data){
-                console.log("Count ::::::::::::::::::"+ data);
+                console.log("Category Performance ::::::::::::::::::");
                 res.locals.categoryPerformance = data;
                 console.log(res.locals.categoryPerformance);
             }
@@ -773,41 +768,109 @@ exports.getCategoryPerformance = async(req, res, next) => {
     }
 };
 
-exports.generatePdf = async (req, res, next) => {
-    const puppeteer = require('puppeteer');
-    const fs = require('fs');
+// exports.generatePdf = async (req, res, next) => {
+//     const puppeteer = require('puppeteer');
+//     const fs = require('fs');
 
-    async function generatePDF(url, outputFile){
-        try{
-            //launch browser
-            const browser = await puppeteer.launch({headless: false});
-            const page = await browser.newPage();
+//     async function generatePDF(url, outputFile){
+//         try{
+//             //launch browser
+//             const browser = await puppeteer.launch({headless: false});
+//             const page = await browser.newPage();
 
-            // //navigate to page
-            // await page.goto(url, { waitUntil: 'networkidle0' });
-            const html = fs.readFileSync('sample.html', 'utf-8');
-            await page.setContent(html, { waitUntil: 'domcontentloaded' });
+//             // //navigate to page
+//             // await page.goto(url, { waitUntil: 'networkidle0' });
+//             const html = fs.readFileSync('sample.html', 'utf-8');
+//             await page.setContent(html, { waitUntil: 'domcontentloaded' });
 
-            //To reflect CSS used for screens instead of print
-            await page.emulateMediaType('screen');
+//             //To reflect CSS used for screens instead of print
+//             await page.emulateMediaType('screen');
 
-            //generate pdf
-            await page.pdf({
-                path: outputFile, 
-                format: 'A4',
-                margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
-                printBackground: true
-            });
+//             //generate pdf
+//             await page.pdf({
+//                 path: outputFile, 
+//                 format: 'A4',
+//                 margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+//                 printBackground: true
+//             });
 
-            //close browser
-            await browser.close();
-            res.send("PDF Saved!");
-        } catch(err){
-            console.log(err);
+//             //close browser
+//             await browser.close();
+//             res.send("PDF Saved!");
+//         } catch(err){
+//             console.log(err);
+//         }
+//     }
+
+//     const url = "http://localhost:8080/user/order-invoice/64ec2da84314998bc93bd41d";
+//     const outputFile = Date.now() + "out1.pdf";
+//     generatePDF(url, outputFile);
+// };
+
+exports.getOrderSales = async (req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Sales------------>");
+            await Orderdb.find()
+                .sort({createdAt: -1}).lean()
+                .then(data => {
+                    console.log(data);
+                    if(data !== null || data.length !== 0){
+                        res.locals.orders = data;
+                    }
+                    next();
+                })
+        } else{
+            next();
         }
+    }catch(err){
+        next();
     }
-
-    const url = "http://localhost:8080/user/order-invoice/64ec2da84314998bc93bd41d";
-    const outputFile = Date.now() + "out1.pdf";
-    generatePDF(url, outputFile);
 };
+
+exports.generateInvoicePDF = (req, res, next) => {
+    const fs = require('fs');
+    const path = require('path');
+    const order = res.locals.order;
+    const products = []
+    order.forEach((product)=>{
+        return products.push({
+            "quantity": String(product?.products?.quantity),
+            "description": String(product?.productInfo[0]?.productName),
+            "price": String(product?.products?.salePrice),
+            "tax-rate" : "0"
+        });
+    })
+    const data = {
+        "client": {
+            "company": String(order[0]?.customerInfo[0]?.firstName) + " " + String(order[0]?.customerInfo[0]?.lastName),
+            "address": String(order[0]?.shippingAddress?.addressLine1) + " " + String(order[0]?.shippingAddress?.addressLine2),
+            "city": String(order[0]?.shippingAddress?.city),
+            "country": String(order[0]?.shippingAddress?.state) + " " + String(order[0]?.shippingAddress?.country),
+            "zip": String(order[0]?.shippingAddress?.pincode),
+        },
+        images: {
+            logo: fs.readFileSync(path.join(__dirname, "../../public/assets/imgs/theme/logo.png"), 'base64'),
+        },    
+        "sender": {
+            "company": "JMJ Music House",
+            "address": "White Field",
+            "city": "Bangalore",
+            "country": "India",
+            "zip": "",
+            "custom1": "650013",
+            "email" : "orders@jmjmusichouse.com"
+        },
+        "information": {
+            "number": order[0]?._id,
+            "date": order[0]?.createdAt.toLocaleDateString(),
+        },
+        "products": products,
+        "bottomNotice": "JMJ Music House 2023",
+        "settings": {
+            "currency": "INR",
+        },
+    };
+    res.json(data);
+}
+

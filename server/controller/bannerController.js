@@ -11,7 +11,9 @@ exports.addBanner = async (req, res, next) => {
         else {
             const newBanner = new Bannerdb({
                 title: req.body.title,
+                description: req.body.description,
                 link: req.body.link,
+                location: req.body.location,
                 image: req.file.filename,
                 isActive: req.body.isActive === "on" ? true : false
             })
@@ -90,7 +92,9 @@ exports.updateBanner = async (req, res, next) => {
 
         const editBanner = {
             title: req.body.title,
+            description: req.body.description,
             link: req.body.link,
+            location: req.body.location,
             isActive: req.body.isActive === "on" ? true : false,
             _id: id
         };

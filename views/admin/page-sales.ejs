@@ -18,7 +18,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/datatable.css">
     <link rel="stylesheet" href="/css/custom-alert.css">
-
+    <style>
+        .notification {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 15px;
+            background-color: #f4dede;
+            color: #121010;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 2000;
+            width: fit-content;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,35 +40,74 @@
         <%- include('./partials/admin/admin-header.ejs') %>
         <section class="content-main">
             <!-- Begin Page Content -->
-                <!-- DataTales Example -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex">
-                        <h6 class="my-auto font-weight-bold text-primary">Sales</h6>
-                        <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
-                            <select class="form-select">
-                                <option selected>All category</option>
-                                <option>Electronics</option>
-                                <option>Clothes</option>
-                                <option>Automobile</option>
-                            </select>
-                        </div> -->
-                    </div>
                     <div class="card-body mb-50">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <form id="formReport" name="formReport" action="/admin/get-report" method="post">
+                        <div class="row w-100" style="position: relative;">
+                            <div class="col-3 m-auto">
+                                <h6 class="my-auto font-weight-bold text-primary">Overall Order Sales</h6>
+                                <!-- <select class="form-select" id="category" name="category" onchange="getReport()">
+                                    <option value="all" selected>All category</option>
+                                    <% if (locals.categories) { %>
+                                        <% for (let i = 0; i < categories.length; i++) { %>
+                                            <% if(categories[i]?.isListed) { %>
+                                                <option value="<%= categories[i]?.categoryName %>"><%= categories[i]?.categoryName %></option>
+                                            <% } %>
+                                        <% } %>                                        
+                                    <% } %>
+                                </select> -->
+                            </div>
+                            <div class='col-3 form-group date w-25' id='picker1'>
+                                <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')" class="form-control" placeholder="Start Date" name="startDate" id="startDate" required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                            <div class='col-3 form-group date w-25' id='picker2'>
+                                <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')" class="form-control" placeholder="End Date" name="endDate" id="endDate" required />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                            <div class="col-3 m-auto text-end d-flex">
+                                <a href="javascript:{}" type="submit" onclick="getReport()" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
+                                <a href="javascript:{}" class="btn btn-secondary print ms-2" onclick="downloadReport()"><i class="icon material-icons md-print"></i></a>
+                            </div>
+                            <div class="notification" id="notification">
+                                <p>Report download has started...</p>
+                            </div>
+                        </div>
+                        </form>
+                        <div class="table-responsive mt-25">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" class="display">
                                 <thead>
                                     <tr>
                                         <th class="align-middle" scope="col">Order ID</th>
-                                        <th class="align-middle" scope="col">Billing Name</th>
-                                        <th class="align-middle" scope="col">Date</th>
+                                        <th class="align-middle" scope="col">Timestamp</th>
+                                        <th class="align-middle" scope="col">Customer</th>
+                                        <th class="align-middle" scope="col">Items</th>
                                         <th class="align-middle" scope="col">Total</th>
-                                        <th class="align-middle" scope="col">Payment Status</th>
-                                        <th class="align-middle" scope="col">Payment Method</th>
-                                        <th class="align-middle" scope="col">Order Status</th>
-                                        <th class="align-middle" scope="col">Actions</th>
+                                        <th class="align-middle" scope="col">Payment<br>Method</th>
                                     </tr>
                                 </thead>
-                                <tbody>                                    
+                                <tbody>  
+                                    <% if(locals.salesData) {%>
+                                        <% for(let i = 0; i < salesData.length; i++) { %>
+                                    <tr>
+                                        <td><a class="fw-bold" href="/admin/orders/<%= salesData[i]._id %>" target="_blank">#<%= salesData[i].orderId %></a> </td>
+                                        <td><%= salesData[i]?.createdAt.toLocaleDateString() %><br><%= salesData[i]?.createdAt.toLocaleTimeString() %></td>
+                                        <td><%= salesData[i]?.shippingAddress?.customerName %></td>
+                                        <td>
+                                            <% for(let j = 0; j < salesData[i]?.products.length; j++) { %>
+                                                <% if(j !== 0) { %> <br> <% } %>
+                                                <%= salesData[i]?.products[j]?.productName %> x <%= salesData[i]?.products[j]?.quantity %>
+                                            <% } %>
+                                        </td>
+                                        <td>₹<%= salesData[i]?.totalAmount %></td>
+                                        <td><i class="material-icons md-payment font-xxl text-muted mr-5"></i><%= salesData[i]?.paymentMethod %></td>
+                                    </tr> 
+                                        <% } %>                                 
+                                    <% } %>                                 
                                 </tbody>
                              </table>
                         </div>
@@ -84,10 +136,20 @@
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
             $('#dataTable').DataTable({
-                order: [[2, 'desc']],
-                columnDefs: [{ "targets": [0,7], "orderable": false }]
+                order: [[1, 'desc']],
+                columnDefs: [{ "targets": [0,3], "orderable": false }],
+                dom: '<"top"i>rt<"bottom"lp><"clear">'
             });
         });
+        
+        function downloadReport() {console.log("Download Report"); showNotification();}
+        function getReport() {console.log("Get new DATA");}
+
+        function showNotification() {
+            const notification = document.getElementById("notification");
+            notification.style.display = "block";
+            setTimeout(()=>{ notification.style.display = "none"; }, 3000);
+        }
     </script> 
 </body>
 

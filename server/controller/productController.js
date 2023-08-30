@@ -376,10 +376,10 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
 exports.getProductCount = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
-            console.log("Getting Order Count------------>");
+            console.log("Getting Product Count------------>");
             const count = await Productdb.countDocuments({isDeleted: false});
             if(count){
-                console.log("Count ::::::::::::::::::"+ count);
+                console.log("Product Count ::::::::::::::::::"+ count);
                 res.locals.productCount = count;
                 console.log(res.locals.productCount);
             }

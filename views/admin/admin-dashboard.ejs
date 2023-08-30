@@ -173,7 +173,7 @@
                             </div>
                         </div>
                         <!-- Recent Activities -->
-                        <div class="col-lg-7">
+                        <!-- <div class="col-lg-7">
                             <div class="card mb-4">
                                 <article class="card-body">
                                     <h5 class="card-title">Recent activities</h5>
@@ -256,29 +256,66 @@
                                     </ul>
                                 </article>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-12">
                     <div class="card mb-4">
                         <article class="card-body">
-                            <h5 class="card-title">All Orders</h5>
+                            <h5 class="card-title">This Month Orders</h5>
                             <figure class="highcharts-figure">
                                 <div id="container"></div>
                             </figure>
                         </article>
                     </div>
+                    <!-- Side Bar Graph -->
+                    <!-- <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="small font-weight-bold">Server Migration <span
+                                    class="float-right">20%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"
+                                    aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Sales Tracking <span
+                                    class="float-right">40%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 40%"
+                                    aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Customer Database <span
+                                    class="float-right">60%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar" role="progressbar" style="width: 60%"
+                                    aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Payout Details <span
+                                    class="float-right">80%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 80%"
+                                    aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Account Setup <span
+                                    class="float-right">Complete!</span></h4>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"
+                                    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div> -->
                     <!-- Category Statistics -->
                     <div class="card mb-4">
                         <article class="card-body">
-                            <h5 class="card-title">Category Wise Performance</h5>
+                            <h5 class="card-title">Category Wise Monthly Performance</h5>
                             <% if(locals.categoryPerformance) { %>
                                 <% const totCatCount = categoryPerformance.reduce((sum, item)=>{ return sum + item.count},0) %>
                                 <% for(let i = 0; i < categoryPerformance.length; i++) {%>
                                     <% const progressWidth = Math.floor((categoryPerformance[i].count/totCatCount)*100) %>
                             <span class="text-muted font-xs"><%= categoryPerformance[i].category %></span>
                             <div class="progress mb-3">
-                                // @ts-ignore
                                 <div class="progress-bar" role="progressbar" style="width: <%= progressWidth %>%">
                                     <%= progressWidth %>%
                                 </div>
@@ -312,12 +349,11 @@
             });
         }
 
-        let d0 = Number('<%= orderCountPercent[0].count %>');
-        let d1 = Number('<%= orderCountPercent[1].count %>');
-        let d2 = Number('<%= orderCountPercent[2].count %>');
-        let d3 = Number('<%= orderCountPercent[3].count %>');
-        let d4 = Number('<%= orderCountPercent[4].count %>');
-        let d5 = Number('<%= orderCountPercent[5].count %>');
+        const data = [];
+        '<% for( let i = 0; i < orderCountPercent.length; i++ ) { %>'
+            data.push(['<%= orderCountPercent[i]?.status %>', Number('<%= orderCountPercent[i]?.count %>')]);
+        '<% } %>'
+        
         Highcharts.chart('container', {
             chart: {
                 plotBackgroundColor: null,
@@ -362,14 +398,15 @@
                 type: 'pie',
                 name: 'Orders',
                 innerSize: '50%',
-                data: [
-                    ['Pending', d4],
-                    ['Approved', d0],
-                    ['Delivered', d3],
-                    ['Cancelled', d1],
-                    ['Declined', d2],
-                    ['Returned', d5]
-                ]
+                // data: [
+                //     ['Pending', d4],
+                //     ['Approved', d0],
+                //     ['Delivered', d3],
+                //     ['Cancelled', d1],
+                //     ['Declined', d2],
+                //     ['Returned', d5]
+                // ]
+                data:data
             }],
             navigation: {
                 buttonOptions: {

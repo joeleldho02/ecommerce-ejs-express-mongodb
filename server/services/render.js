@@ -160,7 +160,9 @@ exports.getAdminBannerPage = (req, res) => {
 };
 exports.getAdminSalesPage = (req, res) => {
     res.render('page-sales', {
-        pageTitle: "Sales Report"
+        pageTitle: "Sales Report",
+        salesData: res.locals.orders,
+        categories: res.locals.categories,
     });
 };
 
