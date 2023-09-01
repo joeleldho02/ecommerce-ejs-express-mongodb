@@ -150,7 +150,7 @@ exports.getListedCategories = async (req, res, next) => {
         });
     } catch(err){
         res.status(500).render('error', {
-            message: "Unable to retrieve data from database",
+            message: "Unable to retrieve data from database", 
             errStatus : 500
         });    
         console.log(err.message);    

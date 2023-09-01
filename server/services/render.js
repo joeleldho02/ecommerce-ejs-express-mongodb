@@ -3,8 +3,14 @@ const userController = require('../controller/userController');
 //------- HOME PAGE --------//
 exports.homePage = (req, res) => {
     res.render('home',{
+        user: req.session.user,
         categories: res.locals.categories,
-
+        banners: res.locals.banners,
+        cartItems : res.locals.cartItems,
+        subTotal : res.locals.subTotal,
+        itemsCount : res.locals.itemsCount,
+        featuredProds : res.locals.featuredProds,
+        newArrivalProds : res.locals.newArrivalProds,
     });
 };
 exports.categoryProductsPage = (req, res) => {
@@ -15,26 +21,36 @@ exports.categoryProductsPage = (req, res) => {
                     });
     } else{
         res.render('page-category-products', {
+            user: req.session.user,
             categories: res.locals.categories,
             products : res.locals.products,
+            newProducts : res.locals.newProducts,
             cartItems : res.locals.cartItems,
             subTotal : res.locals.subTotal,
-            itemsCount : res.locals.itemsCount
+            itemsCount : res.locals.itemsCount,
+            currentPage : res.locals.currentPage,
+            totalPages : res.locals.totalPages,
+            category : res.locals.category
         });
     }    
 };
 exports.productDetailsPage = (req, res) => {
     res.render('page-product-details', {
+        user: req.session.user,
         categories: res.locals.categories,
         product: res.locals.product,
+        newProducts : res.locals.newProducts,
         relatedProducts: res.locals.products,
         cartItems : res.locals.cartItems,
         subTotal : res.locals.subTotal,
-        itemsCount : res.locals.itemsCount
+        itemsCount : res.locals.itemsCount,
+        currentPage : res.locals.currentPage,
+        totalPages : res.locals.totalPages,
     });
 };
 exports.getUserCartPage = (req, res) => {
     res.render('page-cart', {
+        user: req.session.user,
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         subTotal : res.locals.subTotal,
@@ -46,6 +62,7 @@ exports.getUserCheckoutPage = (req, res) => {
         res.redirect('/');
     } else{
         res.render('page-checkout', {
+            user: req.session.user,
             categories: res.locals.categories,
             cartItems : res.locals.cartItems,
             subTotal : res.locals.subTotal,
@@ -57,10 +74,20 @@ exports.getUserCheckoutPage = (req, res) => {
 };
 exports.getOrderPlacedPage = (req, res) => {
     res.render('page-order-placed',{
+        user: req.session.user,
         categories: res.locals.categories,        
         itemsCount : res.locals.itemsCount,
         cartItems : res.locals.cartItems,
         order: res.locals.order,
+    });
+};
+exports.contactUs = (req, res) => {
+    res.render('page-contact',{
+        user: req.session.user,
+        categories: res.locals.categories,
+        cartItems : res.locals.cartItems,
+        subTotal : res.locals.subTotal,
+        itemsCount : res.locals.itemsCount
     });
 };
 
@@ -85,6 +112,7 @@ exports.adminDashboardPage = (req, res) => {
             orderCountPercent: res.locals.orderCountPercent,
             newUsers: res.locals.newUsers,
             categoryPerformance: res.locals.categoryPerformance,
+            monthlyOrderStats: res.locals.monthlyOrderStats,
         });
     else if(req.session.userLoggedIn === true)
         res.redirect('/user');
@@ -159,11 +187,24 @@ exports.getAdminBannerPage = (req, res) => {
     });
 };
 exports.getAdminSalesPage = (req, res) => {
-    res.render('page-sales', {
-        pageTitle: "Sales Report",
-        salesData: res.locals.orders,
-        categories: res.locals.categories,
-    });
+    if(Object.keys(req.query).length !== 0){
+        console.log("YES");
+        res.render('page-sales', {
+            pageTitle: "Sales Report",
+            salesData: res.locals.orders,
+            categories: res.locals.categories,
+            startDate: req.query.start,
+            endDate: req.query.end,
+            duration: req.query.duration,
+        });
+    } else {
+        console.log("NO");
+        res.render('page-sales', {
+            pageTitle: "Sales Report",
+            salesData: res.locals.orders,
+            categories: res.locals.categories,
+        });
+    }
 };
 
 //------- USER SIDE --------//
@@ -195,20 +236,24 @@ exports.userLoginPage = (req, res) => {
     else
         res.render('user-login',{
             errMsg: req.session.loginErrMsg, 
-            err: req.session.loginErr});
+            err: req.session.loginErr,   
+            categories: res.locals.categories,});
 };
 exports.userSignupPage = (req, res) => {
     if(req.session.userLoggedIn === true)
         res.redirect('/user');
     else
-        res.render('user-signup');
+        res.render('user-signup',{    
+            categories: res.locals.categories,
+        });
 };
 exports.userVerifyOtpPage = (req, res) => {
     if(req.session.userLoggedIn === true)
         res.redirect('/user');
     else
         res.render('user-otp',{
-            phone: req.session.signupPhone
+            phone: req.session.signupPhone,   
+            categories: res.locals.categories,
         });
 }
 exports.userLogout = (req, res) => {
@@ -217,6 +262,7 @@ exports.userLogout = (req, res) => {
 };
 exports.getUserOrderDetailsPage = (req, res) => {
     res.render('user-order-view', {
+        user: req.session.user,
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         itemsCount : res.locals.itemsCount,
@@ -226,6 +272,7 @@ exports.getUserOrderDetailsPage = (req, res) => {
 }
 exports.getUserOrderInvoicePage = (req, res) => {
     res.render('user-order-invoice', {
+        user: req.session.user,
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         itemsCount : res.locals.itemsCount,

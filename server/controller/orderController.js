@@ -87,8 +87,7 @@ exports.placeOrder = async (req, res, next) => {
 			if (result.modifiedCount !== products.length) {
 				return res.status(500).json({ status: false, errMsg: 'Something went wrong, Pls try again later' })
 			}
-    
-            const newOrder = new Orderdb({
+            const tempOrder = {
                 orderId: orderId,
                 customerId: userId,
                 paymentMethod: req.body.paymentMethod,
@@ -97,7 +96,13 @@ exports.placeOrder = async (req, res, next) => {
                 totalAmount : req.body.totalAmount,
                 totalItems : totalItems,
                 finalAmount: req.body.totalAmount
-            })
+            };
+            if(req.body.discountCoupon !== ""){
+                tempOrder.coupon = req.body.discountCoupon;
+                tempOrder.discount = req.body.discountAmount;
+                tempOrder.totalAmount = Number(req.body.totalAmount) + Number(req.body.discountAmount);
+            }
+            const newOrder = new Orderdb(tempOrder);
 
             /////////////////
             // const placeOrder = newOrder.save();
@@ -139,7 +144,7 @@ exports.placeOrder = async (req, res, next) => {
                                 console.log(err);
                             });                                             
                     } else if(savedOrder.paymentMethod === 'RAZORPAY'){
-                        const generatedOrder = await paymentHelper.generateOrderRazorpay(savedOrder._id, savedOrder.totalAmount);
+                        const generatedOrder = await paymentHelper.generateOrderRazorpay(savedOrder._id, savedOrder.finalAmount);
                         res.json({payment:false, method:"razorpay", razorpayOrder: generatedOrder, order: savedOrder});                       
                     } else if(savedOrder.paymentMethod === 'WALLET'){
                         console.log("WALLET: "+savedOrder.paymentMethod);
@@ -627,6 +632,77 @@ exports.getOrderCount = async(req, res, next) => {
     }
 };
 
+exports.getMonthlyOrdersForChart = async(req, res, next) => {
+    try{
+        if(req.session.adminLoggedIn === true){
+            console.log("Getting Order Count------------>");
+            const orderData = await Orderdb.aggregate([
+                {
+                    $group: {
+                        _id: {  month: { '$month': "$createdAt" } },
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        orderStats: { $push: { month: "$_id.month", count: "$count" } }
+                    }
+                },{
+                    $project:{_id:0}
+                }
+            ]);
+
+            const productData = await Orderdb.aggregate([
+                {
+                    $unwind: '$products'
+                },
+                {
+                    $group: {
+                        _id: { month: { '$month': "$createdAt" } },
+                        count: { $sum: '$products.quantity' }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        productStats: { $push: { month: "$_id.month", count: "$count" } }
+                    }
+                }, {
+                    $project: { _id: 0 }
+                }
+            ]);
+
+            const monthlyOrderData = [0,0,0,0,0,0,0,0,0,0,0,0];
+            const monthlyProductData = [0,0,0,0,0,0,0,0,0,0,0,0];
+
+            const orderStats = orderData[0]?.orderStats || [];
+            const productStats = productData[0]?.productStats || [];
+
+            orderStats.forEach((item)=>{
+                monthlyOrderData[item.month-1] = item.count;
+            })
+            productStats.forEach((item)=>{
+                monthlyProductData[item.month-1] = item.count;
+            })
+
+            console.log(monthlyOrderData);
+            console.log(monthlyProductData);
+
+            res.json({
+                status: true, 
+                orderData: monthlyOrderData,
+                productData: monthlyProductData,
+            });
+        } else{
+            res.json({status: false});
+        }
+    }catch(err){
+        console.log(err);
+        res.json({status: false});
+    }
+};
+
 exports.getTotalRevenue = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
@@ -674,19 +750,16 @@ exports.getMonthlyTotalRevenue = async(req, res, next) => {
                     }
                 },
                 {
-                    $group:{_id:null, totalMonthlyRevenue: { $sum: "$finalAmount" }}
+                    $group:{_id:null, totMonthlyRevenue: { $sum: "$finalAmount" }}
                 },
                 {
                     $project:{_id:0}
-                }
-                
+                }                
             ]);
-            const totalMonthlyRevenue = data[0].totalMonthlyRevenue;
-            if(totalMonthlyRevenue){
-                console.log("total Monthly Revenue ::::::::::::::::::");
-                res.locals.totalMonthlyRevenue = totalMonthlyRevenue;
-                console.log(res.locals.totalMonthlyRevenue);
-            }
+            const totalMonthlyRevenue = data[0]?.totMonthlyRevenue || 0;
+            console.log("total Monthly Revenue ::::::::::::::::::");
+            res.locals.totalMonthlyRevenue = totalMonthlyRevenue;
+            console.log(res.locals.totalMonthlyRevenue);
             next();
         } else{
             next();
@@ -700,8 +773,16 @@ exports.getMonthlyTotalRevenue = async(req, res, next) => {
 exports.getOrderCountPercent = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
-            console.log("Getting Order Count Percent------------>");           
+            console.log("Getting Order Count Percent------------>");   
+            const month = new Date().getMonth() + 1;    
             const data = await Orderdb.aggregate([
+                {
+                    $match: {
+                        "$expr": { 
+                            "$eq": [ { "$month": "$createdAt" }, month] 
+                        } 
+                    }
+                },
                 {
                     $group:{_id:{ status:'$orderStatus'}, count: {$sum :1}}
                 },
@@ -730,13 +811,13 @@ exports.getOrderCountPercent = async(req, res, next) => {
 exports.getCategoryPerformance = async(req, res, next) => {
     try{
         if(req.session.adminLoggedIn === true){
-            console.log("Getting Category Performancet------------>");           
+            console.log("Getting Category Performancet------------>"); 
+            const month = new Date().getMonth() + 1;
             const data = await Orderdb.aggregate([
                 {
                     $match: {
-                        orderStatus: { $nin: ['CANCELLED', 'RETURNED'] },
                         "$expr": {
-                            "$eq": [{ "$month": "$createdAt" }, 8]
+                            "$eq": [{ "$month": "$createdAt" }, month]
                         }
                     }
                 },
@@ -807,24 +888,73 @@ exports.getCategoryPerformance = async(req, res, next) => {
 //     generatePDF(url, outputFile);
 // };
 
+exports.generatePdf = async (req, res, next) => {
+    const ejs = require('ejs');
+    ejs.compile()
+}
+
 exports.getOrderSales = async (req, res, next) => {
     try{
+        let query;
+        let defaultDate = new Date().getFullYear() + "-" +  Number(new Date().getMonth() + 1) + "-" + new Date().getDate();
+        console.log(defaultDate);
+
+        if(Object.keys(req.query).length !== 0){
+            console.log("YES");
+            console.log(req.query.start, req.query.end, req.query.duration);
+            if(req.query.start !== "" && req.query.end !== ""){
+                let start = new Date(req.query.start), end = new Date(req.query.end);
+                if(start.getTime() === end.getTime()) 
+                    end.setDate(end.getDate() + 1); 
+                query = {createdAt:{"$gte": start, "$lte": end }};
+            } else if(req.query.duration !== ""){
+                if(req.query.duration === "Today"){
+                    let start = new Date(defaultDate), end = new Date(defaultDate);
+                    end.setDate(end.getDate() + 1);
+                    query = {createdAt:{"$gte": start, "$lte": end }};
+                } else if(req.query.duration === "Week"){
+                    let start = new Date(defaultDate), end = new Date(defaultDate);
+                    end.setDate(end.getDate() + 7);
+                    query = {createdAt:{"$gte": start, "$lte": end }};
+                } else if(req.query.duration === "Month"){
+                    let start = new Date(defaultDate), end = new Date(defaultDate);
+                    end.setMonth(end.getMonth() + 1);
+                    query = {createdAt:{"$gte": start, "$lte": end }};
+                } else if(req.query.duration === "Year"){
+                    let start = new Date(defaultDate), end = new Date(defaultDate);
+                    start.setYear(start.getYear() - 1);
+                    query = {createdAt:{"$gte": start, "$lte": end }};
+                }
+            } else{
+                query = {};
+            }
+            console.log(query);
+        } else {
+            console.log("NO");
+            let start = new Date(defaultDate), end = new Date(defaultDate);
+            end.setDate(end.getDate() + 1);
+            query = {createdAt:{"$gte": start, "$lte": end }};
+        }
+        console.log(query);
+
         if(req.session.adminLoggedIn === true){
             console.log("Getting Order Sales------------>");
-            await Orderdb.find()
-                .sort({createdAt: -1}).lean()
-                .then(data => {
-                    console.log(data);
-                    if(data !== null || data.length !== 0){
-                        res.locals.orders = data;
-                    }
-                    next();
-                })
+            await Orderdb.find(query)
+            .sort({createdAt: -1}).lean()
+            .then(data => {
+                //console.log(data);
+                if(data !== null || data.length !== 0){
+                    console.log("Getting Order Sales------------>");
+                    res.locals.orders = data;  
+                    next(); 
+                }
+            })
         } else{
-            next();
+            next(); 
         }
-    }catch(err){
-        next();
+    }catch(err){        
+        next(); 
+        console.log(err);
     }
 };
 

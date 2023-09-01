@@ -261,7 +261,11 @@ exports.applyCoupon = async (req, res) => {
     if(coupon){
         if(Object.keys(coupon).length !== 0){
             if(coupon.minAmount < orderTotal){
-                res.json({success: true, coupon: coupon});
+                let discount = coupon.discount*(orderTotal/100);
+                if(discount > coupon.maxDiscount){
+                    discount = coupon.maxDiscount;  
+                }
+                res.json({success: true, coupon: coupon, discount: discount});
             }
         }
         else{

@@ -61,16 +61,6 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Description</th>
-                                        <th>Category</th>
-                                        <th>Sale Price</th>
-                                        <th>Stock</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </tfoot>
                                 <tbody>
                                     <% if (locals.products) { %>  
                                     <% for (let i = 0; i < products.length; i++) { %>
@@ -89,7 +79,7 @@
                                                 </a>                  
                                             </div>                        
                                           </td>
-                                          <td style="vertical-align: middle;"><%= products[i].description %></td>
+                                          <td style="vertical-align: middle;"><%= products[i].shortDescription %></td>
                                           <td style="vertical-align: middle;"><%= products[i].category %></td>
                                           <td style="vertical-align: middle;"><%= products[i].salePrice %></td>
                                           <td style="vertical-align: middle;"><%= products[i].stock %></td>

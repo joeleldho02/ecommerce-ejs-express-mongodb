@@ -1,0 +1,22 @@
+<div class="sidebar-widget product-sidebar  mb-30 p-30 bg-grey border-radius-10">
+    <div class="widget-header position-relative mb-20 pb-10">
+        <h5 class="widget-title mb-10">New products</h5>
+        <div class="bt-1 border-color-1"></div>
+    </div>                            
+    <% if (locals.newProducts) { %>                                    
+        <% for (let i = 0; i < newProducts.length; i++) { %>
+    <div class="single-post clearfix">
+        <div class="image">
+            <img src="/img/products/<%= newProducts[i]?.images[0] %>" alt="<%= newProducts[i]?.productName %>">
+        </div>
+        <div class="content pt-10">
+            <h5><a href="/<%= newProducts[i]?.category.toLowerCase() %>/<%= newProducts[i]?._id %>"><%= newProducts[i]?.productName %></a></h5>
+            <p class="price mb-0 mt-5">₹<%= products[i]?.salePrice %> </p>
+            <div class="product-rate">
+                <div class="product-rating" style="width:90%"></div>
+            </div>
+        </div>
+    </div>                            
+        <% } %>
+    <% }  %>
+</div>

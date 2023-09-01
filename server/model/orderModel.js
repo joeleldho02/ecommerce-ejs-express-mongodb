@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment-timezone');
 
 //-----   Order Model   -----//
 const orderSchema = new mongoose.Schema({
@@ -37,8 +38,7 @@ const orderSchema = new mongoose.Schema({
 		default: 0,
 	},
     coupon:{
-        couponText: String,
-        amount: Number
+        type: String,
     },
     discount: {
 		type: Number,
@@ -51,11 +51,11 @@ const orderSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: () => Date.now()
+        default: () => moment.tz(Date.now(), "Asia/Kolkata")
     },
     updatedAt:{
         type: Date,
-        default: () => Date.now()
+        default: () => moment.tz(Date.now(), "Asia/Kolkata")
     }
 });
 

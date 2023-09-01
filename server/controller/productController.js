@@ -326,11 +326,249 @@ exports.getProductItemById = async (req, res, next) => {
 //find and retrieve all product(s) of a single category
 exports.getProductsOfSingleCategory = async (req, res, next) => {
     try{
+        if(req.params.category){            
+            res.locals.category = req.params.category;
+            const prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
+            console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
+            //console.log(JSON.stringify(prodCategoryId));
+
+            const count = await Productdb.countDocuments({ category: prodCategoryId, isDeleted: false});
+            const pageItemCount = 3;
+            const totalPages = Math.ceil(count/pageItemCount) || 1;
+            let currentPage = 1;
+            if(req.query.page){
+                currentPage = req.query.page || 1;
+            }            
+            console.log(count);
+            console.log(pageItemCount);
+            console.log(totalPages);
+            console.log(currentPage); 
+
+            await Productdb.find({ category: prodCategoryId, isDeleted: false})
+            .skip(pageItemCount*(currentPage-1)).limit(pageItemCount).lean()
+            .then(data => {                
+                // console.log(JSON.stringify(data));
+                if(data.length !== 0){
+                    console.log("111111");
+                    data.forEach(product => {
+                        const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product?.category) );
+                        product.category = prodCategoryName[0]?.categoryName;
+                    });                 
+                    console.log("2222");
+                    res.locals.products = data;
+                    res.locals.currentPage = currentPage;
+                    res.locals.totalPages = totalPages;
+                    // console.log(res.locals.products);
+                    console.log(res.locals.currentPage);
+                    console.log(res.locals.totalPages);
+                    next();
+                }
+                else{
+                    // res.status(404).render('error', {
+                    //     message: "Oops..! Page not available",
+                    //     errStatus : 404
+                    // });                
+                    console.log("Related products not available!");     
+                    next();                             
+                }
+                
+            })           
+            .catch(err => {
+                res.status(500).render('error', {
+                    message: "Unable to retrieve data from database",
+                    errStatus : 500
+                });
+                console.log("Unable to retrieve data from database! " + err); 
+            });
+        }else{
+            res.status(404).render('error', {
+                message: "Oops..! Page not available",
+                errStatus : 404
+            });
+        }        
+    } catch(err){
+        res.status(404).render('error', {
+            message: "Unable to retrieve data from database",
+            errStatus : 404
+        });
+        console.log(err);
+    }
+};
+
+//search and retrieve product(s)
+exports.getSearchProducts = async (req, res, next) => {
+    try{
+        console.log(req.query);  
+        let prodCategoryId, query;
+        const regex1 = new RegExp("^" + req.query.c + "$");
+        const regex2 = new RegExp(req.query.p);
+        if(req.query.c !== ""){
+            prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.query.c.toLowerCase());
+            res.locals.category = req.query.c;
+            query = {
+                categoryName: { $regex: regex1, $options: 'i' },               
+                $or:[
+                    {productName: { $regex: regex2, $options: 'i' }}, 
+                    {brand: { $regex: regex2, $options: 'i' }}, 
+                    {shortDescription: { $regex: regex2, $options: 'i' }}, 
+                    {description: { $regex: regex2, $options: 'i' }}, 
+                ],
+                isDeleted: false
+            };
+        } else {
+            query = {
+                $or:[
+                    {productName: { $regex: regex2, $options: 'i' }}, 
+                    {brand: { $regex: regex2, $options: 'i' }}, 
+                    {shortDescription: { $regex: regex2, $options: 'i' }}, 
+                    {description: { $regex: regex2, $options: 'i' }}, 
+                ],
+                isDeleted: false
+            };
+        }
+        console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
+        const count = await Productdb.countDocuments(query);
+        const pageItemCount = 3;
+        const totalPages = Math.ceil(count/pageItemCount) || 1;
+        let currentPage = 1;
+        if(req.query.page){
+            currentPage = req.query.page || 1;
+        }            
+        console.log(count);
+        console.log(pageItemCount);
+        console.log(totalPages);
+        console.log(currentPage); 
+        await Productdb.find(query)
+        .skip(pageItemCount*(currentPage-1)).limit(pageItemCount).lean()
+        .then(data => {                
+            // console.log(JSON.stringify(data));
+            if(data.length !== 0){
+                console.log("111111");
+                data.forEach(product => {
+                    const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product?.category) );
+                    product.category = prodCategoryName[0]?.categoryName;
+                });                 
+                console.log("2222");
+                res.locals.products = data;
+                res.locals.currentPage = currentPage;
+                res.locals.totalPages = totalPages;
+                // console.log(res.locals.products);
+                console.log(res.locals.currentPage);
+                console.log(res.locals.totalPages);
+                next();
+            }
+            else{
+                // res.status(404).render('error', {
+                //     message: "Oops..! Page not available",
+                //     errStatus : 404
+                // });                
+                console.log("Related products not available!");     
+                next();                             
+            }
+            
+        })           
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Unable to retrieve data from database",
+                errStatus : 500
+            });
+            console.log("Unable to retrieve data from database! " + err); 
+        });      
+    } catch(err){
+        res.status(404).render('error', {
+            message: "Unable to retrieve data from database",
+            errStatus : 404
+        });
+        console.log(err);
+    }
+};
+
+//find and retrieve featured product(s) to display in table
+exports.getFeaturedProducts = (req, res, next) => {
+    try{
+        Productdb.find({isDeleted: false},{review: 0, rating: 0})
+        .limit(8).lean()
+        .then(data => {
+            if(data.length !== 0){
+                if(res.locals.categories){
+                    data.forEach(product => {
+                        const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.category) );
+                        product.category = prodCategoryName[0]?.categoryName;
+                    });    
+                    res.locals.featuredProds = data;
+                    next();
+                }
+                else{
+                    res.locals.featuredProds = data;
+                    next();
+                }
+            } else{
+                next();
+                console.log("No featured products available to show!");                  
+            }                        
+        })
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Unable to retrieve data from database",
+                errStatus : 500
+            });
+            console.log(err);
+        });
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Unable to retrieve data from database",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+};
+//find and retrieve 12 product(s) of a single category
+exports.getNewArrivalProducts = async (req, res, next) => {
+    try{
+        await Productdb.find({isDeleted: false})
+        .sort({createdAt: -1})
+        .limit(7).lean()
+        .then(data => {                
+            console.log(JSON.stringify(data));
+            if(data.length !== 0){
+                data.forEach(product => {
+                    const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.category) );
+                    product.category = prodCategoryName[0]?.categoryName;
+                });                 
+                res.locals.newArrivalProds = data;
+                next();
+            }
+            else{
+                res.locals.newArrivalProds = data;
+                console.log("Related products not available!");     
+                next();                          
+            }
+            
+        })           
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Unable to retrieve data from database",
+                errStatus : 500
+            });
+            console.log("Unable to retrieve data from database! " + err); 
+        });             
+    } catch(err){
+        res.status(404).render('error', {
+            message: "Unable to retrieve data from database",
+            errStatus : 404
+        });
+        console.log(err);
+    }
+};
+//find and retrieve 3 product(s) of a single category
+exports.getNewProductsOfCategory = async (req, res, next) => {
+    try{
         if(req.params.category){
             const prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
             console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
             console.log(JSON.stringify(prodCategoryId));
-            await Productdb.find({ category: prodCategoryId, isDeleted: false}).limit(8).lean()
+            await Productdb.find({ category: prodCategoryId, isDeleted: false})
+            .sort({createdAt: -1}).limit(3).lean()
             .then(data => {                
                 console.log(JSON.stringify(data));
                 if(data.length !== 0){
@@ -338,7 +576,7 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
                         const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.category) );
                         product.category = prodCategoryName[0]?.categoryName;
                     });                 
-                    res.locals.products = data;
+                    res.locals.newProducts = data;
                     next();
                 }
                 else{

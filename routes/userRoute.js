@@ -11,9 +11,9 @@ router.get('/', authController.authenticateUser, categoryController.getListedCat
     cartController.getAllCartItems, cartController.getCartItemsCount, 
     userController.getAllAddresses, orderController.getAllOrdersOfUser, 
     userController.getUserWalletDetails, userController.getWalletBalance, serviceRender.userDashboardPage);
-router.get('/signup', serviceRender.userSignupPage);
-router.get('/verify-otp', serviceRender.userVerifyOtpPage);
-router.get('/login', serviceRender.userLoginPage);
+router.get('/signup', categoryController.getListedCategories, serviceRender.userSignupPage);
+router.get('/verify-otp', categoryController.getListedCategories, serviceRender.userVerifyOtpPage);
+router.get('/login', categoryController.getListedCategories, serviceRender.userLoginPage);
 router.get('/logout', serviceRender.userLogout);
 router.get('/view-order/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderDetailsPage)
 router.get('/order-invoice/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderInvoicePage)

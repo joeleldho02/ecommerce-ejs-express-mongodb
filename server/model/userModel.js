@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment-timezone');
 
 //-----   User Model   -----//
 const userSchema = new mongoose.Schema({

@@ -42,10 +42,10 @@
             <!-- Begin Page Content -->
                 <div class="card shadow mb-4">
                     <div class="card-body mb-50">
-                        <form id="formReport" name="formReport" action="/admin/get-report" method="post">
+                        <form id="formReport" name="formReport" action="/admin/sales" method="get">
                         <div class="row w-100" style="position: relative;">
-                            <div class="col-3 m-auto">
-                                <h6 class="my-auto font-weight-bold text-primary">Overall Order Sales</h6>
+                            <div class="col-2 m-auto">
+                                <h6 class="my-auto font-weight-bold text-primary">Order Sales</h6>
                                 <!-- <select class="form-select" id="category" name="category" onchange="getReport()">
                                     <option value="all" selected>All category</option>
                                     <% if (locals.categories) { %>
@@ -57,20 +57,34 @@
                                     <% } %>
                                 </select> -->
                             </div>
-                            <div class='col-3 form-group date w-25' id='picker1'>
-                                <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')" class="form-control" placeholder="Start Date" name="startDate" id="startDate" required/>
+                            <div class="col-2 m-auto">
+                                <select class="form-select" id="category" name="duration" onchange="getReport()">
+                                    <option value="Today" <% if(locals.duration){ %><% if(duration === "Today"){ %> selected <% } %><% } %>>Today</option>
+                                    <option value="Week" <% if(locals.duration){ %><% if(duration === "Week"){ %> selected <% } %><% } %>>Week</option>
+                                    <option value="Month" <% if(locals.duration){ %><% if(duration === "Month"){ %> selected <% } %><% } %>>Month</option>
+                                    <option value="Year" <% if(locals.duration){ %><% if(duration === "Year"){ %> selected <% } %><% } %>>Year</option>                                    
+                                </select>
+                            </div>
+                            <div class="col-1"></div>
+                            <div class='col-2 form-group date ' id='picker1'>
+                                <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')" class="form-control" placeholder="Start Date" name="start" id="startDate" min="2020-01-01" 
+                                <% if (locals.startDate) { %>value="<%= startDate %>"<% } %> />
+                                <div class="error text-danger ms-2"></div>
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
                             </div>
-                            <div class='col-3 form-group date w-25' id='picker2'>
-                                <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')" class="form-control" placeholder="End Date" name="endDate" id="endDate" required />
+                            <div class='col-2 form-group date ' id='picker2'>
+                                <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')"  class="form-control" placeholder="End Date" name="end" id="endDate" min="2020-01-01" 
+                                <% if (locals.endDate) { %>value="<%= endDate %>"<% } %>/>
+                                <div class="error text-danger ms-2"></div>
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
                             </div>
                             <div class="col-3 m-auto text-end d-flex">
-                                <a href="javascript:{}" type="submit" onclick="getReport()" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
+                                <button type="submit" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Show report</button>
+                                <!-- <a href="javascript:{}" type="submit" onclick="getReport('formReport')" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a> -->
                                 <a href="javascript:{}" class="btn btn-secondary print ms-2" onclick="downloadReport()"><i class="icon material-icons md-print"></i></a>
                             </div>
                             <div class="notification" id="notification">
@@ -78,7 +92,7 @@
                             </div>
                         </div>
                         </form>
-                        <div class="table-responsive mt-25">
+                        <div class="table-responsive mt-0">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" class="display">
                                 <thead>
                                     <tr>
@@ -133,17 +147,154 @@
     <script src="/js/custom-confirm.js"></script>
     <!-- Page level custom scripts -->
     <script>
+
+        
+
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        let startDateValue; 
+        let endDateValue; 
+
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
             $('#dataTable').DataTable({
                 order: [[1, 'desc']],
-                columnDefs: [{ "targets": [0,3], "orderable": false }],
-                dom: '<"top"i>rt<"bottom"lp><"clear">'
+                columnDefs: [
+                    { "targets": [0,3], "orderable": false },
+                    { "type": "date", "targets":  [1]}
+                ],
+                dom: '<"top"i>rt<"bottom"lp><"clear">',
+                // serverSide: true,
+                // ajax: {
+                //   url: '/admin/get-report',
+                //   type: 'POST',
+                //   data: function () {
+                //     return { "start": startDateValue, "end" : endDateValue };
+                //   }
+                // },
             });
+
+            //set max date for date picker
+            let today = new Date();
+            let dd = today.getDate();
+            let mm = today.getMonth() + 1; //January is 0!
+            let yyyy = today.getFullYear();
+
+            if (dd < 10) {
+               dd = '0' + dd;
+            }
+
+            if (mm < 10) {
+               mm = '0' + mm;
+            } 
+
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById('startDate').setAttribute("max", today);
+            document.getElementById('endDate').setAttribute("max", today);
         });
         
-        function downloadReport() {console.log("Download Report"); showNotification();}
-        function getReport() {console.log("Get new DATA");}
+        const form = document.getElementById('formReport'); 
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("Get new DATA");
+
+            const setError = (element, message, e) => {
+                e.preventDefault();
+                const inputControl = element.parentElement;
+                const errorDisplay = inputControl.querySelector('.error');
+
+                errorDisplay.innerText = message;
+                inputControl.classList.add('error');
+                inputControl.classList.remove('success');
+            };
+            const setSuccess = element => {
+                const inputControl = element.parentElement;
+                const errorDisplay = inputControl.querySelector('.error');
+            
+                errorDisplay.innerText = '';
+                inputControl.classList.add('success');
+                inputControl.classList.remove('error');
+            };
+            const setVisible = (x) => {
+                var element = document.getElementById(x);
+                element.style.display = 'block'; 
+            }
+            const setHide = (x) => {
+                var element = document.getElementById(x);
+                element.style.display = 'none'; 
+            }
+            function validateInputs(e){ 
+                startDateValue = startDate.value.trim();
+                endDateValue = endDate.value.trim();
+                const dateStartDate = new Date(startDateValue);
+                const dateEndDate = new Date(endDateValue);
+                
+                if(startDateValue === '') {
+                    setError(startDate, 'Please select start date', e);
+                    startDate.focus();
+                    return false;
+                } else if(dateEndDate.getDate() > new Date().getDate() && dateEndDate.getMonth() > new Date().getMonth() && dateEndDate.getYear() > new Date().getYear()){
+                    setError(startDate, 'Please select valid date', e);
+                    startDate.focus();
+                    return false;
+                }
+                else{
+                    setSuccess(startDate);
+                }
+
+                if(endDateValue === '') {
+                    setError(endDate, 'Please select end date', e);
+                    endDate.focus();
+                    return false;
+                } else if(dateEndDate.getDate() > new Date().getDate() && dateEndDate.getMonth() > new Date().getMonth() && dateEndDate.getYear() > new Date().getYear()){
+                    setError(endDate, 'Please select valid date', e);
+                    endDate.focus();
+                    return false;
+                } else if(dateStartDate.getTime() > dateEndDate.getTime()){
+                    setError(startDate, 'Please select date before end date', e);
+                    startDate.focus();
+                    return false;
+                }
+                else{
+                    setSuccess(endDate);
+                }
+            
+                return true;
+            }
+            console.log('Login submit button recorded');
+            if(validateInputs(e)){
+                console.log("VALIDATION Success");
+                getReport();
+            }
+        });
+
+        function getReport() {
+            console.log("Getting report....");
+            // $('#dataTable').DataTable().ajax.reload(); 
+            // $.ajax({
+            //     url:'/admin/get-report',
+            //     data : $("#formReport").serialize(),
+            //     method: 'POST',
+            //     success: function(response){
+            //         console.log(response); 
+            //         $('tbody').empty();
+            //         for (let data of response) {
+            //             let prodText = ''
+            //             for(let j = 0; j < data?.products.length; j++) { 
+            //                 if(j !== 0) {  prodText += '<br>' } 
+            //                 prodText += data?.products[j]?.productName + ' x ' + data?.products[j]?.quantity; 
+            //             } 
+            //            $('tbody').append('<tr><td><a class="fw-bold" href="/admin/orders/'+ data._id +'" target="_blank">#'+ data.orderId +'</a> </td><td>'+ new Date(data?.createdAt).toLocaleDateString() +'<br>'+ new Date(data?.createdAt).toLocaleTimeString() +'</td><td>'+ data?.shippingAddress?.customerName +'</td><td>'+prodText+'</td><td>₹'+ data?.totalAmount +'</td><td><i class="material-icons md-payment font-xxl text-muted mr-5"></i>'+ data?.paymentMethod +'</td></tr> ');
+            //         }
+            //     },
+            //     error: function(){
+            //         alert('Oops..!', "Unable to retrieve data!");
+            //     }
+            // });
+            document.getElementById('formReport').submit();
+        }
+        
+        function downloadReport() {console.log("Download Report");  showNotification(); }
 
         function showNotification() {
             const notification = document.getElementById("notification");

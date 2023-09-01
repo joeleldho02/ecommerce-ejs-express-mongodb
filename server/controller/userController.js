@@ -254,14 +254,14 @@ exports.updateSinlgleUser = (req, res) => {
             return res.redirect('back');
         }
         const id = req.body.id;
-        const user = new Userdb({
+        const user = {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             phone: req.body.phone,
             isActive: req.body.isActive === "on" ? true : false,
             updatedAt: Date.now(),
             _id: id
-        });
+        };
         Userdb.findByIdAndUpdate(id, user)
             .then(data => {
                 if (!data) {
@@ -611,6 +611,7 @@ exports.getUserWalletBalance = (userId) => {
 exports.getWalletBalance = async (req, res, next) => {
     try{
         const walletBalance =  await exports.getUserWalletBalance(req.session.user._id) ?? 0;
+        console.log(walletBalance, " wallet balance");
         res.locals.walletBalance = walletBalance;
         next();       
     } catch(err){

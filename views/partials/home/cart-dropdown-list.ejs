@@ -1,0 +1,31 @@
+<% if(locals.cartItems) { %>
+    <div class="cart-dropdown-wrap cart-dropdown-hm2">
+        <ul>
+            <% if (locals.cartItems) { %>                                    
+                <% for (let i = 0; i < cartItems.length; i++) { %>
+            <li>
+                <div class="shopping-cart-img">
+                    <a href="/<%= cartItems[i]?.productInfo[0].category%>/<%= cartItems[i]?.productInfo[0]._id %>"><img alt="Evara" src="/img/products/<%= cartItems[i]?.productInfo[0].images[0] %>"></a>
+                </div>
+                <div class="shopping-cart-title">
+                    <h4><a href="/<%= cartItems[i]?.productInfo[0].category%>/<%= cartItems[i]?.productInfo[0]._id %>"><%= cartItems[i]?.productInfo[0].productName %></a></h4>
+                    <h4><span><%= cartItems[i]?.quantity %> × </span>₹<%= cartItems[i]?.salePrice %></h4>
+                </div>
+                <div class="shopping-cart-delete">
+                    <a href="/remove-cart-item/<%= cartItems[i]?.productInfo[0]._id %>"><i class="fi-rs-cross-small"></i></a>
+                </div>
+            </li>
+                <% } %>
+             <% }  %>
+        </ul>
+                <div class="shopping-cart-footer">
+                    <div class="shopping-cart-total ">
+                        <h4>Total <span>₹<% if(locals.subTotal) { %> <%= subTotal %> <% } else { %>0<% }%></span></h4>
+                    </div>
+                    <div class="shopping-cart-button">
+                        <a href="/cart" class="outline">View cart</a>
+                        <a href="/checkout">Checkout</a>
+                    </div>
+                </div>
+    </div>
+<% }%>

@@ -1,0 +1,90 @@
+<div class="mobile-header-active mobile-header-wrapper-style">
+    <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-top">
+            <div class="mobile-header-logo">
+                <a href="/"><img src="/assets/imgs/theme/logo.svg" alt="logo"></a>
+            </div>
+            <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
+                <button class="close-style search-close">
+                    <i class="icon-top"></i>
+                    <i class="icon-bottom"></i>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-header-content-area">
+            <div class="mobile-search search-style-3 mobile-header-border">
+                <form action="/search" method="get">
+                    <input type="text" placeholder="Search for items..." name="p">
+                    <button type="submit"><i class="fi-rs-search"></i></button>
+                </form>
+            </div>
+            <div class="mobile-menu-wrap mobile-header-border">
+                <div class="main-categori-wrap mobile-header-border">
+                    <a class="categori-button-active-2" href="#">
+                        <span class="fi-rs-apps"></span> Browse Categories
+                    </a>
+                    <div class="categori-dropdown-wrap categori-dropdown-active-small">
+                        <ul><% if (locals.categories) { %>
+                            <% for (let i = 0; i < categories.length; i++) { %>
+                                <% if(categories[i].isListed) { %>
+                                    <li><a href="/<%= categories[i].categoryName.toLowerCase() %>"><%= categories[i].categoryName %></a></li>
+                                <% } %>
+                            <% } %>                                        
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+                <!-- mobile menu start -->
+                <nav>
+                    <ul class="mobile-menu">
+                        <li class="menu-item-has-children"><span class="menu-expand"></span><a href="/">Home</a>
+                            <ul class="dropdown">
+                                <% if (locals.categories) { %>
+                                    <% for (let i = 0; i < categories.length; i++) { %>
+                                        <% if(categories[i].isListed) { %>
+                                            <li><a href="/<%= categories[i].categoryName.toLowerCase() %>"><%= categories[i].categoryName %></a></li>
+                                        <% } %>
+                                    <% } %>                                        
+                                <% } %>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/user">My Account</a>
+                        </li>
+                        </li>                            
+                        <li>
+                            <a href="/user?tab=orders">My Orders</a>
+                        </li>
+                        <li>
+                            <a href="/contact">Contact</a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- mobile menu end -->
+            </div>
+            <div class="mobile-header-info-wrap mobile-header-border">
+                <div class="single-mobile-header-info mt-30">
+                    <a  href="/contact"> Our location </a>
+                </div>
+                <div class="single-mobile-header-info">
+                    <a href="/user/login">
+                        <% if (locals.user) { %>
+                            <%= user.firstName %> <%= user.lastName %>
+                        <% } else { %> Log In / Sign Up <% } %>
+                    </a>
+                </div>
+                <div class="single-mobile-header-info">
+                    <a href="#">(+91) 9123 - 456 - 780</a>
+                </div>
+            </div>
+            <div class="mobile-social-icon">
+                <h5 class="mb-15 text-grey-4">Follow Us</h5>
+                <a href="#"><img src="/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                <a href="#"><img src="/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                <a href="#"><img src="/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                <a href="#"><img src="/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                <a href="#"><img src="/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+            </div>
+        </div>
+    </div>
+</div>

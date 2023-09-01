@@ -62,8 +62,9 @@ exports.getAllCartItems = async (req, res, next) => {
             res.locals.cartItems = cartItems;
             next(); 
         } else{
-            res.locals.requestFrom = "/user/cart";
-            res.redirect('/user/login');
+            // res.locals.requestFrom = "/user/cart";
+            // res.redirect('/user/login');
+            next(); 
         }
     } catch(err){
         res.status(500).render('error', {

@@ -40,6 +40,7 @@
             <div class="card mx-auto card-login">
                 <div class="card-body">
                     <h4 class="card-title mb-4 text-center">Admin Login</h4>
+                    <p class="text-danger text-center w-100 mb-2"><% if (locals.errorMsg) { %><%= errorMsg %><% } %></p>
                     <form action="/admin/login" method="post" name="loginForm" id="loginForm">
                         <div class="mb-3">
                             <input class="form-control" placeholder="Username or email" name="email" type="text" autocomplete="on" value="admin@user.com">

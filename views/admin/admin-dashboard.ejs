@@ -72,23 +72,15 @@
     <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'dashboard'}) %>
     <main class="main-wrap">
         <%- include('./partials/admin/admin-header.ejs') %>
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <p>Overall view and performance of the online store.</p>
-                </div>
-                <div>
-                    <a href="#" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
-                </div>
-            </div>
+        <section class="content-main">            
             <div class="row">
                 <div class="col-lg-3">
                     <div class="card card-body mb-4">
                         <article class="icontext">
                             <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
                             <div class="text">
-                                <h6 class="mb-1 card-title">Revenue</h6>
-                                <span>₹<% if (locals.totalRevenue) { %><%= totalRevenue %><% } %></span>
+                                <h6 class="mb-1 card-title">Total Revenue</h6>
+                                <span>₹<% if (locals.totalRevenue) { %><%= totalRevenue %><% } else { %>0<% } %></span>
                                 <span class="text-sm">
                                     Shipping fees are not included
                                 </span>
@@ -102,7 +94,7 @@
                             <span class="icon icon-sm rounded-circle bg-success-light"><i class="text-success material-icons md-local_shipping"></i></span>
                             <div class="text">
                                 <h6 class="mb-1 card-title">Orders</h6> 
-                                <span><% if (locals.orderCount) { %><%= orderCount %><% } %></span>
+                                <span><% if (locals.orderCount) { %><%= orderCount %><% } else { %>0<% } %></span>
                                 <span class="text-sm">
                                     Excluding orders in transit
                                 </span>
@@ -115,7 +107,7 @@
                         <article class="icontext">
                             <span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
                             <div class="text">
-                                <h6 class="mb-1 card-title">Products</h6> <span><% if (locals.productCount) { %><%= productCount %><% } %></span>
+                                <h6 class="mb-1 card-title">Products</h6> <span><% if (locals.productCount) { %><%= productCount %><% } else { %>0<% } %></span>
                                 <span class="text-sm">
                                     In <% if (locals.categoryCount) { %><%= categoryCount %><% } %> Categories
                                 </span>
@@ -128,7 +120,7 @@
                         <article class="icontext">
                             <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                             <div class="text">
-                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>₹<% if (locals.totalMonthlyRevenue) { %><%= totalMonthlyRevenue %><% } %></span>
+                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>₹<% if (locals.totalMonthlyRevenue) { %><%= totalMonthlyRevenue %><% } else { %>0<% } %></span>
                                 <span class="text-sm">
                                     Based on your local time.
                                 </span>

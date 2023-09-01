@@ -63,7 +63,7 @@ exports.getAllBannerDetails = async (req, res, next) => {
     try{
         const data = await getAllBanners();
         if(data.length !== 0){
-            console.log("Data received: " + data);
+            console.log("Banner Data received: " + data);
             res.locals.banners = data;
         }
         else{
