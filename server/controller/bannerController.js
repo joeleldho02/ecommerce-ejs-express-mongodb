@@ -3,32 +3,31 @@ const Bannerdb = require('../model/bannerModel');
 //add new banner to DB
 exports.addBanner = async (req, res, next) => {
     try{
-        console.log(req.body);
-        console.log(req.file);
         if (!req.body) {
             res.redirect('/admin/banners');
         }
         else {
+            const {title, description, link, location, isActive} = req.body;
+            const {filename} = req.file;
             const newBanner = new Bannerdb({
-                title: req.body.title,
-                description: req.body.description,
-                link: req.body.link,
-                location: req.body.location,
-                image: req.file.filename,
-                isActive: req.body.isActive === "on" ? true : false
+                title: title,
+                description: description,
+                link: link,
+                location: location,
+                image: filename,
+                isActive: isActive === "on" ? true : false
             })
             await newBanner.save()
                 .then(data => {
-                    console.log(data);
                     res.redirect('/admin/banners');
                 })
                 .catch(err => {
                     res.status(500).render('error', {
                         message: "Unable to add banner to database",
                         errStatus : 500
-                });
+                    });
                     console.log(err);
-            });
+                });
         } 
     } catch(err){
         res.status(500).render('error', {
@@ -88,14 +87,14 @@ exports.updateBanner = async (req, res, next) => {
             });
         }
         console.log(req.body);
-        const id = req.body.id;
+        const {id, title, description, link, location, isActive} = req.body;
 
         const editBanner = {
-            title: req.body.title,
-            description: req.body.description,
-            link: req.body.link,
-            location: req.body.location,
-            isActive: req.body.isActive === "on" ? true : false,
+            title: title,
+            description: description,
+            link: link,
+            location: location,
+            isActive: isActive === "on" ? true : false,
             _id: id
         };
         if(req.file){

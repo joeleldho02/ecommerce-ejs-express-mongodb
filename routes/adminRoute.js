@@ -1,76 +1,83 @@
 const express = require('express');
 const router = express.Router(); 
-const path = require('path');
-const adminController = require('../server/controller/adminController');
-const userController = require('../server/controller/userController');
-const productController = require('../server/controller/productController');
-const categoryController = require('../server/controller/categoryController');
-const orderController = require('../server/controller/orderController');
-const couponController = require('../server/controller/couponController');
-const bannerController = require('../server/controller/bannerController');
-const authController = require('../server/middleware/authenticate-admin');
-const uploadController = require('../server/middleware/upload-image');
-const serviceRender = require('../server/services/render');
+const {adminLogin} = require('../server/controller/adminController');
+const {buildPDF} = require('../server/helper/invoicePDF');
+const {authenticateAdmin} = require('../server/middleware/authenticate-admin');
+const {getNewUsers, getAllUsers, updateSinlgleUser, deleteUser} = require('../server/controller/userController');
+const {getAllCouponDetails, addCoupon, updateCoupon, deleteCoupon} = require('../server/controller/couponController');
+const {getAllBannerDetails, addBanner, updateBanner, deleteBanner} = require('../server/controller/bannerController');
+const {getCategoryCount, getListedCategories, getAllCategoryDetails, addCategory, updateCategory, deleteCategory} = require('../server/controller/categoryController');
+const {getProductCount, getAllProducts, getEditProductItemDetails, addNewProduct, updateProductItem, deleteProductItem} = require('../server/controller/productController');
+const {uploadProductImage, uploadBannerImage, resizeImages} = require('../server/middleware/upload-image');
+const {getOrderCount, getTotalRevenue, getMonthlyTotalRevenue, getOrderCountPercent, getCategoryPerformance, getSingleOrderDetails, getAllUsersOrders, updateOrderStatus, getOrderSales, getMonthlyOrdersForChart} = require('../server/controller/orderController');
+const {adminDashboardPage, adminLoginPage, adminLogout, getAdminProductPage, getAddProductPage, getEditProductPage, getAdminUsersPage, getAdminCategoryPage, getAdminViewOrderPage, getAdminOrdersPage, getAdminCouponPage, getAdminBannerPage, getAdminSalesPage} = require('../server/services/render');
 
 
 //------- LOGIN / LOGOUT --------//
-router.get('/', orderController.getOrderCount, productController.getProductCount,
-            categoryController.getCategoryCount, orderController.getTotalRevenue, 
-            orderController.getMonthlyTotalRevenue, orderController.getOrderCountPercent,
-            userController.getNewUsers, orderController.getCategoryPerformance, serviceRender.adminDashboardPage);
-router.get('/login', serviceRender.adminLoginPage);
-router.get('/logout', authController.authenticateAdmin, serviceRender.adminLogout);
+router.get('/', getOrderCount, getProductCount, getCategoryCount, getTotalRevenue, getMonthlyTotalRevenue, getOrderCountPercent,getNewUsers, getCategoryPerformance, adminDashboardPage);
+router.get('/login', adminLoginPage);
+router.get('/logout', authenticateAdmin, adminLogout);
 
-router.post('/login', adminController.adminLogin);
+router.post('/login', adminLogin);
 
 
 //------- PRODUCTS --------//
-router.get('/products', authController.authenticateAdmin, categoryController.getListedCategories, productController.getAllProducts, serviceRender.getAdminProductPage);
-router.get('/add-product', authController.authenticateAdmin, categoryController.getListedCategories, serviceRender.getAddProductPage);
-router.get('/edit-product/:id', authController.authenticateAdmin, categoryController.getListedCategories, productController.getEditProductItemDetails, serviceRender.getEditProductPage);
+router.get('/products', authenticateAdmin, getListedCategories, getAllProducts, getAdminProductPage);
+router.get('/add-product', authenticateAdmin, getListedCategories, getAddProductPage);
+router.get('/edit-product/:id', authenticateAdmin, getListedCategories, getEditProductItemDetails, getEditProductPage);
 
-router.post('/add-product', authController.authenticateAdmin, uploadController.uploadProductImage.array('productImage', 5), productController.addNewProduct);// , uploadController.resizeImages
-router.post('/edit-product', authController.authenticateAdmin, uploadController.uploadProductImage.array('productImage', 5), productController.updateProductItem);
-router.post('/delete-product', authController.authenticateAdmin, productController.deleteProductItem);
+router.post('/add-product', authenticateAdmin, uploadProductImage.array('productImage', 5), addNewProduct); // , resizeImages
+router.post('/edit-product', authenticateAdmin, uploadProductImage.array('productImage', 5), updateProductItem);
+router.post('/delete-product', authenticateAdmin, deleteProductItem);
 
 
 //------- CUSTOMERS --------//
-router.get('/customers', authController.authenticateAdmin, userController.getAllUsers, serviceRender.getAdminUsersPage);
+router.get('/customers', authenticateAdmin, getAllUsers, getAdminUsersPage);
 
-router.post('/edit-user', authController.authenticateAdmin, userController.updateSinlgleUser); 
-router.post('/delete-user', authController.authenticateAdmin, userController.deleteUser);
+router.post('/edit-user', authenticateAdmin, updateSinlgleUser); 
+router.post('/delete-user', authenticateAdmin, deleteUser);
 
 
 //------- CATEGORY --------//
-router.get('/category', authController.authenticateAdmin, categoryController.getAllCategoryDetails, serviceRender.getAdminCategoryPage);
+router.get('/category', authenticateAdmin, getAllCategoryDetails, getAdminCategoryPage);
 
-router.post('/add-category', authController.authenticateAdmin, categoryController.addCategory);
-router.post('/edit-category', authController.authenticateAdmin, categoryController.updateCategory);
-router.post('/delete-category', authController.authenticateAdmin, categoryController.deleteCategory);
+router.post('/add-category', authenticateAdmin, addCategory);
+router.post('/edit-category', authenticateAdmin, updateCategory);
+router.post('/delete-category', authenticateAdmin, deleteCategory);
 
 
 //------- ORDERS --------//
-router.get('/orders/:id', authController.authenticateAdmin, categoryController.getListedCategories, orderController.getSingleOrderDetails, serviceRender.getAdminViewOrderPage)
-router.get('/orders', authController.authenticateAdmin, orderController.getAllUsersOrders, serviceRender.getAdminOrdersPage);
-router.post('/update-order', orderController.updateOrderStatus);
+router.get('/orders/:id', authenticateAdmin, getListedCategories, getSingleOrderDetails, getAdminViewOrderPage)
+router.get('/orders', authenticateAdmin, getAllUsersOrders, getAdminOrdersPage);
+
+router.post('/update-order', updateOrderStatus);
 
 //------- COUPONS --------//
-router.get('/coupons', authController.authenticateAdmin, couponController.getAllCouponDetails, serviceRender.getAdminCouponPage);
+router.get('/coupons', authenticateAdmin, getAllCouponDetails, getAdminCouponPage);
 
-router.post('/add-coupon', authController.authenticateAdmin, couponController.addCoupon);
-router.post('/edit-coupon', authController.authenticateAdmin, couponController.updateCoupon);
-router.post('/delete-coupon', authController.authenticateAdmin, couponController.deleteCoupon);
+router.post('/add-coupon', authenticateAdmin, addCoupon);
+router.post('/edit-coupon', authenticateAdmin, updateCoupon);
+router.post('/delete-coupon', authenticateAdmin, deleteCoupon);
 
 //------- BANNERS --------//
-router.get('/banners', authController.authenticateAdmin, bannerController.getAllBannerDetails, serviceRender.getAdminBannerPage);
+router.get('/banners', authenticateAdmin, getAllBannerDetails, getAdminBannerPage);
 
-router.post('/add-banner', authController.authenticateAdmin, uploadController.uploadBannerImage.single('image'), bannerController.addBanner);
-router.post('/edit-banner', authController.authenticateAdmin, uploadController.uploadBannerImage.single('image'), bannerController.updateBanner);
-router.post('/delete-banner', authController.authenticateAdmin, bannerController.deleteBanner);
+router.post('/add-banner', authenticateAdmin, uploadBannerImage.single('image'), addBanner);
+router.post('/edit-banner', authenticateAdmin, uploadBannerImage.single('image'), updateBanner);
+router.post('/delete-banner', authenticateAdmin, deleteBanner);
 
 //------- SALES --------//
-router.get('/sales', authController.authenticateAdmin, categoryController.getListedCategories, orderController.getOrderSales, serviceRender.getAdminSalesPage);
-// router.post('/get-report', authController.authenticateAdmin, orderController.getOrderSales);
-router.get('/get-monthly-order-stats', authController.authenticateAdmin, orderController.getMonthlyOrdersForChart);
+router.get('/sales', authenticateAdmin, getListedCategories, getOrderSales, getAdminSalesPage);
+router.get('/get-monthly-order-stats', authenticateAdmin, getMonthlyOrdersForChart);
+router.get('/sales-pdf', (req,res,next)=>{
+    const stream = res.writeHead(200, {
+        'Content-Type' : 'application/pdf',
+        'Content-Disposition' : 'attachment;filename=salesReport.pdf',
+    });
+    buildPDF(
+        (chunk) => stream.write(chunk),
+        () => stream.end()
+    );
+});
 
 module.exports = router;  

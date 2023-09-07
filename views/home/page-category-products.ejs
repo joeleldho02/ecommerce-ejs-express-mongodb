@@ -72,13 +72,23 @@
                                     </div>
                                     <div class="sort-by-dropdown">
                                         <ul>
-                                            <li><a class="active" href="#">Featured</a></li>
-                                            <li><a href="#">Price: Low to High</a></li>
-                                            <li><a href="#">Price: High to Low</a></li>
-                                            <li><a href="#">Release Date</a></li>
+                                            <li><a class="active" href="<% if (locals.originalUrl) { %><%= originalUrl %><% } %><% if(originalUrl.includes("&p=")) { %>&sort=0<% } else { %>?sort=0<% } %>">Featured</a></li>
+                                            <li><a href="<% if (locals.originalUrl) { %><%= originalUrl %><% } %><% if(originalUrl.includes("&p=")) { %>&sort=1<% } else { %>?sort=-1<% } %>">Price: Low to High</a></li>
+                                            <li><a href="<% if (locals.originalUrl) { %><%= originalUrl %><% } %><% if(originalUrl.includes("&p=")) { %>&sort=-1<% } else { %>?sort=1<% } %>">Price: High to Low</a></li>
+                                            <!-- <li><a href="<% if (locals.originalUrl) { %><%= originalUrl %><% } %><% if(originalUrl.includes("&p=")) { %>&recent=1<% } else { %>?recent=1<% } %>">Release Date</a></li> -->
                                         </ul>
                                     </div>
                                 </div>
+                                <!-- <form action="<% if (locals.originalUrl) { %><%= originalUrl %><% } %>">
+                                    <select name="sort" id="sortFilter" class="form-select" onchange="this.form.submit()">
+                                        <option value="0">Featured</option>
+                                        <option value="1">Low to High</option>
+                                        <option value="-1">High to Low</option>
+                                    </select>
+                                    <% if (locals.c) { %><input type="hidden" name="c" value="<%= c %>" /><% } %>
+                                    <% if (locals.p) { %><input type="hidden" name="p" value="<%= p %>" /><% } %>
+                                    <input type="hidden" name="page" value="<% if (locals.currentPage) { %><%= currentPage %><% } %>" />
+                                </form> -->
                             </div>
                         </div>
                         <div class="product-list mb-50">
@@ -145,8 +155,11 @@
                                     <ul class="pagination justify-content-start">
                                     <% for (let i = 0; i < totalPages; i++) { %>
                                     <li class="page-item <% if (locals.currentPage) { %><% if (currentPage == i+1) { %>active<% } %><% } %> ">
-                                        <a class="page-link" href="/<% if (locals.category) { %><%= category %><% } %>?page=<%= i+1 %>"><%= i+1 %></a>
+                                        <a class="page-link" onclick="submitForm('pageForm','pageInput','<%= i+1 %>')" ><%= i+1 %></a>
                                     </li>
+                                    <form id="pageForm" action="<% if (locals.originalUrl) { %><%= originalUrl %><% } %>">
+                                        <input id="pageInput" type="hidden" name="page" value="<% if (locals.currentPage) { %><%= currentPage + 1 %><% } %>">
+                                    </form>
                                     <% } %>
                                     <!-- <li class="page-item"><a class="page-link dot" href="#">...</a></li> -->
                                     <!-- <li class="page-item"><a class="page-link" href="#"><i class="fi-rs-angle-double-small-right"></i></a></li> -->
@@ -256,6 +269,12 @@
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>
+    <script>
+        function submitForm(formId, target, val){
+            document.getElementById(target).value= val;
+            document.getElementById(formId).submit();
+        }
+    </script>
     <script>
         function addToCart(prodId){
             console.log(prodId); 

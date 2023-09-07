@@ -8,28 +8,32 @@ exports.addNewProduct = async (req, res) => {
         if (!req.body) {
             console.log("Product data not submitted");
             res.redirect('/admin/products');
-        } else if(req.files.length <= 0){
-            console.log("Product images not submitted");
-            res.redirect('/admin/products');
-        } else {
-            await categoryController.getCategoryId(req.body.category)
+        } 
+        // else if(req.files.length <= 0){
+        //     console.log("Product images not submitted");
+        //     res.redirect('/admin/products');
+        // } 
+        else {
+            
+            const {productName, category, shortDescription, description, brand, regularPrice, salePrice, taxRate, stock, tags, sku} = req.body;
+            await categoryController.getCategoryId(category)
                 .then(catergoryId => {                    
-                    const imageFiles = req.files.map(file => {
-                        return file.filename;
-                    });
+                    // const imageFiles = req.files.map(file => {
+                    //     return file.filename;
+                    // });
                     const newProduct = new Productdb({
-                        productName: req.body.productName,
-                        shortDescription: req.body.shortDescription,
-                        description: req.body.description,
+                        productName: productName,
+                        shortDescription: shortDescription,
+                        description: description,
                         category: catergoryId,
-                        brand: req.body.brand,
-                        regularPrice: req.body.regularPrice,
-                        salePrice: req.body.salePrice,
-                        taxRate: req.body.taxRate,
-                        stock: req.body.stock,
-                        tags: req.body.tags,
-                        SKU:req.body.sku,
-                        images: imageFiles, 
+                        brand: brand,
+                        regularPrice: regularPrice,
+                        salePrice: salePrice,
+                        taxRate: taxRate,
+                        stock: stock,
+                        tags: tags,
+                        SKU:sku,
+                        images: req.body.images, 
                         updatedAt: Date.now()
                     });
                     console.log(newProduct);
@@ -160,23 +164,23 @@ exports.updateProductItem = async (req, res) => {
                 message: "Data to update cannot be empty"
             });
         }       
-        
-        await categoryController.getCategoryId(req.body.category)
+        const {productName, category, shortDescription, description, brand, regularPrice, salePrice, taxRate, stock, tags, sku} = req.body;
+        await categoryController.getCategoryId(category)
                 .then(catergoryId => {
                     const id = req.body.productID;
                     let imageFiles = [];
                     const product = {
-                        productName: req.body.productName,
-                        shortDescription: req.body.shortDescription,
-                        description: req.body.description,
+                        productName: productName,
+                        shortDescription: shortDescription,
+                        description: description,
                         category: catergoryId,
-                        brand: req.body.brand,
-                        regularPrice: req.body.regularPrice,
-                        salePrice: req.body.salePrice,
-                        taxRate: req.body.taxRate,
-                        stock: req.body.stock,
-                        tags: req.body.tags,
-                        SKU:req.body.sku,
+                        brand: brand,
+                        regularPrice: regularPrice,
+                        salePrice: salePrice,
+                        taxRate: taxRate,
+                        stock: stock,
+                        tags: tags,
+                        SKU:sku,
                         updatedAt: Date.now(),
                         _id: id
                     };
@@ -399,11 +403,11 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
 exports.getSearchProducts = async (req, res, next) => {
     try{
         console.log(req.query);  
-        let prodCategoryId, query;
+        let prodCategoryId, query, sort;
         const regex1 = new RegExp("^" + req.query.c + "$");
         const regex2 = new RegExp(req.query.p);
         if(req.query.c !== ""){
-            prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.query.c.toLowerCase());
+            prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.query?.c.toLowerCase());
             res.locals.category = req.query.c;
             query = {
                 categoryName: { $regex: regex1, $options: 'i' },               
@@ -426,6 +430,16 @@ exports.getSearchProducts = async (req, res, next) => {
                 isDeleted: false
             };
         }
+        if(req.query.sort ) {
+            if(req.query.sort == '1')
+                sort = {salePrice: 1};
+            else if(req.query.sort == '-1')
+                sort = {salePrice: -1};
+            else if(req.query.sort == '0')
+                sort = {};
+        } else{
+            sort = {}
+        }
         console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
         const count = await Productdb.countDocuments(query);
         const pageItemCount = 3;
@@ -439,7 +453,9 @@ exports.getSearchProducts = async (req, res, next) => {
         console.log(totalPages);
         console.log(currentPage); 
         await Productdb.find(query)
-        .skip(pageItemCount*(currentPage-1)).limit(pageItemCount).lean()
+        .skip(pageItemCount*(currentPage-1))
+        .limit(pageItemCount)
+        .sort(sort).lean()
         .then(data => {                
             // console.log(JSON.stringify(data));
             if(data.length !== 0){

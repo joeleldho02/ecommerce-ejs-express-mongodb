@@ -35,7 +35,9 @@
                         <div class="position-relative">
                             <div class="hero-slider-1 style-3 dot-style-1 dot-style-1-position-1">
                                 <% if (locals.banners) { %>
+                                <% if (banners.length > 1) { %>
                                     <% for( let i = 0; i < banners.length-1; i++ ) { %>                                
+                                        <% if (banners[i]?.isActive) { %>
                                         <div class="single-hero-slider single-animation-wrap">
                                             <div class="container">
                                                 <div class="slider-1-height-3 slider-animated-1">
@@ -52,7 +54,9 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <% } %>
                                     <% } %>
+                                <% } %>
                                 <% } %>
                                 <!-- <div class="single-hero-slider single-animation-wrap">
                                     <div class="container">
@@ -286,7 +290,9 @@
             </div>
         </section> -->
         <% if (locals.banners) { %>
+        <% if (banners.length > 1) { %>
         <% let i = banners.length-1 %>
+        <% if (banners[i]?.isActive) { %>
         <section class="banner-2 section-padding pb-0">
             <div class="container">
                 <div class="banner-img banner-big wow fadeIn animated f-none">
@@ -299,6 +305,8 @@
                 </div>
             </div>
         </section>
+        <% } %>
+        <% } %>
         <% } %>
         <!-- Popular Categories -->
         <section class="popular-categories section-padding mt-15">

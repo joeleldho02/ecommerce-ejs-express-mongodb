@@ -62,8 +62,6 @@ exports.getAllCartItems = async (req, res, next) => {
             res.locals.cartItems = cartItems;
             next(); 
         } else{
-            // res.locals.requestFrom = "/user/cart";
-            // res.redirect('/user/login');
             next(); 
         }
     } catch(err){
@@ -131,7 +129,6 @@ exports.getAllCartItems = async (req, res, next) => {
 
 //
 exports.addToCart = async (req, res, next) => {
-    //res.send("Adding to cart");
     console.log("ADDING TO CART -------->");
     const prodId = req.params.id;
     const qty = req.query.qty;
@@ -153,8 +150,6 @@ exports.addToCart = async (req, res, next) => {
         console.log(newCart);
         newCart.save()
             .then(data => {
-                //res.redirect('/admin/category');
-                //res.redirect('back');
                 res.json({status: true});
             })
             .catch(err => {
@@ -166,7 +161,6 @@ exports.addToCart = async (req, res, next) => {
             });
     } else{
         console.log("Cart already exists!");
-        //res.send("Product added to cart!")
         let flag = 0;
         for(item of userCart.products){
             if(item.productId.equals(new mongoose.Types.ObjectId(prodId)) ){
@@ -181,8 +175,6 @@ exports.addToCart = async (req, res, next) => {
         const editCart = new Cartdb(userCart);
         Cartdb.findByIdAndUpdate(userCart._id, editCart)
             .then(()=>{
-                //res.redirect('back');
-                //res.send("Product added to existing cart!")
                 res.json({status: true});
             })
             .catch(err => {
@@ -273,13 +265,14 @@ exports.changeCartItemQty = async (req, res) => {
         }
         console.log("CHANGING PRODUCT QTY TO CART -------->");
         console.log(req.body);
+        const {prodId, count} = req.body;
         const userCart = await Cartdb.findOne({customerId: req.session.user._id}).lean();
         if(userCart !== null){
             for(item of userCart.products){
-                if(item.productId.equals(new mongoose.Types.ObjectId(req.body.prodId)) ){  
-                        item.quantity += Number(req.body.count);
+                if(item.productId.equals(new mongoose.Types.ObjectId(prodId)) ){  
+                        item.quantity += Number(count);
                         console.log(item.quantity);
-                        const product = await Productdb.findOne({_id: req.body.prodId}).lean();
+                        const product = await Productdb.findOne({_id: prodId}).lean();
                         if(product !== null){
                             console.log("1111");
                             if(item.quantity > product.stock){

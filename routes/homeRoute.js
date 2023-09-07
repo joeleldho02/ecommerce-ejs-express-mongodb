@@ -1,31 +1,32 @@
 const express = require('express');
 const router = express.Router(); 
-const productController = require('../server/controller/productController');
-const categoryController = require('../server/controller/categoryController');
-const cartController = require('../server/controller/cartController');
-const orderController = require('../server/controller/orderController');
-const userController = require('../server/controller/userController');
-const couponController = require('../server/controller/couponController');
-const bannerController = require('../server/controller/bannerController');
-const serviceRender = require('../server/services/render');
-const authController = require('../server/middleware/authenticate-user');
+const {authenticateUser} = require('../server/middleware/authenticate-user');
+const {applyCoupon} = require('../server/controller/couponController');
+const {getAllBannerDetails} = require('../server/controller/bannerController');
+const {getListedCategories} = require('../server/controller/categoryController');
+const {getAllAddresses, getWalletBalance} = require('../server/controller/userController');
+const {getOrderSummaryDetails, placeOrder, verifyRazorpayPayment} = require('../server/controller/orderController');
+const {getCartItemsCount, getAllCartItems, changeCartItemQty, addToCart, removeCartItem, getUserCart} = require('../server/controller/cartController');
+const {homePage, getUserCartPage, getUserCheckoutPage, getOrderPlacedPage, contactUs, categoryProductsPage, productDetailsPage, aboutUs} = require('../server/services/render');
+const {getFeaturedProducts, getSearchProducts, getProductsOfSingleCategory, getNewProductsOfCategory, getNewArrivalProducts, getProductItemById} = require('../server/controller/productController');
 
-router.get('/', categoryController.getListedCategories, cartController.getCartItemsCount, bannerController.getAllBannerDetails, productController.getFeaturedProducts, productController.getNewArrivalProducts, serviceRender.homePage);
-router.get('/cart', authController.authenticateUser, categoryController.getListedCategories, cartController.getAllCartItems, cartController.getCartItemsCount, serviceRender.getUserCartPage);
-router.get('/checkout', authController.authenticateUser, categoryController.getListedCategories, cartController.getAllCartItems, cartController.getCartItemsCount, userController.getAllAddresses, userController.getWalletBalance, serviceRender.getUserCheckoutPage);
-router.get('/place-order', authController.authenticateUser, categoryController.getListedCategories, cartController.getCartItemsCount, orderController.getOrderSummaryDetails, serviceRender.getOrderPlacedPage);
-router.get('/contact', categoryController.getListedCategories, cartController.getAllCartItems, cartController.getCartItemsCount, serviceRender.contactUs);
-router.get('/search', categoryController.getListedCategories, cartController.getCartItemsCount, cartController.getAllCartItems, productController.getSearchProducts, serviceRender.categoryProductsPage);
-router.get('/add-to-cart/:id', authController.authenticateUser, cartController.addToCart);
-router.get('/remove-cart-item/:id', authController.authenticateUser, cartController.removeCartItem);
+router.get('/', getListedCategories, getCartItemsCount, getAllBannerDetails, getFeaturedProducts, getNewArrivalProducts, homePage);
+router.get('/cart', authenticateUser, getListedCategories, getAllCartItems, getCartItemsCount, getUserCartPage);
+router.get('/checkout', authenticateUser, getListedCategories, getAllCartItems, getCartItemsCount, getAllAddresses, getWalletBalance, getUserCheckoutPage);
+router.get('/place-order', authenticateUser, getListedCategories, getCartItemsCount, getOrderSummaryDetails, getOrderPlacedPage);
+router.get('/contact', getListedCategories, getAllCartItems, getCartItemsCount, contactUs);
+router.get('/about', getListedCategories, getAllCartItems, getCartItemsCount, aboutUs);
+router.get('/search', getListedCategories, getCartItemsCount, getAllCartItems, getSearchProducts, categoryProductsPage);
+router.get('/add-to-cart/:id', authenticateUser, addToCart);
+router.get('/remove-cart-item/:id', authenticateUser, removeCartItem);
 
-router.post('/change-cart-item-quantity', cartController.changeCartItemQty);
-router.post('/apply-coupon', couponController.applyCoupon);
-router.post('/place-order', authController.authenticateUser, categoryController.getListedCategories, cartController.getUserCart, userController.getAllAddresses, orderController.placeOrder);
-router.post('/verify-payment', orderController.verifyRazorpayPayment);
+router.post('/change-cart-item-quantity', changeCartItemQty);
+router.post('/apply-coupon', applyCoupon);
+router.post('/place-order', authenticateUser, getListedCategories, getUserCart, getAllAddresses, placeOrder);
+router.post('/verify-payment', verifyRazorpayPayment);
 
-router.get('/:category', categoryController.getListedCategories, productController.getProductsOfSingleCategory, productController.getNewProductsOfCategory, cartController.getCartItemsCount, cartController.getAllCartItems, serviceRender.categoryProductsPage);
-router.get('/:category/:id', categoryController.getListedCategories, productController.getProductsOfSingleCategory, productController.getNewProductsOfCategory, productController.getProductItemById, cartController.getAllCartItems, cartController.getCartItemsCount, serviceRender.productDetailsPage);
+router.get('/:category', getListedCategories, getProductsOfSingleCategory, getNewProductsOfCategory, getCartItemsCount, getAllCartItems, categoryProductsPage);
+router.get('/:category/:id', getListedCategories, getProductsOfSingleCategory, getNewProductsOfCategory, getProductItemById, getAllCartItems, getCartItemsCount, productDetailsPage);
 
 
 module.exports = router;  

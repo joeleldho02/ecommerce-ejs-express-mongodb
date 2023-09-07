@@ -2,16 +2,17 @@ const Cartdb = require('../model/cartModel');
 const Orderdb = require('../model/orderModel');
 const Productdb = require('../model/productModel');
 const mongoose = require('mongoose');
-const userController = require('./userController');
-const paymentHelper = require('../helper/razorpay'); 
+const {addWalletTransactionToDb, getUserWalletBalance} = require('./userController');
+const {generateOrderRazorpay, verifyOrderPayment} = require('../helper/razorpay'); 
 const invoiceHelper = require('../helper/invoicePDF'); 
 const Userdb = require('../model/userModel');
 
 exports.placeOrder = async (req, res, next) => {
     try{
         console.log(req.body);
-        if(req.body.addressId && req.body.paymentMethod){
-            const addressId = req.body.addressId;
+        
+        const {addressId, paymentMethod, totalAmount, discountAmount, discountCoupon} = req.body;
+        if(addressId && paymentMethod){
             const userId = req.session.user._id;
             const cartProducts = res.locals.userCart.products;
             console.log("CART PRODUCTS LIST : " + cartProducts);
@@ -90,17 +91,17 @@ exports.placeOrder = async (req, res, next) => {
             const tempOrder = {
                 orderId: orderId,
                 customerId: userId,
-                paymentMethod: req.body.paymentMethod,
+                paymentMethod: paymentMethod,
                 products: cartProducts,
                 shippingAddress: address[0],
-                totalAmount : req.body.totalAmount,
+                totalAmount : totalAmount,
                 totalItems : totalItems,
-                finalAmount: req.body.totalAmount
+                finalAmount: totalAmount
             };
-            if(req.body.discountCoupon !== ""){
-                tempOrder.coupon = req.body.discountCoupon;
-                tempOrder.discount = req.body.discountAmount;
-                tempOrder.totalAmount = Number(req.body.totalAmount) + Number(req.body.discountAmount);
+            if(discountCoupon !== ""){
+                tempOrder.coupon = discountCoupon;
+                tempOrder.discount = discountAmount;
+                tempOrder.totalAmount = Number(totalAmount) + Number(discountAmount);
             }
             const newOrder = new Orderdb(tempOrder);
 
@@ -144,19 +145,19 @@ exports.placeOrder = async (req, res, next) => {
                                 console.log(err);
                             });                                             
                     } else if(savedOrder.paymentMethod === 'RAZORPAY'){
-                        const generatedOrder = await paymentHelper.generateOrderRazorpay(savedOrder._id, savedOrder.finalAmount);
+                        const generatedOrder = await generateOrderRazorpay(savedOrder._id, savedOrder.finalAmount);
                         res.json({payment:false, method:"razorpay", razorpayOrder: generatedOrder, order: savedOrder});                       
                     } else if(savedOrder.paymentMethod === 'WALLET'){
                         console.log("WALLET: "+savedOrder.paymentMethod);
-                        const walletBalance = await userController.getUserWalletBalance(req.session.user._id);
+                        const walletBalance = await getUserWalletBalance(req.session.user._id);
                         if(walletBalance < savedOrder.finalAmount){
                             console.log("Wallet is short of money!");
                             res.json({payment:false, method:"wallet", errMsg:"Insufficent balance in wallet to process the order!"});
                         } else{
                             console.log("WALLET: " + savedOrder.paymentMethod);
-                            await userController.addWalletTransactionToDb(req.session.user._id, savedOrder.finalAmount*100, "D", "Debited for order")
+                            await addWalletTransactionToDb(req.session.user._id, savedOrder.finalAmount*100, "D", "Debited for order")
                             const paymentDetails = {
-                                walletBalance : await userController.getUserWalletBalance(req.session.user._id),
+                                walletBalance : await getUserWalletBalance(req.session.user._id),
                             }
                             exports.changePaymentStatus(savedOrder._id, paymentDetails, "PAID")
                                 .then(async ()=>{
@@ -206,7 +207,7 @@ exports.changePaymentStatus = (orderId, payment, status) => {
 };
 exports.verifyRazorpayPayment = (req, res)=>{
     try{
-        paymentHelper.verifyOrderPayment(req.body)
+        verifyOrderPayment(req.body)
         .then(async ()=>{
             console.log("Payment SUCCESSFUL");
             exports.changePaymentStatus(req.body.order._id, req.body.payment, "PAID")
@@ -449,7 +450,7 @@ exports.cancelOrder = async (req, res, next) => {
                     if(order.paymentStatus === "PAID"){
                         const amount = order.finalAmount*100;
                         const remarks = "Refund of order"
-                        await userController.addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
+                        await addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
                             .then((data)=>{
                                 console.log(`Refund of amount "₹${data.amount}" is successful!`);
                                 // res.json({status:true, data: data});
@@ -538,7 +539,7 @@ exports.returnOrder = async (req, res, next) => {
                     if(order.paymentStatus === "PAID"){
                         const amount = order.finalAmount*100;
                         const remarks = "Refund of order"
-                        await userController.addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
+                        await addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
                             .then((data)=>{
                                 console.log(`Refund of amount "₹${data.amount}" is successful!`);
                                 // res.json({status:true, data: data});
@@ -672,12 +673,30 @@ exports.getMonthlyOrdersForChart = async(req, res, next) => {
                     $project: { _id: 0 }
                 }
             ]);
+            const salesData = await Orderdb.aggregate([
+                {
+                    $group: {
+                        _id: {  month: { '$month': "$createdAt" } },
+                        count: { $sum: '$finalAmount' }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        saleStats: { $push: { month: "$_id.month", count: "$count" } }
+                    }
+                },{
+                    $project:{_id:0}
+                }
+            ]);
 
             const monthlyOrderData = [0,0,0,0,0,0,0,0,0,0,0,0];
             const monthlyProductData = [0,0,0,0,0,0,0,0,0,0,0,0];
+            const monthlySalesData = [0,0,0,0,0,0,0,0,0,0,0,0];
 
             const orderStats = orderData[0]?.orderStats || [];
             const productStats = productData[0]?.productStats || [];
+            const saleStats = salesData[0]?.saleStats || [];
 
             orderStats.forEach((item)=>{
                 monthlyOrderData[item.month-1] = item.count;
@@ -685,14 +704,19 @@ exports.getMonthlyOrdersForChart = async(req, res, next) => {
             productStats.forEach((item)=>{
                 monthlyProductData[item.month-1] = item.count;
             })
+            saleStats.forEach((item)=>{
+                monthlySalesData[item.month-1] = item.count/10000;
+            })
 
             console.log(monthlyOrderData);
             console.log(monthlyProductData);
+            console.log(monthlySalesData);
 
             res.json({
                 status: true, 
                 orderData: monthlyOrderData,
                 productData: monthlyProductData,
+                salesData: monthlySalesData,
             });
         } else{
             res.json({status: false});
@@ -913,15 +937,15 @@ exports.getOrderSales = async (req, res, next) => {
                     end.setDate(end.getDate() + 1);
                     query = {createdAt:{"$gte": start, "$lte": end }};
                 } else if(req.query.duration === "Week"){
-                    let start = new Date(defaultDate), end = new Date(defaultDate);
-                    end.setDate(end.getDate() + 7);
+                    let start = new Date(), end = new Date();
+                    start.setDate(start.getDate() - 7);
                     query = {createdAt:{"$gte": start, "$lte": end }};
                 } else if(req.query.duration === "Month"){
-                    let start = new Date(defaultDate), end = new Date(defaultDate);
-                    end.setMonth(end.getMonth() + 1);
+                    let start = new Date(), end = new Date();
+                    start.setMonth(start.getMonth() - 1);
                     query = {createdAt:{"$gte": start, "$lte": end }};
                 } else if(req.query.duration === "Year"){
-                    let start = new Date(defaultDate), end = new Date(defaultDate);
+                    let start = new Date(), end = new Date();
                     start.setYear(start.getYear() - 1);
                     query = {createdAt:{"$gte": start, "$lte": end }};
                 }

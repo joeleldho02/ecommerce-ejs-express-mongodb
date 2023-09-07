@@ -16,8 +16,9 @@ exports.addCoupon = async (req, res, next) => {
         if (!req.body) {
             res.redirect('/admin/coupons');
         }
-        else {
-            const regex = new RegExp("^" + req.body.couponCode + "$");
+        else {            
+            const {couponCode, description, discount, minAmount, maxDiscount, isListed} = req.body;
+            const regex = new RegExp("^" + couponCode + "$");
             await Coupondb.findOne({ couponCode: { $regex: regex }, isDeleted: false })
                 .then(async data => {
                     if (data !== null) {
@@ -42,12 +43,12 @@ exports.addCoupon = async (req, res, next) => {
                     }
                     else{
                         const newCoupon = new Coupondb({
-                            couponCode: req.body.couponCode,
-                            description: req.body.description,
-                            discount: req.body.discount,
-                            minAmount: req.body.minAmount,
-                            maxDiscount: req.body.maxDiscount,
-                            isListed: req.body.isListed === "on" ? true : false
+                            couponCode: couponCode,
+                            description: description,
+                            discount: discount,
+                            minAmount: minAmount,
+                            maxDiscount: maxDiscount,
+                            isListed: isListed === "on" ? true : false
                         })
                         await newCoupon.save()
                             .then(data => {
@@ -144,8 +145,9 @@ exports.updateCoupon = async (req, res, next) => {
             });
         }
         console.log(JSON.stringify(req.body));
-        const regex = new RegExp("^" + req.body.couponCode + "$");
-        await Coupondb.findOne({ couponCode: { $regex: regex }, isDeleted: false, _id:{$ne: req.body.id} })
+        const {id, couponCode, description, discount, minAmount, maxDiscount, isListed} = req.body;
+        const regex = new RegExp("^" + couponCode + "$");
+        await Coupondb.findOne({ couponCode: { $regex: regex }, isDeleted: false, _id:{$ne: id} })
                 .then( async data => {
                     if (data !== null) {
                         console.log("Coupon code already exsits!");  
@@ -167,15 +169,15 @@ exports.updateCoupon = async (req, res, next) => {
                             console.log(err);
                         });
                     } else{
-                        const id = req.body.id;
+                        const id = id;
                         console.log(req.body);
                         const editCoupon = new Coupondb({
-                            couponCode: req.body.couponCode,
-                            description: req.body.description,
-                            discount: req.body.discount,
-                            minAmount: req.body.minAmount,
-                            maxDiscount: req.body.maxDiscount,
-                            isListed: req.body.isListed === "on" ? true : false,
+                            couponCode: couponCode,
+                            description: description,
+                            discount: discount,
+                            minAmount: minAmount,
+                            maxDiscount: maxDiscount,
+                            isListed: isListed === "on" ? true : false,
                             _id: id
                         })
                         await Coupondb.findByIdAndUpdate(id, editCoupon)

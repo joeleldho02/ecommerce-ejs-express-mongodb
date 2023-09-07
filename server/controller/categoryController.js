@@ -8,7 +8,8 @@ exports.addCategory = async (req, res, next) => {
             res.redirect('/admin/category');
         }
         else {
-            const regex = new RegExp("^" + req.body.categoryName + "$");
+            const {categoryName, description, slug, isListed} = req.body;
+            const regex = new RegExp("^" + categoryName + "$");
             await Categorydb.findOne({ categoryName: { $regex: regex, $options: 'i' }, isDeleted: false })
                 .then(async data => {
                     if (data !== null) {
@@ -33,10 +34,10 @@ exports.addCategory = async (req, res, next) => {
                     }
                     else{
                         const newCategory = new Categorydb({
-                            categoryName: req.body.categoryName,
-                            description: req.body.description,
-                            slug: req.body.slug,
-                            isListed: req.body.isListed === "on" ? true : false
+                            categoryName: categoryName,
+                            description: description,
+                            slug: slug,
+                            isListed: isListed === "on" ? true : false
                         })
                         await newCategory.save()
                             .then(data => {
@@ -156,17 +157,14 @@ exports.getListedCategories = async (req, res, next) => {
         console.log(err.message);    
     }
 };
-
 //get category id of single category 
 exports.getCategoryId = (categoryName) => {
     return new Promise((resolve, reject) => {
         try{
             Categorydb.findOne({categoryName: categoryName})
             .then(data => {
-                console.log(data);
                 console.log("ID : " + data._id);
                 if(data !== null){
-                    console.log("1");
                     resolve(data._id)
                 }
                 else{
@@ -174,11 +172,9 @@ exports.getCategoryId = (categoryName) => {
                 }
             })
             .catch(() => {
-                console.log("3");
                 reject();
             });
         } catch{
-            console.log("4");
             reject();
         }        
     });        
@@ -192,9 +188,11 @@ exports.updateCategory = async (req, res, next) => {
                 message: err.message || "Data to update cannot be empty"
             });
         }
+        
+        const {id, categoryName, description, slug, isListed} = req.body;
         console.log(JSON.stringify(req.body));
-        const regex = new RegExp("^" + req.body.categoryName + "$");
-        await Categorydb.findOne({ categoryName: { $regex: regex, $options: 'i' }, isDeleted: false, _id:{$ne: req.body.id} })
+        const regex = new RegExp("^" + categoryName + "$");
+        await Categorydb.findOne({ categoryName: { $regex: regex, $options: 'i' }, isDeleted: false, _id:{$ne: id} })
                 .then( async data => {
                     if (data !== null) {
                         console.log("Category name already exsits!");   
@@ -217,13 +215,13 @@ exports.updateCategory = async (req, res, next) => {
                             console.log(err);
                         });
                     } else{
-                        const id = req.body.id;
+                        const id = id;
                         console.log(req.body);
                         const category = {
-                            categoryName: req.body.categoryName,
-                            description: req.body.description,
-                            slug: req.body.slug,
-                            isListed: req.body.isListed === "on" ? true : false,
+                            categoryName: categoryName,
+                            description: description,
+                            slug: slug,
+                            isListed: isListed === "on" ? true : false,
                             updatedAt: Date.now(),
                             _id: id
                         }
@@ -236,9 +234,9 @@ exports.updateCategory = async (req, res, next) => {
                                     });
                                 }
                                 else {
-                                    //res.send(data);   
                                     const msg = "Category updated successfully!"
                                     res.redirect('/admin/category');
+                                    console.log(msg);
                                 }
                             })
                             .catch(err => {
@@ -302,7 +300,6 @@ exports.deleteCategory = (req, res) => {
         console.log(err.message);
     }
 };
-
 
 exports.getCategoryCount = async(req, res, next) => {
     try{

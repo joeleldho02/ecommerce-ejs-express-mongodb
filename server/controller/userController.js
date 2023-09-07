@@ -70,7 +70,7 @@ exports.registerUser = async (req, res) => {
                     }
                     else {
                         req.session.registeredUser = req.body;
-                        req.session.signupEmail = req.body.email;
+                        req.session.signupEmail = req.body.email.toLowerCase();
                         req.session.signupPhone = req.body.phone;
                         req.session.loginOTP = await sendOTP(req.body.phone);
                         if(!req.session.loginOTP || req.session.loginOTP === null || req.session.loginOTP === undefined){
@@ -105,7 +105,7 @@ async function addUserDetails(req, res) {
         const user = new Userdb({
             firstName: registeredUser.firstName,
             lastName: registeredUser.lastName,
-            email: registeredUser.email,
+            email: registeredUser.email.toLowerCase(),
             phone: registeredUser.phone,
             password: hashedPassword,
             cart:{},

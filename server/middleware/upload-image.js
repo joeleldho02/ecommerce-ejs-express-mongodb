@@ -70,6 +70,7 @@ exports.uploadCategoryImage = multer({ storage: storage4 });
 
 const sharp = require("sharp");
 exports.resizeImages = async (req, res, next) => {
+  console.log(req.files)
   if (!req.files) return next();
   console.log("Resizing images ==========>>>>");
   req.body.images = [];

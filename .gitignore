@@ -1,6 +1,3 @@
 node_modules
 .env
 .vscode
-public/img/products
-public/img/banners
-public/img/users

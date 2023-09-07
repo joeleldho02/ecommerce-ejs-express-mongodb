@@ -58,15 +58,14 @@
                                 </select> -->
                             </div>
                             <div class="col-2 m-auto">
-                                <select class="form-select" id="category" name="duration" onchange="getReport()">
+                                <select class="form-select" id="category" name="duration" onchange="getDurationReport()">
                                     <option value="Today" <% if(locals.duration){ %><% if(duration === "Today"){ %> selected <% } %><% } %>>Today</option>
                                     <option value="Week" <% if(locals.duration){ %><% if(duration === "Week"){ %> selected <% } %><% } %>>Week</option>
                                     <option value="Month" <% if(locals.duration){ %><% if(duration === "Month"){ %> selected <% } %><% } %>>Month</option>
                                     <option value="Year" <% if(locals.duration){ %><% if(duration === "Year"){ %> selected <% } %><% } %>>Year</option>                                    
                                 </select>
                             </div>
-                            <div class="col-1"></div>
-                            <div class='col-2 form-group date ' id='picker1'>
+                            <div class='col-2 form-group date m-auto  ' id='picker1'>
                                 <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')" class="form-control" placeholder="Start Date" name="start" id="startDate" min="2020-01-01" 
                                 <% if (locals.startDate) { %>value="<%= startDate %>"<% } %> />
                                 <div class="error text-danger ms-2"></div>
@@ -74,7 +73,7 @@
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
                             </div>
-                            <div class='col-2 form-group date ' id='picker2'>
+                            <div class='col-2 form-group date m-auto ' id='picker2'>
                                 <input type='text' onfocus ="(this.type='date')" onblur="(this.type='text')"  class="form-control" placeholder="End Date" name="end" id="endDate" min="2020-01-01" 
                                 <% if (locals.endDate) { %>value="<%= endDate %>"<% } %>/>
                                 <div class="error text-danger ms-2"></div>
@@ -82,17 +81,18 @@
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
                             </div>
-                            <div class="col-3 m-auto text-end d-flex">
+                            <div class="col-4 m-auto text-end d-flex">
                                 <button type="submit" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Show report</button>
                                 <!-- <a href="javascript:{}" type="submit" onclick="getReport('formReport')" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a> -->
-                                <a href="javascript:{}" class="btn btn-secondary print ms-2" onclick="downloadReport()"><i class="icon material-icons md-print"></i></a>
+                                <a href="javascript:{}" class="btn btn-secondary print ms-2" onclick="downloadReport()">PDF<i class="icon material-icons md-print"></i></a>
+                                <a href="javascript:{}" class="btn btn-secondary print ms-2" onclick="ExportToExcel('xlsx')">CSV<i class="icon material-icons md-print"></i></a>
                             </div>
                             <div class="notification" id="notification">
                                 <p>Report download has started...</p>
                             </div>
                         </div>
                         </form>
-                        <div class="table-responsive mt-0">
+                        <div id="dvContainer" class="table-responsive mt-0">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" class="display">
                                 <thead>
                                     <tr>
@@ -145,6 +145,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/js/custom-confirm.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
     <!-- Page level custom scripts -->
     <script>
 
@@ -268,6 +269,11 @@
             }
         });
 
+        function getDurationReport(){
+            startDate.value = "";
+            endDate.value = "";
+            getReport();
+        }
         function getReport() {
             console.log("Getting report....");
             // $('#dataTable').DataTable().ajax.reload(); 
@@ -294,13 +300,33 @@
             document.getElementById('formReport').submit();
         }
         
-        function downloadReport() {console.log("Download Report");  showNotification(); }
+        function downloadReport() {
+            console.log("Download Report");  
+            showNotification(); 
+            let divContents = $("#dvContainer").html();
+            let printWindow = window.open('', '', 'height=400,width=800');
+            printWindow.document.write('<html><head><title>DIV Contents</title>');
+            printWindow.document.write('</head><body >');
+            printWindow.document.write(divContents);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
 
         function showNotification() {
             const notification = document.getElementById("notification");
             notification.style.display = "block";
             setTimeout(()=>{ notification.style.display = "none"; }, 3000);
         }
+
+        function ExportToExcel(type, fn, dl) {
+            let elt = document.getElementById('dataTable');
+            let wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+            return dl ?
+            XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }):
+            XLSX.writeFile(wb, fn || ('SalesReport.' + (type || 'xlsx')));
+        }
+
     </script> 
 </body>
 

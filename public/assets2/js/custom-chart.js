@@ -15,7 +15,7 @@
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                     datasets: [{
-                            label: 'Order',
+                            label: 'Order (nos)',
                             tension: 0.3,
                             fill: true,
                             backgroundColor: 'rgba(44, 120, 220, 0.2)',
@@ -23,12 +23,20 @@
                             data: response.orderData
                         },
                         {
-                            label: 'Products',
+                            label: 'Products (nos)',
                             tension: 0.3,
                             fill: true,
                             backgroundColor: 'rgba(380, 200, 230, 0.2)',
                             borderColor: 'rgb(380, 200, 230)',
                             data: response.productData
+                        },
+                        {
+                            label: 'Sales (₹10K)',
+                            tension: 0.3,
+                            fill: true,
+                            backgroundColor: 'rgba(4, 209, 130, 0.2)',
+                            borderColor: 'rgb(4, 209, 130)',
+                            data: response.salesData
                         }
 
                     ]

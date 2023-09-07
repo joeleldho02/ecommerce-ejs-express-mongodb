@@ -1,36 +1,34 @@
 const express = require('express');
 const router = express.Router(); 
-const userController = require('../server/controller/userController');
-const categoryController = require('../server/controller/categoryController');
-const cartController = require('../server/controller/cartController');
-const orderController = require('../server/controller/orderController');
-const authController = require('../server/middleware/authenticate-user');
-const serviceRender = require('../server/services/render');
+const {authenticateUser} = require('../server/middleware/authenticate-user');
+const {getListedCategories} = require('../server/controller/categoryController');
+const {getAllCartItems, getCartItemsCount} = require('../server/controller/cartController');
+const {getAllOrdersOfUser, getSingleOrderDetails, generateInvoicePDF, cancelOrder, returnOrder} = require('../server/controller/orderController');
+const {userDashboardPage, userSignupPage, userVerifyOtpPage, userLoginPage, userLogout, getUserOrderDetailsPage, getUserOrderInvoicePage} = require('../server/services/render');
+const {getAllAddresses, getUserWalletDetails, getWalletBalance, registerUser, loginOTPVerify, userLogin, addNewAddress, deleteAddress, editAddress, addToWalletGetRazorpay, verifyWalletRazorpayPayment} = require('../server/controller/userController');
 
-router.get('/', authController.authenticateUser, categoryController.getListedCategories, 
-    cartController.getAllCartItems, cartController.getCartItemsCount, 
-    userController.getAllAddresses, orderController.getAllOrdersOfUser, 
-    userController.getUserWalletDetails, userController.getWalletBalance, serviceRender.userDashboardPage);
-router.get('/signup', categoryController.getListedCategories, serviceRender.userSignupPage);
-router.get('/verify-otp', categoryController.getListedCategories, serviceRender.userVerifyOtpPage);
-router.get('/login', categoryController.getListedCategories, serviceRender.userLoginPage);
-router.get('/logout', serviceRender.userLogout);
-router.get('/view-order/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderDetailsPage)
-router.get('/order-invoice/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, cartController.getCartItemsCount, serviceRender.getUserOrderInvoicePage)
-router.get('/download-invoice/:id', authController.authenticateUser, categoryController.getListedCategories, orderController.getSingleOrderDetails, orderController.generateInvoicePDF);
+router.get('/', authenticateUser, getListedCategories, getAllCartItems, getCartItemsCount, getAllAddresses, getAllOrdersOfUser, getUserWalletDetails, getWalletBalance, userDashboardPage);
+router.get('/signup', getListedCategories, userSignupPage);
+router.get('/verify-otp', getListedCategories, userVerifyOtpPage);
+router.get('/login', getListedCategories, userLoginPage);
+router.get('/logout', userLogout);
+
+router.get('/view-order/:id', authenticateUser, getListedCategories, getSingleOrderDetails, getCartItemsCount, getUserOrderDetailsPage)
+router.get('/order-invoice/:id', authenticateUser, getListedCategories, getSingleOrderDetails, getCartItemsCount, getUserOrderInvoicePage)
+router.get('/download-invoice/:id', authenticateUser, getListedCategories, getSingleOrderDetails, generateInvoicePDF);
  
-router.post('/signup', userController.registerUser);
-router.post('/verify-otp', userController.loginOTPVerify);
-router.post('/login', userController.userLogin);
+router.post('/signup', registerUser);
+router.post('/verify-otp', loginOTPVerify);
+router.post('/login', userLogin);
 
-router.post('/add-new-address', authController.authenticateUser, userController.addNewAddress);
-router.post('/delete-address',authController.authenticateUser,  userController.deleteAddress);
-router.post('/edit-address', authController.authenticateUser, userController.editAddress);
+router.post('/add-new-address', authenticateUser, addNewAddress);
+router.post('/delete-address',authenticateUser,  deleteAddress);
+router.post('/edit-address', authenticateUser, editAddress);
 
-router.post('/add-to-wallet', authController.authenticateUser, userController.addToWalletGetRazorpay);
-router.post('/verify-wallet-payment', authController.authenticateUser, userController.verifyWalletRazorpayPayment);
+router.post('/add-to-wallet', authenticateUser, addToWalletGetRazorpay);
+router.post('/verify-wallet-payment', authenticateUser, verifyWalletRazorpayPayment);
 
-router.get('/cancel-order/:id', authController.authenticateUser, orderController.cancelOrder);
-router.get('/return-order/:id', authController.authenticateUser, orderController.returnOrder);
+router.get('/cancel-order/:id', authenticateUser, cancelOrder);
+router.get('/return-order/:id', authenticateUser, returnOrder);
 
 module.exports = router;  

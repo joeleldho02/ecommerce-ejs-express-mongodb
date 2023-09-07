@@ -14,6 +14,7 @@ exports.homePage = (req, res) => {
     });
 };
 exports.categoryProductsPage = (req, res) => {
+    console.log(req.originalUrl);
     if(res.locals.categories.length === 0 || !res.locals.products){
         res.status(404).render('error', {
                         message: "Oops..! Page not available",
@@ -30,7 +31,10 @@ exports.categoryProductsPage = (req, res) => {
             itemsCount : res.locals.itemsCount,
             currentPage : res.locals.currentPage,
             totalPages : res.locals.totalPages,
-            category : res.locals.category
+            category : res.locals.category,
+            originalUrl : req.originalUrl,
+            c:req.query?.c,
+            p:req.query?.p,
         });
     }    
 };
@@ -83,6 +87,15 @@ exports.getOrderPlacedPage = (req, res) => {
 };
 exports.contactUs = (req, res) => {
     res.render('page-contact',{
+        user: req.session.user,
+        categories: res.locals.categories,
+        cartItems : res.locals.cartItems,
+        subTotal : res.locals.subTotal,
+        itemsCount : res.locals.itemsCount
+    });
+};
+exports.aboutUs = (req, res) => {
+    res.render('page-about',{
         user: req.session.user,
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
