@@ -1,5 +1,6 @@
 const Productdb = require('../model/productModel');
 const categoryController = require('./categoryController');
+const mongoose = require('mongoose');
 
 //add new product to DB
 exports.addNewProduct = async (req, res) => {
@@ -332,24 +333,37 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
     try{
         if(req.params.category){            
             res.locals.category = req.params.category;
-            const prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
+            let prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
+            prodCategoryId = prodCategoryId[0]._id;
             console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
             //console.log(JSON.stringify(prodCategoryId));
+            
+            console.log(req.query);
 
-            const count = await Productdb.countDocuments({ category: prodCategoryId, isDeleted: false});
-            const pageItemCount = 3;
-            const totalPages = Math.ceil(count/pageItemCount) || 1;
-            let currentPage = 1;
-            if(req.query.page){
-                currentPage = req.query.page || 1;
-            }            
-            console.log(count);
-            console.log(pageItemCount);
+            const totalCount = await Productdb.countDocuments({ category: prodCategoryId, isDeleted: false});
+            const limit = parseInt(req.query.limit) || 3;
+            const totalPages = Math.ceil(totalCount/limit) || 1;
+            let currentPage = parseInt(req.query.page) - 1 || 0; 
+            if(currentPage !== 0)
+                currentPage = (currentPage+1) > totalPages ? 0 : (currentPage+1);
+            let sort = req.query.sort || {};  
+            if(sort === "p-asc"){
+                sort = {salePrice: 1};
+            } else if(sort === "p-desc") {
+                sort = {salePrice: -1};
+            } else {
+                sort = {};
+            }
+            console.log(totalCount);
+            console.log(limit);
             console.log(totalPages);
             console.log(currentPage); 
 
             await Productdb.find({ category: prodCategoryId, isDeleted: false})
-            .skip(pageItemCount*(currentPage-1)).limit(pageItemCount).lean()
+            .skip(limit*currentPage)
+            .limit(limit)
+            .sort(sort)
+            .lean()
             .then(data => {                
                 // console.log(JSON.stringify(data));
                 if(data.length !== 0){
@@ -360,11 +374,10 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
                     });                 
                     console.log("2222");
                     res.locals.products = data;
-                    res.locals.currentPage = currentPage;
+                    // res.locals.currentPage = limit >= totalCount ? 0 : (currentPage+1);
+                    res.locals.currentPage = currentPage+1;
                     res.locals.totalPages = totalPages;
-                    // console.log(res.locals.products);
-                    console.log(res.locals.currentPage);
-                    console.log(res.locals.totalPages);
+                    res.locals.totalCount = totalCount;
                     next();
                 }
                 else{
@@ -403,82 +416,75 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
 exports.getSearchProducts = async (req, res, next) => {
     try{
         console.log(req.query);  
-        let prodCategoryId, query, sort;
-        const regex1 = new RegExp("^" + req.query.c + "$");
-        const regex2 = new RegExp(req.query.p);
-        if(req.query.c !== ""){
+        let prodCategoryId, query;
+        const regex = new RegExp(req.query.p);
+        if(req.query.c && req.query.c !== ""){
             prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.query?.c.toLowerCase());
-            res.locals.category = req.query.c;
+            res.locals.category = prodCategoryId[0]?.categoryName;
+            prodCategoryId = prodCategoryId[0]?._id;
             query = {
-                categoryName: { $regex: regex1, $options: 'i' },               
+                category: prodCategoryId,               
                 $or:[
-                    {productName: { $regex: regex2, $options: 'i' }}, 
-                    {brand: { $regex: regex2, $options: 'i' }}, 
-                    {shortDescription: { $regex: regex2, $options: 'i' }}, 
-                    {description: { $regex: regex2, $options: 'i' }}, 
+                    {productName: { $regex: regex, $options: 'i' }}, 
+                    {brand: { $regex: regex, $options: 'i' }}, 
+                    {shortDescription: { $regex: regex, $options: 'i' }}, 
+                    {description: { $regex: regex, $options: 'i' }}, 
                 ],
                 isDeleted: false
             };
         } else {
             query = {
                 $or:[
-                    {productName: { $regex: regex2, $options: 'i' }}, 
-                    {brand: { $regex: regex2, $options: 'i' }}, 
-                    {shortDescription: { $regex: regex2, $options: 'i' }}, 
-                    {description: { $regex: regex2, $options: 'i' }}, 
+                    {productName: { $regex: regex, $options: 'i' }}, 
+                    {brand: { $regex: regex, $options: 'i' }}, 
+                    {shortDescription: { $regex: regex, $options: 'i' }}, 
+                    {description: { $regex: regex, $options: 'i' }}, 
                 ],
                 isDeleted: false
             };
         }
-        if(req.query.sort ) {
-            if(req.query.sort == '1')
-                sort = {salePrice: 1};
-            else if(req.query.sort == '-1')
-                sort = {salePrice: -1};
-            else if(req.query.sort == '0')
-                sort = {};
-        } else{
-            sort = {}
-        }
         console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
-        const count = await Productdb.countDocuments(query);
-        const pageItemCount = 3;
-        const totalPages = Math.ceil(count/pageItemCount) || 1;
-        let currentPage = 1;
-        if(req.query.page){
-            currentPage = req.query.page || 1;
-        }            
-        console.log(count);
-        console.log(pageItemCount);
+        const totalCount = await Productdb.countDocuments(query);
+        const limit = parseInt(req.query.limit) || 3;
+        const totalPages = Math.ceil(totalCount/limit) || 1;
+        let currentPage = parseInt(req.query.page) - 1 || 0;
+        if(currentPage !== 0 && (currentPage+1) > totalPages)
+            currentPage = 0;
+        let sort = req.query.sort || {};  
+        if(sort === "p-asc"){
+            sort = {salePrice: 1};
+        } else if(sort === "p-desc") {
+            sort = {salePrice: -1};
+        } else {
+            sort = {};
+        }          
+        console.log(totalCount);
+        console.log(limit);
         console.log(totalPages);
         console.log(currentPage); 
+        console.log(query); 
+
+        
+        res.locals.totalCount = totalCount;
+
         await Productdb.find(query)
-        .skip(pageItemCount*(currentPage-1))
-        .limit(pageItemCount)
-        .sort(sort).lean()
-        .then(data => {                
-            // console.log(JSON.stringify(data));
+        .skip(limit*currentPage)
+        .limit(limit)
+        .sort(sort)
+        .lean()
+        .then(data => {
             if(data.length !== 0){
-                console.log("111111");
                 data.forEach(product => {
                     const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product?.category) );
                     product.category = prodCategoryName[0]?.categoryName;
                 });                 
-                console.log("2222");
                 res.locals.products = data;
-                res.locals.currentPage = currentPage;
                 res.locals.totalPages = totalPages;
-                // console.log(res.locals.products);
-                console.log(res.locals.currentPage);
-                console.log(res.locals.totalPages);
+                res.locals.currentPage = currentPage+1;
                 next();
             }
-            else{
-                // res.status(404).render('error', {
-                //     message: "Oops..! Page not available",
-                //     errStatus : 404
-                // });                
-                console.log("Related products not available!");     
+            else{         
+                console.log("Search products not available!");     
                 next();                             
             }
             

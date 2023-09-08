@@ -34,10 +34,10 @@
 
 <body>   
     <!-- Header -->
-    <%- include('./partials/user/user-header.ejs') %>
+    <%- include('./partials/user/user-header.ejs', {currTab: 'orders'}) %>
 
     <!-- Mobile Header -->
-    <%- include('./partials/user/user-mobile-header.ejs') %>
+    <%- include('./partials/user/user-mobile-header.ejs', {currTab: 'orders'}) %>
     
     <main class="main">
         <div class="notification" id="notification">

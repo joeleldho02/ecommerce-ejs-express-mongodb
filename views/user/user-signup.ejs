@@ -20,10 +20,10 @@
 
 <body>   
     <!-- Header -->
-    <%- include('./partials/user/user-header.ejs') %>
+    <%- include('./partials/user/user-header.ejs', {currTab: 'dashboard'}) %>
     
     <!-- Mobile Header -->
-    <%- include('./partials/user/user-mobile-header.ejs') %>
+    <%- include('./partials/user/user-mobile-header.ejs', {currTab: 'dashboard'}) %>
     
     <main class="main">
         <div class="page-header breadcrumb-wrap">

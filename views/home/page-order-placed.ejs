@@ -49,9 +49,9 @@
 
 <body>
     <!-- Header -->
-    <%- include('./partials/home/home-header.ejs') %>
+    <%- include('./partials/home/home-header.ejs', {currTab: 'shop'}) %>
     <!-- Mobile Header -->
-    <%- include('./partials/home/home-mobile-header.ejs') %>
+    <%- include('./partials/home/home-mobile-header.ejs', {currTab: 'shop'}) %>
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
@@ -78,7 +78,7 @@
                     <a class=" btn btn-primary me-4" href="/">Continue Shopping</a>
                 </div>
             </div>               
-            <% if(locals.order) { %>
+            <% if(locals.order, {currTab: 'home'}) { %>
             <div class="col-md-6">
                 <div class="card-body">
                     <div class="row order-info-wrap">

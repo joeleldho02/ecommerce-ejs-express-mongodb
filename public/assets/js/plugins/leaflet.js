@@ -189,7 +189,7 @@
                 pane: 'labels'
             }).addTo(map);
 
-            map.setView({ lat: 47.040182144806664, lng: 9.667968750000002 }, 4);
+            map.setView({ lat: 12.973025, lng: 77.744507 }, 11);
         }
     }
     var multiMarkColors = function () {

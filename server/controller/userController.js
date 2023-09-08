@@ -361,40 +361,32 @@ exports.addNewAddress = async (req, res) => {
         const user = await Userdb.findOne({_id: id}).lean();
         console.log(user);
         if(user){
-            let editUser;
-        if(user.address.length === 0){            
-            editUser = new Userdb({
-                _id: id,
-                address: newAddress,
-                updatedAt: Date.now()
-            });
-            console.log(editUser);            
-        } else{
             user.address.push(newAddress);
-            editUser = new Userdb(user);
-        }
-        await Userdb.findByIdAndUpdate(id, editUser)
-            .then(data => {
-                if (!data) {
+            user.updatedAt =  Date.now();
+            user._id = id;
+
+            await Userdb.findByIdAndUpdate(id, user)
+                .then(data => {
+                    if (!data) {
+                        res.status(500).render('error', {
+                            message: "Unable to add new address to user data",
+                            errStatus : 500
+                        });
+                        console.log("Unable to add new address to user data");
+                    }
+                    else {
+                        const msg = "New address added successfully!";
+                        console.log(msg);
+                        res.redirect('back');
+                    }
+                })
+                .catch(err => {
                     res.status(500).render('error', {
-                        message: "Unable to add new address to user data",
+                        message: "Error adding new address!",
                         errStatus : 500
                     });
-                    console.log("Unable to add new address to user data");
-                }
-                else {
-                    const msg = "New address added successfully!";
-                    console.log(msg);
-                    res.redirect('back');
-                }
-            })
-            .catch(err => {
-                res.status(500).render('error', {
-                    message: "Error adding new address!",
-                    errStatus : 500
+                    console.log(err);
                 });
-                console.log(err);
-            });
         } else{
             res.status(500).render('error', {
                 message: "Unable to add new address to user data",

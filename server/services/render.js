@@ -14,8 +14,25 @@ exports.homePage = (req, res) => {
     });
 };
 exports.categoryProductsPage = (req, res) => {
-    console.log(req.originalUrl);
-    if(res.locals.categories.length === 0 || !res.locals.products){
+    const url = require('url')
+    const urlParts = url.parse(req.url)
+    console.log("Original :" + req.originalUrl);
+    console.log("URL:" + urlParts.pathname);
+    if((res.locals.categories.length === 0 || !res.locals.products) && urlParts.pathname === '/search'){
+        res.render('page-category-products', {
+            user: req.session.user,
+            categories: res.locals.categories,
+            products : res.locals.products,
+            newProducts : res.locals.newProducts,
+            cartItems : res.locals.cartItems,
+            subTotal : res.locals.subTotal,
+            itemsCount : res.locals.itemsCount,
+            totalCount : res.locals.totalCount,
+            category : res.locals.category,
+            c : req.query?.c,
+            p : req.query?.p,
+        });
+    } else if(res.locals.categories.length === 0 || !res.locals.products){
         res.status(404).render('error', {
                         message: "Oops..! Page not available",
                         errStatus : 404
@@ -31,10 +48,14 @@ exports.categoryProductsPage = (req, res) => {
             itemsCount : res.locals.itemsCount,
             currentPage : res.locals.currentPage,
             totalPages : res.locals.totalPages,
+            totalCount : res.locals.totalCount,
             category : res.locals.category,
-            originalUrl : req.originalUrl,
-            c:req.query?.c,
-            p:req.query?.p,
+            query : req.query,
+            urlPath : urlParts.pathname || '/',
+            sort : req.query?.sort,
+            limit : req.query?.limit,
+            c : req.query?.c,
+            p : req.query?.p,
         });
     }    
 };
@@ -136,7 +157,6 @@ exports.adminLogout = (req, res) => {
     req.session.destroy();
     res.render('admin-login');
 };
-
 exports.getAdminOrdersPage = (req, res) => {
     res.render('page-order', {
         pageTitle: "Order Management",
@@ -151,7 +171,6 @@ exports.getAdminViewOrderPage = (req, res) => {
         order: res.locals.order
     });
 };
-
 exports.getAdminProductPage = (req, res) => {
     res.render('page-products', {
         pageTitle: "Product Management",

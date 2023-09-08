@@ -53,7 +53,7 @@
                 <div class="main-menu main-menu-grow main-menu-padding-1 main-menu-lh-1 main-menu-mrg-1 hm3-menu-padding d-none d-lg-block hover-boder">
                     <nav>
                         <ul>
-                            <li><a class="active" href="/">Home <i class="fi-rs-angle-down"></i></a>
+                            <li><a class="<% if(currTab === 'home') { %>active<% } %>" href="/">Home <i class="fi-rs-angle-down"></i></a>
                                 <ul class="sub-menu">
                                     <% if (locals.categories) { %>
                                         <% for (let i = 0; i < categories.length; i++) { %>
@@ -65,14 +65,17 @@
                                 </ul>
                             </li>                            
                             <li>
-                                <a href="/user">My Account</a>
+                                <a class="<% if(currTab === 'shop') { %>active<% } %>" href="/search">Shop</a>
+                            </li>
+                            <li>
+                                <a class="<% if(currTab === 'dashboard') { %>active<% } %>" href="/user">My Account</a>
                             </li>
                             </li>                            
                             <li>
-                                <a href="/user?tab=orders">My Orders</a>
+                                <a class="<% if(currTab === 'orders') { %>active<% } %>" href="/user?tab=orders">My Orders</a>
                             </li>
                             <li>
-                                <a href="/contact">Contact</a>
+                                <a class="<% if(currTab === 'contact') { %>active<% } %>" href="/contact">Contact</a>
                             </li>
                         </ul>
                     </nav>

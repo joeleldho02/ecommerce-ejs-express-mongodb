@@ -37,7 +37,7 @@
                 <!-- mobile menu start -->
                 <nav>
                     <ul class="mobile-menu">
-                        <li class="menu-item-has-children"><span class="menu-expand"></span><a href="/">Home</a>
+                        <li class="menu-item-has-children <% if(currTab === 'home') { %>active<% } %>" ><span class="menu-expand"></span><a href="/">Home</a>
                             <ul class="dropdown">
                                 <% if (locals.categories) { %>
                                     <% for (let i = 0; i < categories.length; i++) { %>
@@ -49,14 +49,17 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="/user">My Account</a>
+                            <a class="<% if(currTab === 'shop') { %>active<% } %>" href="/search">Shop</a>
+                        </li>
+                        <li>
+                            <a class="<% if(currTab === 'dashboard') { %>active<% } %>" href="/user">My Account</a>
                         </li>
                         </li>                            
                         <li>
-                            <a href="/user?tab=orders">My Orders</a>
+                            <a class="<% if(currTab === 'orders') { %>active<% } %>" href="/user?tab=orders">My Orders</a>
                         </li>
                         <li>
-                            <a href="/contact">Contact</a>
+                            <a class="<% if(currTab === 'contact') { %>active<% } %>" href="/contact">Contact</a>
                         </li>
                     </ul>
                 </nav>

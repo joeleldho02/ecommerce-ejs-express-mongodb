@@ -888,7 +888,8 @@ button.submit, button[type='submit'] {
 }
 
 button.submit:hover, button[type='submit']:hover {
-  background-color: #046963 !important;
+  background-color: #990718 !important;
+  color: #ffffff !important;
 }
 
 .btn-brand:hover {
@@ -4530,8 +4531,8 @@ table .product-thumbnail img {
 }
 
 .detail-gallery .slick-slider {
-  background-color: #000;
-  margin-bottom: 30px;
+  /* background-color: #000;
+  margin-bottom: 30px; */
   border-radius: 10px;
 }
 
