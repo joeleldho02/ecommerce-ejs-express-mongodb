@@ -49,6 +49,9 @@ const orderSchema = new mongoose.Schema({
         type : String,
         default: "PENDING"
     },
+    reason : {
+        type: String,
+    },
     createdAt: {
         type: Date,
         default: () => moment.tz(Date.now(), "Asia/Kolkata")

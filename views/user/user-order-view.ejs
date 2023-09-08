@@ -73,11 +73,13 @@
                             </div>
                             <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                                 <% if(order[0]?.orderStatus !== "DELIVERED" && order[0]?.orderStatus !== "CANCELLED" && order[0]?.orderStatus !== "RETURNED") { %>
-                                    <a class="btn btn-primary" href="/user/cancel-order/<%= order[0]?._id %>">CANCEL ORDER</a>
+                                    <!-- <a class="btn btn-primary" href="/user/cancel-order/<%= order[0]?._id %>">CANCEL ORDER</a> -->
+                                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reasonModal" data-bs-title="Cancel" data-bs-route="/user/cancel-order" data-bs-orderid="<%= order[0]?._id %>">CANCEL ORDER</a>
                                     <!-- Return Period 14 Days :- new Date(orders[i]?.createdAt).setDate(new Date().getDate()+1) > Date.now() -->
                                     <!-- Return Period 5 mins :- new Date(orders[i]?.createdAt.getTime() + 5*60000) -->
                                 <% } else if(new Date(order[0]?.createdAt.getTime() + 5*60000) > Date.now() && order[0]?.orderStatus !== "CANCELLED" && order[0]?.orderStatus !== "RETURNED") { %>
-                                    <a class="btn btn-primary" href="/user/return-order/<%= order[0]?._id %>">RETURN ORDER</a>
+                                    <!-- <a class="btn btn-primary" href="/user/return-order/<%= order[0]?._id %>">RETURN ORDER</a> -->
+                                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reasonModal" data-bs-title="Return" data-bs-route="/user/return-order" data-bs-orderid="<%= order[0]?._id %>">RETURN ORDER</a>
                                 <% } %> 
                                 <a class="btn btn-secondary print ms-2" onclick="downloadInvoice()"> INVOICE <i class="icon material-icons md-print"></i></a>
                             </div>
@@ -239,6 +241,12 @@
                                         <label>Notes:</label>
                                         <p><%= order[0]?.shippingAddress?.notes %></p>
                                     </div>
+                                    <% if (locals.order[0]?.reason) { %>
+                                        <div class="mb-3">
+                                            <label>Reason:</label>
+                                            <p><%= order[0]?.reason %></p>
+                                        </div>                                     
+                                    <% } %>
                                     <!-- <button class="btn btn-primary">Save note</button> -->
                                 </div>
                             </div> <!-- col// -->
@@ -249,6 +257,35 @@
             </div>
         </section> <!-- content-main end// -->
     </main>
+
+    <!-- Modal for Order Cancel & Return -->
+    <div class="modal fade" id="reasonModal" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="reasonModalLabel">New message</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center reason-prompt">Are you sure you want to cancel this order? <br>Please do mention a reason for cancelling the order.</p>
+              <form id="reasonForm" action="/cancel-order" method="post">
+                <div class="mb-3">
+                  <input type="hidden" class="form-control" id="orderId" name="orderId">
+                </div>
+                <div class="mb-3">
+                  <label for="reason" class="col-form-label">Reason :</label>
+                  <textarea class="form-control" id="reason" name="reason" placeholder="Please enter a reason..." required></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" form="reasonForm" class="btn btn-primary">Submit & Confirm</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    <!-- End of Modal for Order Cancel & Return -->
 
     <!-- Footer -->
     <%- include('./partials/home/home-footer.ejs') %>
@@ -283,6 +320,7 @@
     <script src="/assets/js/main.js?v=3.4"></script>
     <script src="/js/custom-alert.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easyinvoice/dist/easyinvoice.min.js"></script>
+    <!-- Downloading Invoice -->
     <script>
         function downloadInvoice(){
             $.ajax({
@@ -307,6 +345,26 @@
             notification.style.display = "block";
             setTimeout(()=>{ notification.style.display = "none"; }, 3000);
         }
+    </script>    
+    <!-- Resoning cancel & returning -->
+    <script>
+        const reasonModal = document.getElementById('reasonModal')
+        reasonModal.addEventListener('show.bs.modal', function (event) {            
+            const button = event.relatedTarget;
+
+            const title = button.getAttribute('data-bs-title');
+            const action = button.getAttribute('data-bs-route');
+            const orderId = button.getAttribute('data-bs-orderid');
+
+            const modalTitle = reasonModal.querySelector('.modal-title');
+            const prompt = reasonModal.querySelector('.reason-prompt');
+            const orderIdInput = document.getElementById('orderId');
+            
+            modalTitle.textContent = title + ' Order';
+            $('#reasonForm').attr('action', action);
+            prompt.innerHTML = "Are you sure you want to " + title.toLowerCase() + " this order? <br>Please do mention a reason for doing the order.";
+            orderIdInput.value = orderId;
+        })
     </script>
 </body>
 

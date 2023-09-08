@@ -413,7 +413,9 @@ exports.getOrderDetails = async (req, res, next) => {
 
 exports.cancelOrder = async (req, res, next) => {
     try{
-        const orderId = req.params.id;
+        console.log(req.body);
+        if(req.body){
+        const {orderId, reason} = req.body;
         if(!orderId){
             return res.status(500).render('error', {
                 message: "Error while updating order status!",
@@ -445,96 +447,8 @@ exports.cancelOrder = async (req, res, next) => {
                     //refund payment
                     const editOrder = {
                         _id: orderId,
-                        orderStatus: "CANCELLED"
-                    };
-                    if(order.paymentStatus === "PAID"){
-                        const amount = order.finalAmount*100;
-                        const remarks = "Refund of order"
-                        await addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
-                            .then((data)=>{
-                                console.log(`Refund of amount "₹${data.amount}" is successful!`);
-                                // res.json({status:true, data: data});
-                                editOrder.paymentStatus = "REFUNDED";
-                            })
-                            .catch((err)=>{
-                                console.log(`Refund of amount failed!`);
-                                console.log(err);
-                                // res.json({status: false, errMsg:'Payment failed!'});
-                            });
-                    } else{
-                        editOrder.paymentStatus = "NOT PAID";
-                    }                    
-                    await Orderdb.findByIdAndUpdate(orderId, editOrder)
-                            .then(data => {
-                                if (!data) {
-                                    res.status(500).render('error', {
-                                        message: "Unable to cancel the order",
-                                        errStatus : 500
-                                    });
-                                }
-                                else {
-                                    //res.send(data);   
-                                    console.log("Order cancelled successfully!");
-                                    res.redirect('/user?tab=orders');
-                                }
-                            })
-                            .catch(err => {
-                                res.status(500).render('error', {
-                                    message: "Error cancelling the order",
-                                    errStatus : 500
-                                });
-                                console.log(err.message);
-                            });                  
-                }
-            }).catch(err =>{
-                    console.log(err);
-            });
-    } catch(err){
-        res.status(500).render('error', {
-            message: "Error while updating order status!",
-            errStatus : 500
-        });
-        console.log(err);
-    }
-};
-
-exports.returnOrder = async (req, res, next) => {
-    try{
-        const orderId = req.params.id;
-        if(!orderId){
-            return res.status(500).render('error', {
-                message: "Error while updating order status!",
-                errStatus : 500
-            });
-        }
-        await Orderdb.findById(orderId)
-            .then( async (order)=>{
-                if(order !== null){
-
-                    //re-stock ordered products
-                    const updateOperations = [];
-                    let i = 0;
-                    for(const item of order.products) {
-				        updateOperations.push({
-				    	    updateOne: {
-				    		    filter: { _id: item.productId.toString() },
-				    		    update: { $inc: { stock: item.quantity } },
-				    	    },
-				        });
-                        i++;
-			        }
-                    const result = await Productdb.bulkWrite(updateOperations);
-                    if (result.modifiedCount !== order.products.length) {
-                        return res.status(500).render('error', {
-                            message: "Unable to return the order",
-                            errStatus : 500
-                        });
-                    } else{ console.log("Re-stocked all the ordered products!");}
-
-                    //refund payment                    
-                    const editOrder = {
-                        _id: orderId,
-                        orderStatus: "RETURNED"
+                        orderStatus: "CANCELLED",
+                        reason: reason
                     };
                     if(order.paymentStatus === "PAID"){
                         const amount = order.finalAmount*100;
@@ -578,6 +492,100 @@ exports.returnOrder = async (req, res, next) => {
             }).catch(err =>{
                     console.log(err);
             });
+        }
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Error while updating order status!",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+};
+
+exports.returnOrder = async (req, res, next) => {
+    try{
+        console.log(req.body);
+        if(req.body){
+        const {orderId, reason} = req.body;
+        if(!orderId){
+            return res.status(500).render('error', {
+                message: "Error while updating order status!",
+                errStatus : 500
+            });
+        }
+        await Orderdb.findById(orderId)
+            .then( async (order)=>{
+                if(order !== null){
+
+                    //re-stock ordered products
+                    const updateOperations = [];
+                    let i = 0;
+                    for(const item of order.products) {
+				        updateOperations.push({
+				    	    updateOne: {
+				    		    filter: { _id: item.productId.toString() },
+				    		    update: { $inc: { stock: item.quantity } },
+				    	    },
+				        });
+                        i++;
+			        }
+                    const result = await Productdb.bulkWrite(updateOperations);
+                    if (result.modifiedCount !== order.products.length) {
+                        return res.status(500).render('error', {
+                            message: "Unable to return the order",
+                            errStatus : 500
+                        });
+                    } else{ console.log("Re-stocked all the ordered products!");}
+
+                    //refund payment                    
+                    const editOrder = {
+                        _id: orderId,
+                        orderStatus: "RETURNED",
+                        reason: reason
+                    };
+                    if(order.paymentStatus === "PAID"){
+                        const amount = order.finalAmount*100;
+                        const remarks = "Refund of order"
+                        await addWalletTransactionToDb(req.session.user._id, amount, "C", remarks)
+                            .then((data)=>{
+                                console.log(`Refund of amount "₹${data.amount}" is successful!`);
+                                // res.json({status:true, data: data});
+                                editOrder.paymentStatus = "REFUNDED";
+                            })
+                            .catch((err)=>{
+                                console.log(`Refund of amount failed!`);
+                                console.log(err);
+                                // res.json({status: false, errMsg:'Payment failed!'});
+                            });
+                    } else{
+                        editOrder.paymentStatus = "NOT PAID";
+                    }                    
+                    await Orderdb.findByIdAndUpdate(orderId, editOrder)
+                            .then(data => {
+                                if (!data) {
+                                    res.status(500).render('error', {
+                                        message: "Unable to cancel the order",
+                                        errStatus : 500
+                                    });
+                                }
+                                else {
+                                    //res.send(data);   
+                                    console.log("Order cancelled successfully!");
+                                    res.redirect('back');
+                                }
+                            })
+                            .catch(err => {
+                                res.status(500).render('error', {
+                                    message: "Error cancelling the order",
+                                    errStatus : 500
+                                });
+                                console.log(err.message);
+                            });                  
+                }
+            }).catch(err =>{
+                    console.log(err);
+            });
+        }
     } catch(err){
         res.status(500).render('error', {
             message: "Error while updating order status!",

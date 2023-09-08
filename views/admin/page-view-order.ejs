@@ -224,6 +224,12 @@
                                     <label>Notes:</label>
                                     <p><%= order[0]?.shippingAddress?.notes %></p>
                                 </div>
+                                <% if (locals.order[0]?.reason) { %>
+                                    <div class="mb-3">
+                                        <label>Reason:</label>
+                                        <p><%= order[0]?.reason %></p>
+                                    </div>                                     
+                                <% } %>
                                 <!-- <button class="btn btn-primary">Save note</button> -->
                             </div>
                         </div> <!-- col// -->
