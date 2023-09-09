@@ -141,7 +141,10 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                    <a class="btn ms-3" <% if (flag === 1) { %>style="background-color:grey" onclick="customAlert('Oops..!', 'Some items are out of stock! Remove them to continue to checkout.')"<% } else { %>href="/checkout"<% } %>> 
+                                        <i class="fi-rs-box-alt mr-10"></i> 
+                                        Proceed To CheckOut
+                                    </a>
                                 </div>
                             </div>
                             <% } %><% }  %>
