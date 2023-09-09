@@ -102,7 +102,6 @@ function validateInputs() {
     const regularPriceValue = regularPrice.value.trim();
     const salePriceValue = salePrice.value.trim();
     const stockValue = stock.value.trim();
-    const productImageValue = productImage.value.trim();
 
     if(productNameValue === '') {
         setError(productName, 'Please enter product name');
@@ -186,16 +185,14 @@ function validateInputs() {
       setSuccess(stock);
     }
 
-    if(productID === null){
-      if(productImageValue === '') {
+      if(selectedFiles.length === 0) {
         setError(productImage, 'Please upload images');
         productImage.focus();
         return false;
       }
       else{
         setSuccess(productImage);
-      }
-    }    
+      } 
 
     return true;
 }
@@ -206,70 +203,3 @@ form.addEventListener('submit', function(e) {
         console.log("VALIDATION Success");
     }
 })
-
-function submitForm() {
-    //submitSelectedFiles();
-    const tagsString = tagsArray.join(', ');
-    document.getElementById('productTags').value = tagsString;
-    //console.log('Tags as comma-separated string:', tagsString);
-    //.preventDefault();
-    console.log('Login submit button recorded');
-    if(validateInputs()){
-      console.log("VALIDATION Success");
-      console.log("Form submitted!");   
-      document.getElementById('newProductForm').submit();
-    }
-}
-  
-let selectedFiles = [];
-  
-let imagesPreview = function(placeToInsertImagePreview) {
-  $(placeToInsertImagePreview).empty();
-    
-  if (selectedFiles) {
-    for (let i = 0; i < selectedFiles.length; i++) {
-      let reader = new FileReader();
-      reader.onload = function(event) {
-        let imagePreview = document.createElement('div');
-        imagePreview.classList.add('preview-image');
-  
-        let img = document.createElement('img');
-        img.src = event.target.result;
-  
-        let removeButton = document.createElement('span');
-        removeButton.classList.add('remove-button');
-        removeButton.innerHTML = 'x';
-  
-        removeButton.addEventListener('click', () => {
-          imagePreview.remove();
-          selectedFiles = selectedFiles.filter((file, index) => index !== i);
-          imagesPreview(".preview-images");
-          updateInputValue();
-        });
-  
-        imagePreview.appendChild(img);
-        imagePreview.appendChild(removeButton);
-  
-        $(placeToInsertImagePreview).append(imagePreview);
-      };
-      reader.readAsDataURL(selectedFiles[i]);
-    }
-  }
-};
-  
-function updateInputValue() {
-  let label = document.querySelector('.custom-input-label');
-  let span = label.querySelector('span');
-  if (selectedFiles.length > 0) {
-    span.textContent = `${selectedFiles.length} files selected`;
-  } else {
-    span.textContent = 'Select Files';
-  }
-  console.log(selectedFiles);
-}
-  
-$("#productImage").on("change", function() {
-  selectedFiles = Array.from(this.files);
-  imagesPreview(".preview-images");
-  updateInputValue();
-});

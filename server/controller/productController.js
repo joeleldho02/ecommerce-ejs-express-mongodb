@@ -6,22 +6,24 @@ const mongoose = require('mongoose');
 exports.addNewProduct = async (req, res) => {
     try{
         console.log(req.body);
+        console.log(req.files);
+        console.log(JSON.stringify(req.body));
         if (!req.body) {
             console.log("Product data not submitted");
             res.redirect('/admin/products');
         } 
-        // else if(req.files.length <= 0){
-        //     console.log("Product images not submitted");
-        //     res.redirect('/admin/products');
-        // } 
+        else if(req.files.length <= 0){
+            console.log("Product images not submitted");
+            res.redirect('/admin/products');
+        } 
         else {
             
             const {productName, category, shortDescription, description, brand, regularPrice, salePrice, taxRate, stock, tags, sku} = req.body;
             await categoryController.getCategoryId(category)
                 .then(catergoryId => {                    
-                    // const imageFiles = req.files.map(file => {
-                    //     return file.filename;
-                    // });
+                    const imageFiles = req.files.map(file => {
+                        return file.filename;
+                    });
                     const newProduct = new Productdb({
                         productName: productName,
                         shortDescription: shortDescription,
@@ -34,7 +36,7 @@ exports.addNewProduct = async (req, res) => {
                         stock: stock,
                         tags: tags,
                         SKU:sku,
-                        images: req.body.images, 
+                        images: imageFiles, 
                         updatedAt: Date.now()
                     });
                     console.log(newProduct);
@@ -190,8 +192,11 @@ exports.updateProductItem = async (req, res) => {
                             return file.filename;
                         });
                         product.images = imageFiles;
+                    } else if (req.body.productImage){
+                        product.images = req.body.productImage;
                     }
                     console.log("EDITED PRODUCT --------> " + product);
+                    console.log(JSON.stringify(product));
                     Productdb.findByIdAndUpdate(id, product)
                     .then(data => {
                         if (!data) {

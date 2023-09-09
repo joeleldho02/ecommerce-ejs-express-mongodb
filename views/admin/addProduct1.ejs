@@ -73,11 +73,10 @@
           margin: 10px;
         }
         .preview-image img {
-          max-width: 150px;
-          max-height: 150px;
+          max-width: 100px;
+          max-height: 100px;
           border: 1px solid #ccc;
           padding: 5px;
-          width: 100%;
         }
         .remove-button {
           position: absolute;
@@ -90,7 +89,7 @@
           padding: 3px 4px;
           border-radius: 100%;
         }
-    </style>
+      </style>
 </head>
 
 <body>
@@ -255,31 +254,26 @@
                 <div class="col-lg-6">
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h4>Product Images</h4><p>(Max. 5 images)</p>
+                            <h4>Product Images</h4>
                         </div>
                         <div class="card-body">
-                            <div class="input-upload"> 
+                            <div class="input-upload">                                
                                 <img src="/assets2/imgs/theme/upload.svg" alt="">
-                                <div class="w-100 bg-light rounded-3 p-2 d-flex">
+                                <div class="w-100 bg-light rounded-3 p-2 d-flex d-none">
                                     <label for="productImage" class="custom-input-label py-2 px-3 ms-2 rounded-3 " style="font-size: 13px; background-color: #cfcfcf; color: #000000;"><span>Select Files</span></label>
                                 </div>                                
-                                <!-- <input class="form-control" form="newProductForm" type="file" multiple id="productImage" name="productImage" accept="image/*"> -->
-                                <input class="form-control d-none" type="file" multiple id="productImage" accept="image/*">
-                                <!-- <% if (locals.product) { %>
+                                <input class="form-control" form="newProductForm" type="file" multiple id="productImage" name="productImage" accept="image/*"
+                                <% if (locals.product) { %>
                                     value="<%= product.images.join(', ') %>"
-                                <% } %> > -->
+                                <% } %> >
                                 <div class="error text-danger"></div>
                             </div>
                         </div>
-                        <% if (locals.product && locals.product.images) { %><p id="passedProdImages" class="d-none"><%= product.images %></p><% } %>
                         <div class="card-body">
                             <div class="preview-images">
                                 <% if (locals.product && locals.product.images) { %>
                                     <% for (let j = 0; j < product.images.length; j++) { %>
-                                        <div class="preview-image" id="preview-image-<%= j %>">
-                                            <img src="/img/products/<%= product.images[j] %>" class="img-sm img-thumbnail" alt="<%= product.productName %>">
-                                            <span class="remove-button" onclick="hideDiv('preview-image-<%= j %>', '<%= j %>')">x</span>
-                                        </div>
+                                        <img src="/img/products/<%= product.images[j] %>" class="img-sm img-thumbnail" alt="<%= product.productName %>">
                                     <% } %>
                                 <% } %>
                             </div>
@@ -322,110 +316,6 @@
     <script src="/assets2/js/main.js" type="text/javascript"></script>
     <script src="/js/validate-add-product.js"></script>
     <!-- <script src="/js/upload-image.js"></script> -->
-    <script>
-        function submitForm() {
-            const form = document.getElementById('newProductForm'); 
-            console.log(selectedFiles);
-            const tagsString = tagsArray.join(', ');
-            document.getElementById('productTags').value = tagsString;
-
-            console.log('Login submit button recorded');
-            if(validateInputs()){
-                console.log("VALIDATION Success");
-                console.log("Form submitted!");
-                const formData = new FormData(form);
-                console.log(formData);
-                selectedFiles.forEach((image, index) => {
-                    formData.append("productImage", image)
-                })
-                console.log(formData);
-                let action;
-                if(document.getElementById('productID') !== null){
-                    action = '/admin/edit-product';
-                } else {
-                    action = '/admin/add-product';
-                }
-                $.ajax({
-                    url: action, 
-                    enctype: 'multipart/form-data',
-                    method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: (data) => {
-                        window.location.href = '/admin/products';
-                    },
-                    error: function(xhr, status, error) {
-                        alert("Unable to save product right now! Please try again later.");
-                        window.location.href = '/admin/products';
-                    }
-                })
-            }
-        }
-  
-        let selectedFiles = []
-        if(document.getElementById('passedProdImages') !== null) 
-            selectedFiles = document.getElementById('passedProdImages').innerText.split(",") || [];
-        console.log(selectedFiles);
-
-        function hideDiv(id, i){
-            document.getElementById(id).style.display = "none";
-            selectedFiles = selectedFiles.filter((file, index) => index != i);
-            console.log(selectedFiles);
-        }
-
-        let imagesPreview = function(placeToInsertImagePreview) {
-          $(placeToInsertImagePreview).empty();
-
-          if (selectedFiles) {
-            for (let i = 0; i < selectedFiles.length; i++) {
-              let reader = new FileReader();
-              reader.onload = function(event) {
-                let imagePreview = document.createElement('div');
-                imagePreview.classList.add('preview-image');
-            
-                let img = document.createElement('img');
-                img.src = event.target.result;
-            
-                let removeButton = document.createElement('span');
-                removeButton.classList.add('remove-button');
-                removeButton.innerHTML = 'x';
-            
-                removeButton.addEventListener('click', () => {
-                  imagePreview.remove();
-                  selectedFiles = selectedFiles.filter((file, index) => index !== i);
-                  imagesPreview(".preview-images");
-                  updateInputValue();
-                });
-            
-                imagePreview.appendChild(img);
-                imagePreview.appendChild(removeButton);
-            
-                $(placeToInsertImagePreview).append(imagePreview);
-              };
-              
-              reader.readAsDataURL(selectedFiles[i]);
-            }
-          }
-        };
-
-        function updateInputValue() {
-          let label = document.querySelector('.custom-input-label');
-          let span = label.querySelector('span');
-          if (selectedFiles.length > 0) {
-            span.textContent = `${selectedFiles.length} files selected`;
-          } else {
-            span.textContent = 'Select Files';
-          }
-          console.log(selectedFiles);
-        }
-
-        $("#productImage").on("change", function() {
-          selectedFiles = Array.from(this.files);
-          imagesPreview(".preview-images");
-          setSuccess(productImage);     
-          updateInputValue();
-        });
-    </script>
 </body>
+
 </html>

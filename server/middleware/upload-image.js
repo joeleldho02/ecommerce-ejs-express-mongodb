@@ -32,7 +32,9 @@ const storage1 = multer.diskStorage({
         cb(null, name);
     }
 })
-exports.uploadProductImage = multer({ storage: storage1 });
+exports.uploadProductImage = multer({ 
+  storage: storage1
+});
 
 const storage2 = multer.diskStorage({
   destination: function(req, file, cb){
@@ -43,7 +45,12 @@ const storage2 = multer.diskStorage({
       cb(null, name);
   }
 })
-exports.uploadBannerImage = multer({ storage: storage2 });
+exports.uploadBannerImage = multer({ 
+  storage: storage2,
+  fileFilter: function (req, file, cb){
+    fileFilter(file, cb);
+  }
+});
 
 const storage3 = multer.diskStorage({
   destination: function(req, file, cb){
@@ -54,7 +61,12 @@ const storage3 = multer.diskStorage({
       cb(null, name);
   }
 })
-exports.uploadUserImage = multer({ storage: storage3 });
+exports.uploadUserImage = multer({ storage: 
+  storage3,
+  fileFilter: function (req, file, cb){
+    fileFilter(file, cb);
+  }
+});
 
 const storage4 = multer.diskStorage({
   destination: function(req, file, cb){
@@ -65,7 +77,26 @@ const storage4 = multer.diskStorage({
       cb(null, name);
   }
 })
-exports.uploadCategoryImage = multer({ storage: storage4 });
+exports.uploadCategoryImage = multer({ 
+  storage: storage4,
+  fileFilter: function (req, file, cb){
+    fileFilter(file, cb);
+  }
+});
+
+// Check upload file type
+function fileFilter (file, cb) {
+  const fileTypes = /jpeg|png|jpg|webp/;
+  const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = fileTypes.test(file.mimetype);
+
+  if(mimetype && extname){
+    return cb(null, true);
+  } else {
+    cb("Please upload only images!");
+  }
+}
+
 
 
 const sharp = require("sharp");
