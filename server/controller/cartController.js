@@ -366,3 +366,51 @@ exports.getWishItemsCount = async (req, res, next) => {
     }
     
 }
+
+exports.getAllWishlistItems = async (req, res, next) => {
+    try{
+        if(req.session.user){
+            let wishlistItems = await Userdb.aggregate([
+                {$match: { _id: new mongoose.Types.ObjectId(req.session.user._id)}},
+                {$unwind: '$wishlist'},
+                {$lookup: {
+                         from: 'products',
+                         localField: 'wishlist',
+                         foreignField: '_id',
+                         as: 'productInfo'}
+                },
+                {$project: {
+                    productInfo : 1, 
+                    quantity:'$products.quantity', 
+                    _id:0, 
+                    salePrice:'$productInfo.salePrice'}
+                }
+            ]);
+            console.log(JSON.stringify(wishlistItems));
+            if(wishlistItems.length === 0){
+                console.log(" No items in wishlist!!");
+            } else{
+                wishlistItems.forEach(product => {
+                    const prodCategoryName = res.locals.categories.filter( cat => cat._id.equals(product.productInfo[0]?.category) );
+                    console.log(JSON.stringify(prodCategoryName));
+                    product.productInfo[0].category = prodCategoryName[0]?.categoryName;
+                });  
+                res.locals.subTotal = wishlistItems.reduce((sum, item) =>{
+                    return sum + (item.quantity*item.salePrice);
+                },0)
+                console.log(res.locals.subTotal);
+            }
+            console.log("Cart Items of user: " + wishlistItems);
+            res.locals.wishlistItems = wishlistItems;
+            next(); 
+        } else{
+            next(); 
+        }
+    } catch(err){
+        res.status(500).render('error', {
+            message: "Unable to retrieve data from database",
+            errStatus : 500
+        });
+        console.log(err);
+    }
+};

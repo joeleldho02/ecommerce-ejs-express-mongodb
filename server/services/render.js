@@ -87,6 +87,17 @@ exports.getUserCartPage = (req, res) => {
         wishlistCount : res.locals.wishlistCount,
     });
 };
+exports.getUserWishlistPage = (req, res) => {
+    res.render('page-wishlist', {
+        user: req.session.user,
+        categories: res.locals.categories,
+        cartItems : res.locals.cartItems,
+        subTotal : res.locals.subTotal,
+        itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
+        wishlistItems : res.locals.wishlistItems,
+    });
+};
 exports.getUserCheckoutPage = (req, res) => {
     if(res.locals.cartItems.length === 0){
         res.redirect('/');
