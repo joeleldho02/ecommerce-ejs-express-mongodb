@@ -37,12 +37,12 @@ async function sendOTP(phone){
         const hashedOtp = await bcrypt.hash(String(generatedOtp), 10);
         console.log(`Generated OTP : ${generatedOtp}`)
     //-------------------- TWILIO OTP SENDER CODE ---------------------//
-        // client.messages.create({
-        //     body: `JMJ Music House - OTP for Login is ${generatedOtp}`,
-        //     from: '+17626002830',
-        //     to: '+919656255604' //to: phone ---> send to user phone number
-        // })
-        // .catch(err=>console.log(err));
+        client.messages.create({
+            body: `JMJ Music House - OTP for Login is ${generatedOtp}`,
+            from: '+17626002830',
+            to: '+919656255604' //to: phone ---> send to user phone number
+        })
+        .catch(err=>console.log(err));
         
         return hashedOtp;
     } catch(err){
