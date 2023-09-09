@@ -124,10 +124,20 @@
                                                         <img class="hover-img" src="/img/products/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
                                                     </a>
                                                 </div>
-                                                <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
+                                                <!-- <div class="product-action-1">
+                                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" 
+                                                        data-bs-target="#quickViewModal" 
+                                                        data-productname="<%= featuredProds[i]?.productName %>"
+                                                        data-img="/img/products/<%= featuredProds[i]?.images[0] %>"
+                                                        data-category="<%= featuredProds[i]?.category %>"
+                                                        data-saleprice="<%= featuredProds[i]?.salePrice %>"
+                                                        data-regularprice="<%= featuredProds[i]?.regularPrice %>"
+                                                        data-productid="<%= featuredProds[i]?._id %>"
+                                                        >
+                                                        <i class="fi-rs-eye"></i>
+                                                    </a>
                                                     <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
-                                                </div>
+                                                </div> -->
                                                 <div class="product-badges product-badges-position product-badges-mrg">
                                                     <span class="hot">Hot</span>
                                                 </div>
@@ -525,6 +535,51 @@
             //fetch(url);
         }
     </script>
+    <!-- <script>
+        $(document).on( "click", '.edit_button',function(e) {
+            const id = $(this).data('id');
+            const categoryName = $(this).data('categoryname');
+            const description = $(this).data('description');
+            const slug = $(this).data('slug');
+            const isListed = $(this).data('listed');
+            console.log(isListed);
+            $(".edit-id").val(id);
+            $(".edit-categoryname").val(categoryName);
+            $(".edit-description").val(description);
+            $(".edit-slug").val(slug);
+            $(".edit-islisted").val(isListed);
+            if(isListed === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+        });
+        $('#quickViewModal').on('show.bs.modal', function (event) {
+            let productname = button.data('productname');           
+            let img = button.data('img');           
+            let category = button.data('category');           
+            let saleprice = button.data('saleprice');           
+            let regularprice = button.data('regularprice');           
+            let productid = button.data('productid');           
+            let modal = $(this);
+
+            modal.find('#modalProductName').text(productname);
+            modal.find('#modalProductName').text(img);
+            modal.find('#modalProductName').text(category);
+            modal.find('#modalSalePrice').text(saleprice);
+            modal.find('#modalRegularPrice').text(regularprice);
+            modal.find('#modalProductName').text(productid);
+            
+            if( btnAction === "add" ) {  
+                $('#modalForm').attr('action', '/admin/add-category');
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+                $('#modal-save-btn').text('Add category');
+                
+                document.getElementById("modalForm").reset();
+            }
+            else if( btnAction === "edit" ) {
+                $('#modalForm').attr('action', '/admin/edit-category');
+                $('#modal-save-btn').text('Save changes');
+            }
+        });
+    </script> -->
 </body>
 
 </html>
