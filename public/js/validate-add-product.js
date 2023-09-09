@@ -185,14 +185,14 @@ function validateInputs() {
       setSuccess(stock);
     }
 
-      if(selectedFiles.length === 0) {
-        setError(productImage, 'Please upload images');
-        productImage.focus();
-        return false;
-      }
-      else{
-        setSuccess(productImage);
-      } 
+    if(selectedFiles.length === 0) {
+      setError(productImage, 'Please upload images');
+      productImage.focus();
+      return false;
+    }
+    else{
+      setSuccess(productImage);
+    } 
 
     return true;
 }
