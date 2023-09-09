@@ -135,7 +135,7 @@
                                                     data-productimage="/img/products/<%= products[i]?.images[0] %>"
 
                                                 ><i class="fi-rs-search"></i></a>
-                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
+                                                <a aria-label="Add To Wishlist" onclick="addToWishlist('<%= products[i]?._id %>')" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
                                             </div>
                                             <div class="product-badges product-badges-position product-badges-mrg">
                                                 <span class="hot">Hot</span>
@@ -335,8 +335,34 @@
                     alert("error");
                 }
             });
-            //$.get(url);
-            //fetch(url);
+        }
+
+        function addToWishlist(prodId){
+            console.log(prodId); 
+            const url = "/add-to-wishlist/"+ prodId;
+            console.log(url); 
+            $.ajax({
+                url: url,
+                method: "GET",
+                success: function(response){
+                    console.log(response);
+                    if(response.status){
+                        let count = $('#wishItemsCount').text();
+                        if(response.add){
+                            count = parseInt(count) + Number(1);
+                        } else {
+                            count = parseInt(count) - Number(1);                            
+                        }
+                        console.log("Count : " + count);
+                        $('#wishItemsCount').text(count);
+                    } else {
+                        window.location.href = '/user/login';
+                    }
+                },
+                error: function(){
+                    alert("error");
+                }
+            });
         }
     </script>
 </body>

@@ -73,61 +73,66 @@ exports.getAllCartItems = async (req, res, next) => {
     }
 };
 
-//
-// exports.addItemToUserCart = async (req, res) => {
-//     console.log("ADDING TO CART -------->");
-//     const prodId = req.params.id;
-//     const qty = req.query.qty;
-//     let cart = {};
-//     console.log("QTY : " + qty);
-//     // if(!req.session.user || req.session.isAdmin){
-//     //     return res.json({status: false});
-//     // }
-//     const userCart = await Userdb.findOne({_id: req.session.user._id},{cart:1, _id:0}).lean().cart;
-//     console.log(userCart);
-//     if(userCart.length === 0){
-//         console.log("New cart created!!");
-//         const product = await Productdb.findOne({_id : req.params.id},{productName:1, salePrice:1, category:1}).lean();
-//         if(product !== null){
-//             userCart.push({
-//                 productId: prodId, 
-//                 quantity: qty ?? 1,
-//                 productName: product.productName,
-//                 salePrice: product.salePrice,
-//                 category: product.category
-//             }); 
-//         }                  
-//     } else{
-//         console.log("Cart already exists!");
-//         let flag = 0;
-//         for(item of userCart){
-//             if(item.productId.equals(new mongoose.Types.ObjectId(prodId)) ){
-//                 flag = 1;
-//                 item.quantity += Number(qty ?? 1);
-//                 break;
-//             }
-//         }
-//         if(flag === 0){
-//             userCart.push({productId: prodId, quantity: qty ?? 1});   
-//         }
-//     }
-//     console.log(userCart);
-//     const user = {cart: userCart, _id: req.session.user._id};
-//     Userdb.findByIdAndUpdate(req.session.user._id, user)
-//         .then(()=>{
-//             res.json({status: true});
-//         })
-//         .catch(err => {
-//             res.status(500).render('error', {
-//                 message: "Unable to add product to cart",
-//                 errStatus : 500
-//             });
-//             console.log(err);
-//         });   
-// };
+//cart in user
+exports.addItemToUserCart = async (req, res) => {
+    console.log("ADDING TO CART -------->");
+    const prodId = req.params.id;
+    const qty = req.query.qty;
+    const User = await Userdb.findOne({_id: req.session.user._id},{cart:1, _id:0}).lean();
+    const userCart = User.cart;
+    
+    if(userCart.length === 0){
+        userCart.push({
+            productId: prodId, 
+            quantity: qty || 1
+        }); 
+    } else{
+        let flag = 0;
+        for(item of userCart){
+            if(item.productId.equals(new mongoose.Types.ObjectId(prodId), prodId) ){
+                flag = 1;
+                item.quantity += Number(qty) || 1;
+                break;
+            } 
+        }
+        if(flag === 0){
+            userCart.push({productId: prodId, quantity: qty || 1});   
+        }
+    }
+    const user = {cart: userCart, _id: req.session.user._id};
+    Userdb.findByIdAndUpdate(req.session.user._id, user)
+        .then(()=>{
+            res.json({status: true});
+        })
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Unable to add product to cart",
+                errStatus : 500
+            });
+            console.log(err);
+        });   
+};
 
+exports.removeUserCartItem = async (req, res, next) => {
+    console.log("REMOVING CART ITEM -------->");
+    const prodId = req.params.id;
+    await Userdb.findOneAndUpdate({_id: req.session.user._id}, {
+        $pull:{'cart': {productId: new mongoose.Types.ObjectId(prodId)}}
+        })
+        .then(()=>{
+            console.log("removed item from cart");
+            res.redirect('/cart');
+        })
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Unable to remove item from cart",
+                errStatus : 500
+            });
+            console.log(err);
+        });
+};
 
-//
+//cart in separate collection
 exports.addToCart = async (req, res, next) => {
     console.log("ADDING TO CART -------->");
     const prodId = req.params.id;
@@ -141,7 +146,7 @@ exports.addToCart = async (req, res, next) => {
         const products = [];
         products.push({
             productId: prodId,
-            quantity: qty ?? 1
+            quantity: qty || 1
         });
         const newCart = new Cartdb({
             customerId: req.session.user._id,
@@ -165,12 +170,12 @@ exports.addToCart = async (req, res, next) => {
         for(item of userCart.products){
             if(item.productId.equals(new mongoose.Types.ObjectId(prodId)) ){
                 flag = 1;
-                item.quantity += Number(qty ?? 1);
+                item.quantity += Number(qty || 1);
                 break;
             }
         }
         if(flag === 0){
-            userCart.products.push({productId: prodId, quantity: qty ?? 1});   
+            userCart.products.push({productId: prodId, quantity: qty || 1});   
         }
         const editCart = new Cartdb(userCart);
         Cartdb.findByIdAndUpdate(userCart._id, editCart)
@@ -306,4 +311,58 @@ exports.changeCartItemQty = async (req, res) => {
         });
         console.log(err);
     }
+}
+
+
+// --------------- WISHLIST ------------- //
+exports.addItemToWishlist = async (req, res) => {
+    console.log("ADDING TO WISHLIST -------->");
+    const prodId = req.params.id;
+    const User = await Userdb.findOne({_id: req.session.user._id},{wishlist:1, _id:0}).lean();
+    const userWishlist = User.wishlist;
+    let add;
+    if(userWishlist.length === 0){
+        userWishlist.push(prodId); 
+        add = true;
+    } else{
+        let flag = 0;
+        for(item of userWishlist){
+            if(item.equals(new mongoose.Types.ObjectId(prodId))){
+                flag = 1;
+                userWishlist.splice(userWishlist.indexOf(item), 1);
+                add = false;
+                break;
+            } 
+        }
+        if(flag === 0){
+            userWishlist.push(prodId);  
+            add = true; 
+        }
+    }
+    const user = {wishlist: userWishlist, _id: req.session.user._id};
+    Userdb.findByIdAndUpdate(req.session.user._id, user)
+        .then(()=>{
+            res.json({status: true, add: add});
+        })
+        .catch(err => {
+            res.status(500).render('error', {
+                message: "Unable to add product to cart",
+                errStatus : 500
+            });
+            console.log(err);
+        });   
+};
+
+exports.getWishItemsCount = async (req, res, next) => {
+    if(req.session.userLoggedIn === true){
+        const user = await Userdb.findOne({_id: req.session.user._id},{wishlist:1, _id:0}).lean();
+        if(user.wishlist){
+            console.log("Wishlist count: " + user.wishlist.length);
+            res.locals.wishlistCount = user.wishlist.length;
+        }
+        next();
+    } else{
+        next();
+    }
+    
 }

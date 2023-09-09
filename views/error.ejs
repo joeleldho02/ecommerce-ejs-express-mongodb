@@ -17,8 +17,14 @@
     <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
 </head>
 
-<body>
-    <main class="main page-404">
+<body>    
+    <!-- Header -->
+    <%- include('./partials/home/home-header.ejs', {currTab: 'home'}) %>
+
+    <!-- Mobile Header -->
+    <%- include('./partials/home/home-mobile-header.ejs', {currTab: 'home'}) %>
+
+    <main class="main page-404 mb-50 mt-50">
         <div class="container">
             <div class="row align-items-center height-25vh text-center mt-5">
                 <div class="col-lg-8 m-auto">
@@ -43,21 +49,13 @@
             <pre class="float-start"><% if (locals.error){ %>  <% if (locals.error.stack) { %> <%- error.stack %> <% }  %> <% }  %></pre> 
         </div>
     </main>
+    
+    <!-- Footer -->
+    <%- include('./partials/home/home-footer.ejs') %>
+
     <!-- Preloader Start -->
-    <div id="preloader-active">
-        <div class="preloader d-flex align-items-center justify-content-center">
-            <div class="preloader-inner position-relative">
-                <div class="text-center">
-                    <h5 class="mb-5">Now Loading</h5>
-                    <div class="loader">
-                        <div class="bar bar1"></div>
-                        <div class="bar bar2"></div>
-                        <div class="bar bar3"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <%- include('./partials/home/home-preloader.ejs') %> 
+
     <!-- Vendor JS-->
     <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>
     <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>

@@ -124,8 +124,8 @@
                                                         <img class="hover-img" src="/img/products/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
                                                     </a>
                                                 </div>
-                                                <!-- <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" 
+                                                <div class="product-action-1">
+                                                    <!-- <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" 
                                                         data-bs-target="#quickViewModal" 
                                                         data-productname="<%= featuredProds[i]?.productName %>"
                                                         data-img="/img/products/<%= featuredProds[i]?.images[0] %>"
@@ -135,9 +135,9 @@
                                                         data-productid="<%= featuredProds[i]?._id %>"
                                                         >
                                                         <i class="fi-rs-eye"></i>
-                                                    </a>
-                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
-                                                </div> -->
+                                                    </a> -->
+                                                    <a aria-label="Add To Wishlist" onclick="addToWishlist('<%= featuredProds[i]?._id %>')" class="action-btn hover-up"><i class="fi-rs-heart"></i></a>
+                                                </div>
                                                 <div class="product-badges product-badges-position product-badges-mrg">
                                                     <span class="hot">Hot</span>
                                                 </div>
@@ -411,7 +411,7 @@
                                         </div>
                                         <div class="product-action-1">
                                             <a aria-label="Quick view" class="action-btn small hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
-                                            <a aria-label="Add To Wishlist" class="action-btn small hover-up" href="#" tabindex="0"><i class="fi-rs-heart"></i></a>
+                                            <a aria-label="Add To Wishlist" onclick="addToWishlist('<%= newArrivalProds[i]?._id %>')" class="action-btn small hover-up" href="#" tabindex="0"><i class="fi-rs-heart"></i></a>
                                         </div>
                                     </div>
                                     <div class="product-content-wrap">
@@ -531,8 +531,34 @@
                     alert("error");
                 }
             });
-            //$.get(url);
-            //fetch(url);
+        }
+
+        function addToWishlist(prodId){
+            console.log(prodId); 
+            const url = "/add-to-wishlist/"+ prodId;
+            console.log(url); 
+            $.ajax({
+                url: url,
+                method: "GET",
+                success: function(response){
+                    console.log(response);
+                    if(response.status){
+                        let count = $('#wishItemsCount').text();
+                        if(response.add){
+                            count = parseInt(count) + Number(1);
+                        } else {
+                            count = parseInt(count) - Number(1);                            
+                        }
+                        console.log("Count : " + count);
+                        $('#wishItemsCount').text(count);
+                    } else {
+                        window.location.href = '/user/login';
+                    }
+                },
+                error: function(){
+                    alert("error");
+                }
+            });
         }
     </script>
     <!-- <script>

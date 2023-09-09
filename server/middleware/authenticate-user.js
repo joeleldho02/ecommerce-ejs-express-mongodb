@@ -32,6 +32,8 @@ exports.authenticateUser = async (req, res, next) => {
         }); 
     }
     else{
+        if(!req.originalUrl.includes('add-to-cart') && !req.originalUrl.includes('add-to-wishlist'))
+            req.session.returnTo = req.originalUrl;
         res.redirect('/user/login');
         //next();
     }   

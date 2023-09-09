@@ -42,9 +42,10 @@ const userSchema = new mongoose.Schema({
             default: () => false
         }     
     }],
-    cart: {
-        type: Array
-    },
+    cart: [{
+        productId: mongoose.Schema.Types.ObjectId,
+        quantity: Number,
+    }],
     wishlist :[ mongoose.Schema.Types.ObjectId ],
     createdAt: {
         type: Date,

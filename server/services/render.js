@@ -9,6 +9,7 @@ exports.homePage = (req, res) => {
         cartItems : res.locals.cartItems,
         subTotal : res.locals.subTotal,
         itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
         featuredProds : res.locals.featuredProds,
         newArrivalProds : res.locals.newArrivalProds,
     });
@@ -27,6 +28,7 @@ exports.categoryProductsPage = (req, res) => {
             cartItems : res.locals.cartItems,
             subTotal : res.locals.subTotal,
             itemsCount : res.locals.itemsCount,
+            wishlistCount : res.locals.wishlistCount,
             totalCount : res.locals.totalCount,
             category : res.locals.category,
             c : req.query?.c,
@@ -46,6 +48,7 @@ exports.categoryProductsPage = (req, res) => {
             cartItems : res.locals.cartItems,
             subTotal : res.locals.subTotal,
             itemsCount : res.locals.itemsCount,
+            wishlistCount : res.locals.wishlistCount,
             currentPage : res.locals.currentPage,
             totalPages : res.locals.totalPages,
             totalCount : res.locals.totalCount,
@@ -69,6 +72,7 @@ exports.productDetailsPage = (req, res) => {
         cartItems : res.locals.cartItems,
         subTotal : res.locals.subTotal,
         itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
         currentPage : res.locals.currentPage,
         totalPages : res.locals.totalPages,
     });
@@ -79,7 +83,8 @@ exports.getUserCartPage = (req, res) => {
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         subTotal : res.locals.subTotal,
-        itemsCount : res.locals.itemsCount
+        itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
     });
 };
 exports.getUserCheckoutPage = (req, res) => {
@@ -92,6 +97,7 @@ exports.getUserCheckoutPage = (req, res) => {
             cartItems : res.locals.cartItems,
             subTotal : res.locals.subTotal,
             itemsCount : res.locals.itemsCount,
+            wishlistCount : res.locals.wishlistCount,
             addresses: res.locals.addresses,
             walletBalance: res.locals.walletBalance
         });
@@ -102,6 +108,7 @@ exports.getOrderPlacedPage = (req, res) => {
         user: req.session.user,
         categories: res.locals.categories,        
         itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
         cartItems : res.locals.cartItems,
         order: res.locals.order,
     });
@@ -112,7 +119,8 @@ exports.contactUs = (req, res) => {
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         subTotal : res.locals.subTotal,
-        itemsCount : res.locals.itemsCount
+        itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
     });
 };
 exports.aboutUs = (req, res) => {
@@ -121,7 +129,8 @@ exports.aboutUs = (req, res) => {
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         subTotal : res.locals.subTotal,
-        itemsCount : res.locals.itemsCount
+        itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
     });
 };
 
@@ -249,6 +258,7 @@ exports.userDashboardPage =async (req, res) => {
             cartItems : res.locals.cartItems,
             subTotal : res.locals.subTotal,
             itemsCount : res.locals.itemsCount,
+            wishlistCount : res.locals.wishlistCount,
             addresses : res.locals.addresses,
             orders: res.locals.orders,
             walletDetails: res.locals.walletDetails,
@@ -298,6 +308,7 @@ exports.getUserOrderDetailsPage = (req, res) => {
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
         order: res.locals.order,
         totalAmount : res.locals.subTotal
     })
@@ -308,6 +319,7 @@ exports.getUserOrderInvoicePage = (req, res) => {
         categories: res.locals.categories,
         cartItems : res.locals.cartItems,
         itemsCount : res.locals.itemsCount,
+        wishlistCount : res.locals.wishlistCount,
         order: res.locals.order,
         totalAmount : res.locals.subTotal
     })

@@ -17,12 +17,9 @@ async function setSession(req, res, userData){
             req.session.userLoggedIn = true;
             req.session.user = userData;
             console.log(`User Logged in Succesfully : ${userData.firstName + userData.lastName}`);
-            if(res.locals.requestFrom){
-                res.redirect(res.locals.requestFrom);
-                delete res.locals.requestFrom;
-            } 
-            else         
-                res.redirect('/user'); 
+            console.log("FROM :--> " + req.session.returnTo);
+            res.redirect(req.session.returnTo || '/')
+            delete res.session.returnTo;
     } catch(err){
         res.status(500).render('error', {
             message: "Unable to get userdata from database",
