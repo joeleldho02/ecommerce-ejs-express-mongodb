@@ -34,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <section class="mt-50 mb-50">
+        <section class="mt-10 mb-50">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
@@ -44,6 +44,7 @@
                                     <tr class="main-heading">
                                         <th scope="col">Image</th>
                                         <th scope="col">Name</th>
+                                        <th scope="col">Stock</th>
                                         <th scope="col">Price</th>
                                         <th scope="col">Quantity</th>
                                         <th scope="col">Subtotal</th>
@@ -51,6 +52,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <% let flag = 0; %> 
                                     <% if (locals.cartItems) { %>                                                                        
                                         <% for (let i = 0; i < cartItems.length; i++) { %>
                                     <tr>
@@ -58,6 +60,14 @@
                                         <td class="product-des product-name">
                                             <h4 class="product-name"><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
                                             <p class="font-xs"><%= cartItems[i].productInfo[0].brand %> - <%= cartItems[i].productInfo[0].category %> </p>
+                                        </td>
+                                        <td class="text-center" data-title="Stock">
+                                            <% if (cartItems[i]?.productInfo[0].stock > 0) { %>
+                                                <span class="color3 font-weight-bold">In Stock</span>                                             
+                                            <% } else { %>
+                                                <span class="text-danger font-weight-bold">Out of stock</span>
+                                                <% flag = 1 %>
+                                            <% } %> 
                                         </td>
                                         <td class="price" data-title="Price">₹<span id="itemPrice<%= i %>" ><%= cartItems[i].salePrice %></span></td>
                                         <td class="text-center" data-title="Stock">
@@ -79,7 +89,7 @@
                                         <% if(cartItems.length === 0) { %> 
                                             <tr>
                                                 <td colspan="6" class="text-end">
-                                                    <h6 class="h6 text-center">No items in cart. Cart is empty!</h6>
+                                                    <h6 class="h6 text-center mt-20 mb-20">No items in cart. Cart is empty!</h6>
                                                 </td>
                                             </tr>
                                             <% } %>   
@@ -96,11 +106,15 @@
                             <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
                             <a class="btn-primary-outline me-4" href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                             <% if (locals.cartItems) { %><% if(cartItems.length > 0) { %>
-                                <a href="/checkout" class="btn ms-3"> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                <a class="btn ms-3" <% if (flag === 1) { %>style="background-color:grey" onclick="customAlert('Oops..!', 'Some items are out of stock! Remove them to continue to checkout.')"<% } else { %>href="/checkout"<% } %>> 
+                                    <i class="fi-rs-box-alt mr-10"></i> 
+                                    Proceed To CheckOut
+                                </a>
                             <% } %><% }  %>
                         </div>
-                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
-                        <div class="row mb-50">
+                        <div class="divider center_icon mt-10 mb-10"><i class="fi-rs-fingerprint"></i></div>
+                        <div class="row mb-10">
+                            <div class="col-lg-6 col-md-12"></div>
                             <% if (locals.cartItems) { %><% if(cartItems.length > 0) { %>
                             <div class="col-lg-6 col-md-12">
                                 <div class="border p-md-4 p-30 border-radius cart-totals">

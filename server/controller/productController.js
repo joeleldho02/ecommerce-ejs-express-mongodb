@@ -339,7 +339,7 @@ exports.getProductsOfSingleCategory = async (req, res, next) => {
         if(req.params.category){            
             res.locals.category = req.params.category;
             let prodCategoryId = res.locals.categories.filter( cat => cat.categoryName.toLowerCase() === req.params.category.toLowerCase());
-            prodCategoryId = prodCategoryId[0]._id;
+            prodCategoryId = prodCategoryId[0]?._id;
             console.log("CATEGORY ID : RELATED PRODUCTS : " + prodCategoryId);
             //console.log(JSON.stringify(prodCategoryId));
             

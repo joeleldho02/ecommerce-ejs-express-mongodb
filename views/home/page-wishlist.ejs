@@ -58,20 +58,35 @@
                                             <h5 class="product-name"><a href="/<%= wishlistItems[i]?.productInfo[0]?.category%>/<%= wishlistItems[i]?.productInfo[0]?._id %>"><%= wishlistItems[i]?.productInfo[0]?.productName %></a></h5>
                                             <p class="font-xs"><%= wishlistItems[i]?.productInfo[0]?.brand %> - <%= wishlistItems[i]?.productInfo[0]?.category %></p>
                                         </td>
-                                        <td class="price" data-title="Price"><span>₹<%= cartItems[i]?.salePrice %></span></td>
+                                        <td class="price" data-title="Price"><span>₹<%= wishlistItems[i]?.salePrice %></span></td>
                                         <td class="text-center" data-title="Stock">
-                                            <span class="color3 font-weight-bold">In Stock</span>
+                                            <% if (wishlistItems[i]?.productInfo[0]?.stock > 0) { %>
+                                                <span class="color3 font-weight-bold">In Stock</span>                                             
+                                            <% } else { %>
+                                                <span class="text-danger font-weight-bold">Out of stock</span>
+                                            <% } %> 
                                         </td>
                                         <td class="text-right" data-title="Cart">
-                                            <button class="btn btn-sm"  onclick="addToCart('<%= wishlistItems[i]?.productInfo[0]?._id %>')" ><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                            <button class="btn btn-sm" onclick="addToCart('<%= wishlistItems[i]?.productInfo[0]?._id %>')" <% if (wishlistItems[i]?.productInfo[0]?.stock < 1) { %>disabled<% } %> >
+                                                <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
+                                            </button>
                                         </td>
                                         <td class="action" data-title="Remove"><a onclick="addToWishlist('<%= wishlistItems[i]?.productInfo[0]?._id %>', 'itemRow<%= i %>')"><i class="fi-rs-trash"></i></a></td>
                                     </tr>
                                     <% } %>   
+                                    <% if(wishlistItems.length === 0) { %> 
+                                        <tr>
+                                            <td colspan="6" class="text-end">
+                                                <h6 class="h6 text-center mt-20 mb-20">No items in Wishlist. Wishlist is empty!</h6>
+                                            </td>
+                                        </tr>
+                                        <% } %>   
                                     <% }  %>
                                 </tbody>
                             </table>
                         </div>
+                        <a href="/cart" class="btn m-auto ms-3 float-end"> <i class="fi-rs-shopping-bag mr-10"></i> View Cart</a>
+                        <a class="btn-primary-outline me-4 float-end" href="/search"><i class="fi-rs-box-alt mr-10"></i>Continue Shopping</a>
                     </div>
                 </div>
             </div>
