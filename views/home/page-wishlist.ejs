@@ -52,20 +52,20 @@
                                 <tbody>
                                     <% if (locals.wishlistItems) { %>                                                                        
                                         <% for (let i = 0; i < wishlistItems.length; i++) { %>
-                                    <tr>
-                                        <td class="image product-thumbnail"><img src="/img/products/<%= wishlistItems[i].productInfo[0].images[0] %>" alt="#"></td>
+                                    <tr id="itemRow<%= i %>">
+                                        <td class="image product-thumbnail"><img src="/img/products/<%= wishlistItems[i]?.productInfo[0]?.images[0] %>" alt="#"></td>
                                         <td class="product-des product-name">
-                                            <h5 class="product-name"><a href="/<%= wishlistItems[i].productInfo[0].category%>/<%= wishlistItems[i].productInfo[0]._id %>"><%= wishlistItems[i].productInfo[0].productName %></a></h5>
-                                            <p class="font-xs"><%= wishlistItems[i].productInfo[0].brand %> - <%= wishlistItems[i].productInfo[0].category %></p>
+                                            <h5 class="product-name"><a href="/<%= wishlistItems[i]?.productInfo[0]?.category%>/<%= wishlistItems[i]?.productInfo[0]?._id %>"><%= wishlistItems[i]?.productInfo[0]?.productName %></a></h5>
+                                            <p class="font-xs"><%= wishlistItems[i]?.productInfo[0]?.brand %> - <%= wishlistItems[i]?.productInfo[0]?.category %></p>
                                         </td>
-                                        <td class="price" data-title="Price"><span>₹<%= cartItems[i].salePrice %></span></td>
+                                        <td class="price" data-title="Price"><span>₹<%= cartItems[i]?.salePrice %></span></td>
                                         <td class="text-center" data-title="Stock">
                                             <span class="color3 font-weight-bold">In Stock</span>
                                         </td>
                                         <td class="text-right" data-title="Cart">
-                                            <button class="btn btn-sm"  onclick="addToCart('<%= wishlistItems[i].productInfo[0]._id %>')" ><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                            <button class="btn btn-sm"  onclick="addToCart('<%= wishlistItems[i]?.productInfo[0]?._id %>')" ><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
                                         </td>
-                                        <td class="action" data-title="Remove"><a onclick="addToWishlist('<%= wishlistItems[i].productInfo[0]._id %>')"><i class="fi-rs-trash"></i></a></td>
+                                        <td class="action" data-title="Remove"><a onclick="addToWishlist('<%= wishlistItems[i]?.productInfo[0]?._id %>', 'itemRow<%= i %>')"><i class="fi-rs-trash"></i></a></td>
                                     </tr>
                                     <% } %>   
                                     <% }  %>
@@ -131,7 +131,7 @@
             });
         }
 
-        function addToWishlist(prodId){
+        function addToWishlist(prodId, rowId){
             console.log(prodId); 
             const url = "/add-to-wishlist/"+ prodId;
             console.log(url); 
@@ -149,6 +149,7 @@
                         }
                         console.log("Count : " + count);
                         $('#wishItemsCount').text(count);
+                        document.getElementById(rowId).style.display = 'none';
                     } else {
                         window.location.href = '/user/login';
                     }
