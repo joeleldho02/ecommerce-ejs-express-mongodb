@@ -1,7 +1,7 @@
 const Productdb = require('../model/productModel');
 const categoryController = require('./categoryController');
 const mongoose = require('mongoose');
-
+ 
 //add new product to DB
 exports.addNewProduct = async (req, res) => {
     try{

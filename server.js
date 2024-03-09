@@ -13,7 +13,7 @@ dotenv.config({path:'config.env'});
 
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 const adminRouter = require('./routes/adminRoute');
 const userRouter = require('./routes/userRoute');
